@@ -1,7 +1,10 @@
 plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source contributions",
                         groupType = "Parameter", filterType = "",
                         groupVars = "", 
-                        plotType = "BoxPlot", returnType = "plot",
+                        plotType = "BoxPlot", 
+                        lineSmoothingMethod = "loess",
+                        lineSmoothingSpan = 0.75,
+                        returnType = "plot",
                         showLegend = FALSE, colorPalette = "default",
                         contributionLimit = "None",
                         pointDat = data.frame(), histBins = 50,
@@ -188,14 +191,15 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       ungroup()
     dataSummary$group <- as.numeric(dataSummary$group)
     
-    if (nrow(dataSummary) < 7) {
+    if (nrow(dataSummary) < 4 && lineSmoothingMethod != "lm") { # before we had nrow(dataSummary) < 7 for "lm"
       method = "lm"
+      warning("Too few groups to use loess smoothing. Using linear regression instead.")
     } else {
-      method = "loess"
+      method = lineSmoothingMethod
     }
     
     p <- ggplot(dataSummary, aes_(x = ~group, y = ~meanEst)) +
-      geom_point() + geom_smooth(method = "lm") +
+      geom_point() + geom_smooth(method = method, span = lineSmoothingSpan) +
       ylab(ylabel) +
       xlab(xlabel)
     if (contributionLimit == "0-100%") {

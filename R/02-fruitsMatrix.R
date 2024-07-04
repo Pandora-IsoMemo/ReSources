@@ -878,7 +878,6 @@ fruitsMatrix <- function(input, output, session,
     }),
     defaultSource = config()[["defaultSourceData"]],
     ckanFileTypes = config()[["ckanFileTypes"]],
-    rPackageName = config()[["rPackageName"]],
     outputAsMatrix = TRUE,
     customWarningChecks = list(
       function() {
@@ -890,7 +889,8 @@ fruitsMatrix <- function(input, output, session,
           }
         }
       }
-    )
+    ),
+    options = importOptions(rPackageName = config()[["rPackageName"]])
   )
 
   # Process imported data
@@ -927,7 +927,6 @@ fruitsMatrix <- function(input, output, session,
     colNames = reactive(namesCovVar()),
     defaultSource = config()[["defaultSourceData"]],
     ckanFileTypes = config()[["ckanFileTypes"]],
-    rPackageName = config()[["rPackageName"]],
     outputAsMatrix = TRUE,
     customWarningChecks = list(
       function() {
@@ -939,7 +938,8 @@ fruitsMatrix <- function(input, output, session,
           }
         }
       }
-    )
+    ),
+    options = importOptions(rPackageName = config()[["rPackageName"]])
   )
 
   # Process imported data
@@ -1004,13 +1004,13 @@ fruitsMatrix <- function(input, output, session,
     colNames = reactive(character(0)),
     defaultSource = config()[["defaultSourceData"]],
     ckanFileTypes = config()[["ckanFileTypes"]],
-    rPackageName = config()[["rPackageName"]],
     batch = TRUE,
     outputAsMatrix = TRUE,
     customWarningChecks = list(
       checkColNames,
       checkEmptyValues
-    )
+    ),
+    options = importOptions(rPackageName = config()[["rPackageName"]])
   )
 
   observeEvent(dataImportedBatch(), {
@@ -1144,7 +1144,6 @@ fruitsMatrix <- function(input, output, session,
     colNames = namesCovVar,
     defaultSource = config()[["defaultSourceData"]],
     ckanFileTypes = config()[["ckanFileTypes"]],
-    rPackageName = config()[["rPackageName"]],
     batch = TRUE,
     outputAsMatrix = TRUE,
     customWarningChecks = list(
@@ -1152,7 +1151,8 @@ fruitsMatrix <- function(input, output, session,
       checkRowNamesCov,
       checkColsCov,
       checkRowsCov
-    )
+    ),
+    options = importOptions(rPackageName = config()[["rPackageName"]])
   )
 
   observeEvent(dataImportedBatchCov(), {

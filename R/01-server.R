@@ -110,14 +110,16 @@ fruitsTab <- function(input,
                       modelNotes = uploadedNotes,
                       triggerUpdate = reactive(TRUE))
 
-  uploadedValues <- importDataServer("modelUpload",
-                                     title = "Import Model",
-                                     importType = "model",
-                                     ckanFileTypes = config()[["ckanModelTypes"]],
-                                     ignoreWarnings = TRUE,
-                                     defaultSource = config()[["defaultSourceModel"]],
-                                     fileExtension = config()[["fileExtension"]],
-                                     rPackageName = config()[["rPackageName"]])
+  uploadedValues <- importDataServer(
+    "modelUpload",
+    title = "Import Model",
+    importType = "model",
+    ckanFileTypes = config()[["ckanModelTypes"]],
+    ignoreWarnings = TRUE,
+    defaultSource = config()[["defaultSourceModel"]],
+    fileExtension = config()[["fileExtension"]],
+    options = importOptions(rPackageName = config()[["rPackageName"]])
+  )
   
   observeEvent(uploadedValues(), {
     logDebug("Entering observeEvent(uploadedValues())")

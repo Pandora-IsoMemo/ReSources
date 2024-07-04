@@ -57,24 +57,31 @@ outputPlotUI <- function(id) {
         label = "Select plot type:",
         choices = c(
           "BoxPlot", "KernelDensity",
-          "Histogram", "Line"
+          "Histogram", "Smooth Line" = "Line"
         )
       ),
-      checkboxInput(
-        inputId = ns("showLegend"),
-        label = "Show legend",
-        value = FALSE
+      conditionalPanel(
+        ns = ns,
+        condition = "input.plotType == 'Line'",
+        lineSmoothingUI(ns("lineSmoothing"))
       ),
       conditionalPanel(
         condition = "input.plotType == 'Histogram'",
         ns = ns,
+        tags$hr(),
         sliderInput(
           inputId = ns("histBins"),
           label = "Number of histogram bins",
           min = 5,
           max = 200,
           value = 50
-        )
+        ),
+        tags$hr()
+      ),
+      checkboxInput(
+        inputId = ns("showLegend"),
+        label = "Show legend",
+        value = FALSE
       ),
       selectInput(
         inputId = ns("colorPalette"),
@@ -125,6 +132,34 @@ outputPlotUI <- function(id) {
   )
 }
 
+lineSmoothingUI <- function(id) {
+  ns <- NS(id)
+  
+  tagList(
+      tags$hr(),
+      selectInput(
+        inputId = ns("method"),
+        label = "Smoothing method",
+        choices = c("Linear Model" = "lm",
+                    "Locally Weighted Scatterplot Smoothing" = "loess"),
+        selected = "lm"
+      ),
+      conditionalPanel(
+        ns = ns,
+        condition = "input.method == 'loess'",
+        sliderInput(
+          inputId = ns("loessSpan"),
+          label = "Amount of smoothing (span)",
+          min = 0.01,
+          max = 1,
+          value = 0.75,
+          step = 0.01
+        )
+      ),
+      tags$hr()
+  )
+}
+
 outputPlot <- function(input, output, session, model, values) {
   options(deparse.max.lines = 1)
   pointDat <- reactiveVal({
@@ -171,6 +206,8 @@ outputPlot <- function(input, output, session, model, values) {
       groupVars = input$groupVars,
       individual = input$individuals,
       plotType = input$plotType,
+      lineSmoothingMethod = input[["lineSmoothing-method"]],
+      lineSmoothingSpan = input[["lineSmoothing-loessSpan"]],
       showLegend = input$showLegend,
       histBins = input$histBins,
       binSize = binSize,
