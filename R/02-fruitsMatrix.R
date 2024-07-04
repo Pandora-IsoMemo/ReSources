@@ -158,7 +158,9 @@ fruitsMatrix <- function(input, output, session,
                          row, col, namesCov = NULL,
                          filter = list(), filterCov = list(), fixedCols = FALSE) {
   ns <- session$ns
-
+  logDebug(sprintf("Initialize INPUT MATRIX for '%s'",
+                   substr(ns(""), 1, nchar(ns("")) - 1)))
+  
   colsFixed <- !is.logical(fixedCols)
 
   rowVar <- reactive({

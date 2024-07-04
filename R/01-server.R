@@ -1517,6 +1517,7 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsTarget <- reactive({
+    logDebug("Call reactive 'plotFunCharacteristicsTarget'")
     function() {
       req(values$obsvn, values$obsvnError, input$targetSelect)
       req(input$targetSelect %in% values$targetNames)
@@ -1541,9 +1542,10 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsConc <- reactive({
+    logDebug("Call reactive 'plotFunCharacteristicsConc'")
     function() {
-      req(values$concentration, values$concentrationUncert, input$concentrationsSelect)
-      req(input$concentrationsSelect %in% values$fractionNames)
+      req(length(values$concentration) > 0, values$concentrationUncert, input$concentrationsSelect)
+      req(input$concentrationsSelect %in% colnames(values$concentration[[1]]))
       
       sourceTargetPlot(
         simSources = NULL,
@@ -1567,6 +1569,7 @@ fruitsTab <- function(input,
   
   plotFunCharacteristics <- reactive({
     validate(validModelOutput(modelCharacteristics()))
+    logDebug("Call reactive 'plotFunCharacteristics'")
     function() {
       sourceTargetPlot(
         simSources = modelCharacteristics()$modelResults$simSources$simSources,
@@ -1588,6 +1591,7 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsMix <- reactive({
+    logDebug("Call reactive 'plotFunCharacteristicsMix'")
     validate(validModelOutput(modelCharacteristics()))
     function() {
       sourceTargetPlot(
