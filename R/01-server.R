@@ -1519,8 +1519,8 @@ fruitsTab <- function(input,
   plotFunCharacteristicsTarget <- reactive({
     logDebug("Call reactive 'plotFunCharacteristicsTarget'")
     function() {
-      req(values$obsvn, values$obsvnError, input$targetSelect)
-      req(input$targetSelect %in% values$targetNames)
+      req(length(values$obsvn) > 0, values$obsvnError, input$targetSelect)
+      req(input$targetSelect %in% colnames(values$obsvn[["default"]]))
       
       sourceTargetPlot(
         simSources = NULL,
