@@ -847,7 +847,6 @@ fruitsMatrix <- function(input, output, session,
     }),
     defaultSource = config()[["defaultSourceData"]],
     ckanFileTypes = config()[["ckanFileTypes"]],
-    rPackageName = config()[["rPackageName"]],
     outputAsMatrix = TRUE,
     customWarningChecks = list(
       function() {
@@ -859,6 +858,9 @@ fruitsMatrix <- function(input, output, session,
           }
         }
       }
+    ),
+    options = importOptions(
+      rPackageName = config()[["rPackageName"]]
     )
   )
 
@@ -896,7 +898,6 @@ fruitsMatrix <- function(input, output, session,
     colNames = reactive(namesCovVar()),
     defaultSource = config()[["defaultSourceData"]],
     ckanFileTypes = config()[["ckanFileTypes"]],
-    rPackageName = config()[["rPackageName"]],
     outputAsMatrix = TRUE,
     customWarningChecks = list(
       function() {
@@ -908,6 +909,9 @@ fruitsMatrix <- function(input, output, session,
           }
         }
       }
+    ),
+    options = importOptions(
+      rPackageName = config()[["rPackageName"]]
     )
   )
 
@@ -969,16 +973,20 @@ fruitsMatrix <- function(input, output, session,
   # Get batch imported data
   dataImportedBatch <- importDataServer(
     "batchImport",
+    importType = "data",
     rowNames = reactive(values[[rowVar()]]),
     colNames = reactive(character(0)),
     defaultSource = config()[["defaultSourceData"]],
     ckanFileTypes = config()[["ckanFileTypes"]],
-    rPackageName = config()[["rPackageName"]],
     batch = TRUE,
     outputAsMatrix = TRUE,
     customWarningChecks = list(
       checkColNames,
       checkEmptyValues
+    ),
+    options = importOptions(
+      rPackageName = config()[["rPackageName"]],
+      customHelpText = helpText("The first column in your file needs to contain the observation names from the target table.")
     )
   )
 
@@ -1109,11 +1117,11 @@ fruitsMatrix <- function(input, output, session,
 
   dataImportedBatchCov <- importDataServer(
     "batchImportCov",
+    importType = "data",
     rowNames = namesCovVar,
     colNames = namesCovVar,
     defaultSource = config()[["defaultSourceData"]],
     ckanFileTypes = config()[["ckanFileTypes"]],
-    rPackageName = config()[["rPackageName"]],
     batch = TRUE,
     outputAsMatrix = TRUE,
     customWarningChecks = list(
@@ -1121,6 +1129,10 @@ fruitsMatrix <- function(input, output, session,
       checkRowNamesCov,
       checkColsCov,
       checkRowsCov
+    ),
+    options = importOptions(
+      rPackageName = config()[["rPackageName"]],
+      customHelpText = helpText("The first column in your file needs to contain the observation names from the target table.")
     )
   )
 

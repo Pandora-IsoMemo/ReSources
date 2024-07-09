@@ -6,8 +6,8 @@
 #' @importFrom car ellipse
 #' @importFrom coda mcmc raftery.diag gelman.diag geweke.diag heidel.diag
 #' @importFrom colourpicker colourInput
-#' @importFrom DataTools has_internet importDataUI importDataServer downloadModelUI downloadModelServer 
-#'  tryCatchWithWarningsAndErrors
+#' @importFrom DataTools has_internet importDataUI importDataServer importOptions 
+#'  downloadModelUI downloadModelServer tryCatchWithWarningsAndErrors
 #' @importFrom DT dataTableOutput renderDataTable datatable coerceValue renderDT DTOutput
 #' @importFrom futile.logger flog.warn
 #' @importFrom ggplot2 ggplot ylab xlab aes_ geom_boxplot geom_density geom_histogram geom_line
