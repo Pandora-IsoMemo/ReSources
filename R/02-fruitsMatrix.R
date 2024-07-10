@@ -1002,6 +1002,7 @@ fruitsMatrix <- function(input, output, session,
   # Get batch imported data
   dataImportedBatch <- importDataServer(
     "batchImport",
+    importType = "data",
     rowNames = reactive(values[[rowVar()]]),
     colNames = reactive(character(0)),
     defaultSource = config()[["defaultSourceData"]],
@@ -1012,7 +1013,10 @@ fruitsMatrix <- function(input, output, session,
       checkColNames,
       checkEmptyValues
     ),
-    options = importOptions(rPackageName = config()[["rPackageName"]])
+    options = importOptions(
+      rPackageName = config()[["rPackageName"]],
+      customHelpText = helpText("The first column in your file needs to contain the observation names from the target table.")
+    )
   )
 
   observeEvent(dataImportedBatch(), {
@@ -1142,6 +1146,7 @@ fruitsMatrix <- function(input, output, session,
 
   dataImportedBatchCov <- importDataServer(
     "batchImportCov",
+    importType = "data",
     rowNames = namesCovVar,
     colNames = namesCovVar,
     defaultSource = config()[["defaultSourceData"]],
@@ -1154,7 +1159,10 @@ fruitsMatrix <- function(input, output, session,
       checkColsCov,
       checkRowsCov
     ),
-    options = importOptions(rPackageName = config()[["rPackageName"]])
+    options = importOptions(
+      rPackageName = config()[["rPackageName"]],
+      customHelpText = helpText("The first column in your file needs to contain the observation names from the target table.")
+    )
   )
 
   observeEvent(dataImportedBatchCov(), {
