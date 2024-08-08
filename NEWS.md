@@ -1,7 +1,7 @@
 # ReSources 24.08.0
 
 ## Updates
-- apply new version of model import from DataTools package
+- apply new faster version of model import from DataTools package
 
 ## Bug Fixes
 - _Result graphs_: fix error when a covariate is selected in "Display by" (#126)
