@@ -110,7 +110,7 @@ fruitsTab <- function(input,
                       modelNotes = uploadedNotes,
                       triggerUpdate = reactive(TRUE))
 
-  uploadedValues <- importDataServer(
+  uploadedValues <- importServer(
     "modelUpload",
     title = "Import Model",
     importType = "model",

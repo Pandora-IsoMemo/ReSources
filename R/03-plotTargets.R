@@ -15,12 +15,14 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
   if (length(groupVars) == 0 && numCov == FALSE) {
     return(NULL)
   }
+  
   if (numCov == TRUE) {
     numVars <- matrix(t(apply(fruitsObj$covariatesNum, 1, function(r)r*attr(fruitsObj$covariatesNum,'scaled:scale') + attr(fruitsObj$covariatesNum, 'scaled:center'))), ncol = ncol(fruitsObj$covariatesNum))
     colnames(numVars) <- colnames(fruitsObj$covariatesNum)
     numCols <- cbind(Target = rownames(fruitsObj$covariatesNum), numVars[, groupType, drop = F] %>% as.data.frame)
     modelResults <- left_join(modelResults, numCols, by = "Target")
   }
+  
   modelResults <- modelResults[modelResults[, 1] == estType, ]
   filterRows <- which(individual == modelResults[, filterType])
   if (filterType != "all" & length(filterRows) > 0 & filterType != groupType) {
@@ -309,7 +311,11 @@ getTeaser <- function(data, individual, filterType) {
     }
   } else {
     if (individual != "all") {
-      individuals <- which(data$covariates[, filterType] == individual)
+      if (filterType %in% names(data$covariates)) {
+        individuals <- which(data$covariates[, filterType] == individual)
+      } else {
+        individuals <- which(rownames(data$covariates) == individual)
+      }
     } else {
       individuals <- 1:NROW(data$covariates)
     }

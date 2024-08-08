@@ -1,3 +1,9 @@
+# ReSources 24.08.0
+
+## Bug Fixes
+- _Result graphs_: fix error when a covariate is selected in "Display by" (#126)
+- catch errors when plotting data and display as a popup message, prevents the app from crashing
+
 # ReSources 24.07.0
 
 ## New Features
