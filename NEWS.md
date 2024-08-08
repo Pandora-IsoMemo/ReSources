@@ -1,5 +1,8 @@
 # ReSources 24.08.0
 
+## Updates
+- apply new version of model import from DataTools package
+
 ## Bug Fixes
 - _Result graphs_: fix error when a covariate is selected in "Display by" (#126)
 - catch errors when plotting data and display as a popup message, prevents the app from crashing
