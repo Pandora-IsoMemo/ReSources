@@ -305,43 +305,27 @@ fruitsTab <- function(input,
         })
       }
       
-      # first, keep old value
-      newValue <- values$fractionNames
+      # get fractionNames
+      newValue <- getFractionNames(withComponents = input$modelWeights, 
+                                   withConcentration = input$modelConcentrations, 
+                                   weights = values$weights, 
+                                   concentration = values$concentration, 
+                                   targetNames = values$targetNames) %>%
+        shinyTryCatch(errorTitle = "Error with fraction names")
       
-      # check fractionNames
-      if (input$modelWeights) { # "Include components" == TRUE
-        if (input$modelConcentrations) {
-          if (length(values$concentration) > 0) {
-            newValue <- unique(colnames(values$concentration[[1]]))
-          } # reset if no length??
-        } else {
-          if (length(values$weights) > 0) {
-            newValue <- unique(colnames(values$weights))
-          } # reset if no length??
-        }
-      } else {
-        newValue <- values$targetNames
+      # update fractionNames if newValue is different
+      if (!is.null(newValue) && !identical(values$fractionNames, newValue)) {
+        values$fractionNames <- newValue
       }
       
-      # update fractionNames
-      if (!identical(values$fractionNames, newValue)) {
-        values$fractionNames <- values$targetNames
-      }
+      # get sourceNames
+      newValue <- getSourceNames(withConcentration = input$modelConcentrations,
+                                 concentration = values$concentration,
+                                 source = values$source) %>%
+        shinyTryCatch(errorTitle = "Error with source names")
       
-      # first, keep old value
-      newValue <- values$sourceNames
-      
-      # check sourceNames
-      if (input$modelConcentrations) { # "Include concentrations" == TRUE
-        if (length(values$concentration) > 0) {
-          newValue <- unique(rownames(values$concentration[[1]]))
-        } # reset if no length??
-      } else if (length(values$source) > 0 && length(values$source[[1]]) > 1) {
-        newValue <- unique(rownames(values$source[[1]][[1]][[1]]))
-      } # reset if no length??
-      
-      # update sourceNames
-      if (!identical(values$sourceNames, newValue)) {
+      # update sourceNames if newValue is different
+      if (!is.null(newValue) && !identical(values$sourceNames, newValue)) {
         values$sourceNames <- newValue
       }
       
