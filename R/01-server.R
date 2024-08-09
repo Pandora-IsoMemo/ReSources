@@ -322,7 +322,7 @@ fruitsTab <- function(input,
       newValue <- getSourceNames(withConcentration = input$modelConcentrations,
                                  concentration = values$concentration,
                                  source = values$source) %>%
-        shinyTryCatch(errorTitle = "Error with fraction names")
+        shinyTryCatch(errorTitle = "Error with source names")
       
       # update sourceNames if newValue is different
       if (!is.null(newValue) && !identical(values$sourceNames, newValue)) {
