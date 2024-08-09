@@ -245,7 +245,8 @@ outputPlot <- function(input, output, session, model, values) {
       p <- do.call(
         plotTargets,
         params
-      )
+      ) %>%
+        shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
       
       # we need to trigger the update after pressing "Apply", that's why we use the if condition
       if (input$applyOutputPlotRanges >= 0) {
@@ -278,7 +279,8 @@ outputPlot <- function(input, output, session, model, values) {
       do.call(
         plotTargets,
         params
-      )
+      ) %>%
+        shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
       
     }
   })

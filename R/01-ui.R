@@ -16,7 +16,7 @@ fruitsUI <- function(id, title = "FRUITS") {
       sidebarPanel(
         style = "position:fixed; width:15%; max-width:350px; overflow-y:auto; height:85%",
         width = 2,
-        importDataUI(ns("modelUpload"), label = "Import Model"),
+        importUI(ns("modelUpload"), label = "Import Model"),
         tags$br(), tags$br(),
         downloadModelUI(ns("modelDownload"), label = "Save Model"),
         # selectInput(
@@ -59,10 +59,7 @@ fruitsUI <- function(id, title = "FRUITS") {
           style = "display:none;",
           verbatimTextOutput(ns("status")),
           verbatimTextOutput(ns("statusSim"))
-        )#,
-        # tags$hr(),
-        # downloadModelUI(ns("modelDownload"), "Download Model"),
-        # uploadModelUI(ns("modelUpload"))
+        )
       ),
       # Main panel ----
       mainPanel(
