@@ -1,3 +1,8 @@
+# ReSources 24.08.1
+
+## Bug Fixes
+- fixes issue with missing labels in _Prior Info_ and in _User Estimates_ (#125)
+
 # ReSources 24.08.0
 
 ## Updates
