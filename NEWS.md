@@ -1,3 +1,8 @@
+# ReSources 24.08.2
+
+## Updates
+- Adds one-dimensional source mixture plot in addition to available 2- and 3dimensional ones
+
 # ReSources 24.08.1
 
 ## Bug Fixes

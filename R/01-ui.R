@@ -800,7 +800,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                   value = "sourceMixPlot",
                   pickerInput(
                     inputId = ns("sourceSelectMix"),
-                    label = "Select two or three proxies",
+                    label = "Select one, two or three proxies",
                     choices = NULL,
                     selected = NULL,
                     multiple = TRUE
