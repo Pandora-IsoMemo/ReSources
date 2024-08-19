@@ -316,18 +316,12 @@ sourceTargetPlot <- function(simSources = NULL,
       return(plot)
     }
     if ((length(sources) < 3 & length(targets) > 1) | (length(sources) < 2 & length(targets) == 1)) {
-      if(length(targets) > 1){
-        data <- data.frame(
-          Message = c("Please select at least 3 sources"),
-          Proxy1 <- c(0), Proxy2 <- c(1)
-        )
-      }
-      if(length(targets) ==1){
-        data <- data.frame(
-          Message = c("Please select at least 2 sources"),
-          Proxy1 <- c(0), Proxy2 <- c(1)
-        )
-      }
+      minNSources <- ifelse(length(targets) > 1, 3, 2)
+      data <- data.frame(
+        Message = sprintf("Please select at least %s sources", minNSources),
+        Proxy1 = c(0), 
+        Proxy2 = c(1)
+      )
       
       plot <- plot_ly(data,
         x = ~Proxy1, y = ~Proxy2,
