@@ -688,10 +688,12 @@ fruitsUI <- function(id, title = "FRUITS") {
                 choices = c("horizontal", "vertical"),
                 selected = "vertical"
               ),
-              tags$p("Click on simulate for additional characteristics"),
+              tags$hr(),
+              helpText("Click on 'Simulate' for additional characteristics:"),
               div(foodIntakesButton(
                 ns("foodIntakes"), "Add Source Contributions"
               )),
+              tags$br(),
               div(
                 sliderInput(
                   ns("seqSim"),
@@ -709,6 +711,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                 multiple = TRUE
               ),
               div(actionButton(ns("runModelChar"), "Simulate")),
+              tags$br(),
               conditionalPanel(
                 condition = "output.statusSim == 'COMPLETED'",
                 ns = ns,
@@ -800,7 +803,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                   value = "sourceMixPlot",
                   pickerInput(
                     inputId = ns("sourceSelectMix"),
-                    label = "Select two or three proxies",
+                    label = "Select one, two or three proxies",
                     choices = NULL,
                     selected = NULL,
                     multiple = TRUE

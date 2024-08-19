@@ -298,11 +298,10 @@ sourceTargetPlot <- function(simSources = NULL,
     targetErrors <- fruitsObj$data$obsvnError
     covariateValues <- fruitsObj$data$covariates
   }
-
   if (!is.null(sources)) {
-    if (!(length(targets) %in% c(2, 3))) {
+    if (!(length(targets) %in% c(1, 2, 3))) {
       data <- data.frame(
-        Message = c("Please select 2 or 3 proxies"),
+        Message = c("Please select 1, 2 or 3 proxies"),
         Proxy1 <- c(0), Proxy2 <- c(1)
       )
       plot <- plot_ly(data,
@@ -316,11 +315,14 @@ sourceTargetPlot <- function(simSources = NULL,
       }
       return(plot)
     }
-    if (length(sources) < 3) {
+    if ((length(sources) < 3 & length(targets) > 1) | (length(sources) < 2 & length(targets) == 1)) {
+      minNSources <- ifelse(length(targets) > 1, 3, 2)
       data <- data.frame(
-        Message = c("Please select at least 3 sources"),
-        Proxy1 <- c(0), Proxy2 <- c(1)
+        Message = sprintf("Please select at least %s sources", minNSources),
+        Proxy1 = c(0), 
+        Proxy2 = c(1)
       )
+      
       plot <- plot_ly(data,
         x = ~Proxy1, y = ~Proxy2,
         mode = "text", type = "scatter",
@@ -424,7 +426,12 @@ sourceTargetPlot <- function(simSources = NULL,
       }
     }
   }
+  if (!is.null(sources)) {
+    means <- means[rownames(means) %in% sources, ,drop=FALSE]
+    covs <- covs[names(covs) %in% sources]
+  }
   names <- rownames(means)
+  
   colorsPlot <- colorRampPalette(brewer.pal(max(3, min(8, nrow(means))), "Set2"))(length(unique(rownames(means))))[rownames(means) %>%
     factor() %>%
     as.numeric()]
@@ -437,6 +444,16 @@ sourceTargetPlot <- function(simSources = NULL,
         error = round(qnorm(1 - (1 - confidence) / 2) * sqrt(unlist(covs)), 3),
         colorsPlot = colorsPlot
       )
+      if((showGrid | showPoints) & (!is.null(sources))){
+        simData <- data.frame(
+          y = round(meansAll[, 1], 3),
+          x = sapply(1:nrow(simGrid),
+                     function(i) paste(paste0(colnames(simGrid), ":", round(simGrid[i, ],3)), collapse = ", ")),
+          error = round(qnorm(1 - (1 - confidence) / 2) * sqrt(unlist(covsAll)), 3),
+          colorsPlot = "blue"
+        )
+        plotData <- rbind(simData, plotData)
+      }
     }
     if (showIndividuals == TRUE) {
       if (!is.null(simSources)) {
@@ -453,7 +470,7 @@ sourceTargetPlot <- function(simSources = NULL,
           targetErrors[, targets], 3),
         colorsPlot = cols
       )
-      plotData <- rbind(plotData, individualData)
+      plotData <- rbind(individualData, plotData)
     }
     if (!is.null(userDefinedSim)) {
       cols <- colorRampPalette(brewer.pal(max(3, min(8, nrow(means))), "Set3"))(nrow(meansUser))
@@ -463,7 +480,7 @@ sourceTargetPlot <- function(simSources = NULL,
         error = round(qnorm(1 - (1 - confidence) / 2) * sqrt(unlist(covsUser)), 3),
         colorsPlot = cols
       )
-      plotData <- rbind(plotData, userData)
+      plotData <- rbind(userData, plotData)
     }
 
 
@@ -480,7 +497,7 @@ sourceTargetPlot <- function(simSources = NULL,
           )
         }
       ))
-      plotData <- rbind(plotData, covData)
+      plotData <- rbind(covData, plotData)
     }
     if (!is.null(concentrationValues)) {
       concData <- data.frame(
@@ -490,7 +507,7 @@ sourceTargetPlot <- function(simSources = NULL,
           concentrationErrors[, fractions], 3),
         colorsPlot = colorsPlot
       )
-      plotData <- rbind(plotData, concData)
+      plotData <- rbind(concData, plotData)
     }
     plotData$x <- factor(plotData$x, levels = unique(plotData$x))
     plotData <- plotData %>% arrange_(~x)
