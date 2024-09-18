@@ -129,7 +129,7 @@ fruitsTab <- function(input,
     emptyTables <- checkForEmptyTables(valuesDat)
     if (length(emptyTables) > 0) {
       warningInputs <- paste(
-        "Following tables contain no values: \n",
+        "No data found for following input tables: \n",
         paste0(emptyTables, collapse = ", "),
         " ")
       shinyalert(title = "Empty tables",
