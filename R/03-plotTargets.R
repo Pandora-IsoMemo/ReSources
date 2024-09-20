@@ -198,10 +198,12 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       method = lineSmoothingMethod
     }
     
-    p <- ggplot(dataSummary, aes(x = .data$group, y = .data$meanEst)) +
-      geom_point() + geom_smooth(method = method, span = lineSmoothingSpan) +
-      ylab(ylabel) +
+    p <- ggplot(dataSummary, aes(x = .data$group, y = .data$meanEst)) + 
+      geom_point() + 
+      suppressWarnings(geom_smooth(method = method, span = lineSmoothingSpan)) +
+      ylab(ylabel) + 
       xlab(xlabel)
+    
     if (contributionLimit == "0-100%") {
       p <- p + ylim(c(0, 100))
     }
