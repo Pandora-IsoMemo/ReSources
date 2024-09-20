@@ -64,6 +64,11 @@
   - if a model was previously loaded the default name is that of the loaded model (#54)
   - a reset returns the default name to "model.resources" (#54)
 
+# ReSources 24.05.1
+
+## Bug Fixes
+- fix issue with the check for empty tables after importing a model. Now, source tables are checked correctly.
+
 # ReSources 24.05.0
 
 ## New Features
