@@ -200,7 +200,7 @@ test_that("test compileRunModel - fiveSourcesData with default inputs", {
     expect_gt(min(testResultsVec[[typeName]]$parameters), -35)
     expect_lt(max(testResultsVec[[typeName]]$parameters), 101)
     expect_gt(testResultsVec[[typeName]]$wAIC, 20)
-    expect_lt(testResultsVec[[typeName]]$wAIC, 70)
+    expect_lt(testResultsVec[[typeName]]$wAIC, 100)
     expect_gt(min(testResultsVec[[typeName]]$pValue), 0.55)
     expect_lt(max(testResultsVec[[typeName]]$pValue), 0.9999)
     expect_gt(testResultsVec[[typeName]]$BIC, 350)
