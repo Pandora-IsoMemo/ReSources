@@ -510,7 +510,7 @@ sourceTargetPlot <- function(simSources = NULL,
       plotData <- rbind(concData, plotData)
     }
     plotData$x <- factor(plotData$x, levels = unique(plotData$x))
-    plotData <- plotData %>% arrange_(~x)
+    plotData <- plotData %>% arrange(.data$x)
 
     if (showConfidence) {
       if (horizontalPlot != "vertical") {
@@ -580,7 +580,7 @@ sourceTargetPlot <- function(simSources = NULL,
         name = rownames(means)
       )
       plotData$name <- factor(plotData$name, levels = unique(plotData$name))
-      plotData <- plotData %>% arrange_(~name)
+      plotData <- plotData %>% arrange(.data$name)
       plotDataSegments <- data.frame(y = round(meansAll[, 2], 3), x = round(meansAll[, 1], 3))
     }
     plotDataAll <- plotData
@@ -641,7 +641,7 @@ sourceTargetPlot <- function(simSources = NULL,
       }
       plotDataAll <- rbind(plotData, individualData)
       plotDataAll$name <- factor(plotDataAll$name, levels = unique(plotDataAll$name))
-      plotDataAll <- plotDataAll %>% arrange_(~name)
+      plotDataAll <- plotDataAll %>% arrange(.data$name)
 
       IndividualAnnotations <- list(
         yref = "y",
@@ -719,7 +719,7 @@ sourceTargetPlot <- function(simSources = NULL,
       }
       plotDataAll <- rbind(plotDataAll, covData)
       plotDataAll$name <- factor(plotDataAll$name, levels = unique(plotDataAll$name))
-      plotDataAll <- plotDataAll %>% arrange_(~name)
+      plotDataAll <- plotDataAll %>% arrange(.data$name)
       sourceAnnotations <- list(
         yref = "y",
         x = c(means[, 1], covData[, 2]),
@@ -1025,7 +1025,7 @@ sourceTargetPlot <- function(simSources = NULL,
     )
     plotDataAll <- plotData
     plotDataAll$name <- factor(plotDataAll$name, levels = unique(plotDataAll$name))
-    plotDataAll <- plotDataAll %>% arrange_(~name)
+    plotDataAll <- plotDataAll %>% arrange(.data$name)
     if (!is.null(simSources)) {
       plotDataSegments <- data.frame(y = round(meansAll[, 2], 3), x = round(meansAll[, 1], 3), z = round(meansAll[, 3], 3))
     }
@@ -1068,7 +1068,7 @@ sourceTargetPlot <- function(simSources = NULL,
       )
       plotDataAll <- rbind(plotData, individualData)
       plotDataAll$name <- factor(plotDataAll$name, levels = unique(plotDataAll$name))
-      plotDataAll <- plotDataAll %>% arrange_(~name)
+      plotDataAll <- plotDataAll %>% arrange(.data$name)
 
       IndividualAnnotations <-
         lapply(1:nrow(individualData), function(i) {
@@ -1142,7 +1142,7 @@ sourceTargetPlot <- function(simSources = NULL,
       ))
       plotDataAll <- rbind(plotDataAll, covData)
       plotDataAll$name <- factor(plotDataAll$name, levels = unique(plotDataAll$name))
-      plotDataAll <- plotDataAll %>% arrange_(~name)
+      plotDataAll <- plotDataAll %>% arrange(.data$name)
     }
 
     plot <- plot_ly(
