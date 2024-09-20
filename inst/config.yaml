@@ -7,8 +7,8 @@ ckanFileTypes:
   - "odt"
   - "txt"
 ckanModelTypes:
-  - "zip"
   - "resources"
+  - "zip"
 githubRepo: "resources"        # for import of models
 defaultSourceModel: "file"           # for import of models
 fileExtension: "resources"      # for download of models

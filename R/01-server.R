@@ -1771,7 +1771,9 @@ fruitsTab <- function(input,
   
   output$targetPlot <- renderPlotly({
     plotFunCharacteristicsTarget()() %>%
-      shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
   })
   
   plotExportServer("exportTargetPlot",
@@ -1782,7 +1784,9 @@ fruitsTab <- function(input,
   
   output$concentrationsPlot <- renderPlotly({
     plotFunCharacteristicsConc()() %>%
-      shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
   })
   
   plotExportServer("exportConcentrationsPlot",
@@ -1794,7 +1798,9 @@ fruitsTab <- function(input,
   output$SourceCharacteristicsPlot <- renderPlotly({
     validate(validModelOutput(modelCharacteristics()))
     plotFunCharacteristics()() %>%
-      shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
   })
   
   plotExportServer("exportSourceCharacteristicsPlot",
@@ -1807,7 +1813,9 @@ fruitsTab <- function(input,
   output$SourceCharacteristicsPlot2 <- renderPlotly({
     validate(validModelOutput(modelCharacteristics()))
     plotFunCharacteristicsMix()() %>%
-      shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
   })
   # })
   

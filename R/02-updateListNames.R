@@ -39,7 +39,7 @@ getSourceNames <- function(withConcentration, concentration, source) {
     if (length(concentration) > 0) {
       newValue <- unique(rownames(concentration[[1]]))
     } # reset if no length??
-  } else if (length(source) > 0 && length(source[[1]]) > 1) {
+  } else if (length(source) > 0 && length(source[[1]]) > 0) {
     newValue <- unique(rownames(source[[1]][[1]][[1]]))
   } # reset if no length??
   

@@ -246,7 +246,9 @@ outputPlot <- function(input, output, session, model, values) {
         plotTargets,
         params
       ) %>%
-        shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
+        shinyTryCatch(errorTitle = "Error during plotting",
+                      warningTitle = "Warning during plotting",
+                      alertStyle = "shinyalert")
       
       # we need to trigger the update after pressing "Apply", that's why we use the if condition
       if (input$applyOutputPlotRanges >= 0) {
@@ -280,7 +282,9 @@ outputPlot <- function(input, output, session, model, values) {
         plotTargets,
         params
       ) %>%
-        shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
+        shinyTryCatch(errorTitle = "Error during plotting",
+                      warningTitle = "Warning during plotting",
+                      alertStyle = "shinyalert")
       
     }
   })
@@ -292,7 +296,9 @@ outputPlot <- function(input, output, session, model, values) {
       # this only works with ggplots when print() is used 
       plotFunTarget()() %>%
         print() %>%
-        shinyTryCatch(errorTitle = "Error in plot", alertStyle = "shinyalert")
+        shinyTryCatch(errorTitle = "Error during plotting",
+                      warningTitle = "Warning during plotting",
+                      alertStyle = "shinyalert")
     },
     cacheKeyExpr = {
       plotParams()

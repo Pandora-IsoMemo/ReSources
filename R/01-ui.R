@@ -1130,7 +1130,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                 if (!isoInstalled()) {
                   helpText(
                     paste(
-                      "To export data to fruits you need the package MpiIsoApp installed in version >=",
+                      "To export data to fruits you need the package DSSM installed in version >=",
                       isoVersion()
                     )
                   )

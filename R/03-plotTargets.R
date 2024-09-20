@@ -34,9 +34,9 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
   modelResults$group <- factor(modelResults[, groupType], levels = unique(modelResults[, groupType]))
   modelResults <- modelResults[, c("estimate", "group")]
   if (contributionLimit == "0-100%") {
-    modelResults <- modelResults %>% mutate_(estimate = ~ estimate * 100)
+    modelResults <- modelResults %>% mutate(estimate = .data$estimate * 100)
     if (nrow(pointDat) > 0) {
-      pointDat <- pointDat %>% mutate_(y = ~ y * 100)
+      pointDat <- pointDat %>% mutate(y = .data$y * 100)
     }
   }
   
@@ -59,7 +59,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       )
 
       modelResults <- modelResults %>%
-        group_by_(~group, ~bin) %>%
+        group_by(.data$group, .data$bin) %>%
         summarise(nSamples = n()) %>%
         ungroup()
     }
@@ -68,9 +68,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
 
   if (plotType == "BoxPlot") {
     # return BoxPlot ----
-    # fix R CMD check warnings
-    lower <- upper <- middle <- q1 <- q3 <- group <- estimate <- iqr <- minim <- maxim <- meanEst <- q32 <- q68 <- q95 <- q05 <- NULL
-
+    
     # default labels
       xlabel <- groupType
       if (contributionLimit == "0-100%") {
@@ -80,23 +78,23 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       }
     
     dataSummary <- modelResults %>%
-      group_by(group) %>%
+      group_by(.data$group) %>%
       summarise(
-        # sd = sd(estimate),
-        median = median(estimate),
-        meanEst = mean(estimate),
-        q68 = quantile(estimate, boxQuantile),
-        q95 = quantile(estimate, 1 - ((1 - whiskerMultiplier) / 2)),
-        q32 = quantile(estimate, 1 - boxQuantile),
-        q05 = quantile(estimate, (1 - whiskerMultiplier) / 2),
+        # sd = sd(.data$estimate),
+        median = median(.data$estimate),
+        meanEst = mean(.data$estimate),
+        q68 = quantile(.data$estimate, boxQuantile),
+        q95 = quantile(.data$estimate, 1 - ((1 - whiskerMultiplier) / 2)),
+        q32 = quantile(.data$estimate, 1 - boxQuantile),
+        q05 = quantile(.data$estimate, (1 - whiskerMultiplier) / 2),
       ) %>%
       ungroup()
     if (colorPalette == "white") {
-      p <- ggplot(dataSummary, aes_(x = ~group)) +
+      p <- ggplot(dataSummary, aes(x = .data$group)) +
         ylab(ylabel) +
         xlab(xlabel)
     } else {
-      p <- ggplot(dataSummary, aes_(x = ~group, fill = ~group)) +
+      p <- ggplot(dataSummary, aes(x = .data$group, fill = .data$group)) +
         ylab(ylabel) +
         xlab(xlabel)
     }
@@ -104,14 +102,14 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
 
     p <- p + geom_boxplot(
       mapping = aes(
-        lower = q32,
-        upper = q68,
-        middle = median,
-        ymin = q05,
-        ymax = q95
+        lower = .data$q32,
+        upper = .data$q68,
+        middle = .data$median,
+        ymin = .data$q05,
+        ymax = .data$q95
       ),
       stat = "identity"
-    ) + geom_errorbar(aes(ymin = meanEst, ymax = meanEst), linetype = "dashed", data = dataSummary)
+    ) + geom_errorbar(aes(ymin = .data$meanEst, ymax = .data$meanEst), linetype = "dashed", data = dataSummary)
     if (contributionLimit == "0-100%") {
       p <- p + ylim(c(0, 100))
     }
@@ -124,7 +122,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
         pointDat$y <- pointDat$y / 100
       }
       p <- p + geom_point(
-        data = pointDat, mapping = aes_(x = ~group, y = ~y),
+        data = pointDat, mapping = aes(x = .data$group, y = .data$y),
         color = pointDat$pointColor,
         size = pointDat$pointSize, alpha = pointDat$pointAlpha,
         show.legend = FALSE
@@ -151,7 +149,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       }
       ylabel <- "density"
     
-    p <- ggplot(modelResults, aes_(x = ~estimate, fill = ~group)) +
+    p <- ggplot(modelResults, aes(x = .data$estimate, fill = .data$group)) +
       geom_density(alpha = 0.3) +
       ylab(ylabel) +
       xlab(xlabel)
@@ -180,15 +178,15 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       ylabel <- "mean"
     
     dataSummary <- modelResults %>%
-      group_by(group) %>%
+      group_by(.data$group) %>%
       summarise(
-        # sd = sd(estimate),
-        median = median(estimate),
-        meanEst = mean(estimate),
-        q68 = quantile(estimate, boxQuantile),
-        q95 = quantile(estimate, 1 - ((1 - whiskerMultiplier) / 2)),
-        q32 = quantile(estimate, 1 - boxQuantile),
-        q05 = quantile(estimate, (1 - whiskerMultiplier) / 2),
+        # sd = sd(.data$estimate),
+        median = median(.data$estimate),
+        meanEst = mean(.data$estimate),
+        q68 = quantile(.data$estimate, boxQuantile),
+        q95 = quantile(.data$estimate, 1 - ((1 - whiskerMultiplier) / 2)),
+        q32 = quantile(.data$estimate, 1 - boxQuantile),
+        q05 = quantile(.data$estimate, (1 - whiskerMultiplier) / 2),
       ) %>%
       ungroup()
     dataSummary$group <- as.numeric(dataSummary$group)
@@ -200,10 +198,12 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       method = lineSmoothingMethod
     }
     
-    p <- ggplot(dataSummary, aes_(x = ~group, y = ~meanEst)) +
-      geom_point() + geom_smooth(method = method, span = lineSmoothingSpan) +
-      ylab(ylabel) +
+    p <- ggplot(dataSummary, aes(x = .data$group, y = .data$meanEst)) + 
+      geom_point() + 
+      suppressWarnings(geom_smooth(method = method, span = lineSmoothingSpan)) +
+      ylab(ylabel) + 
       xlab(xlabel)
+    
     if (contributionLimit == "0-100%") {
       p <- p + ylim(c(0, 100))
     }
@@ -223,7 +223,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       }
       ylabel <- "number of observations"
     
-    p <- ggplot(modelResults, aes_(x = ~estimate, fill = ~group)) +
+    p <- ggplot(modelResults, aes(x = .data$estimate, fill = .data$group)) +
       geom_histogram(alpha = 0.5, binwidth = NULL, bins = histBins, position = "identity") +
       ylab(ylabel) +
       xlab(xlabel)
@@ -244,7 +244,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       1:(nrow(modelResults) / length(unique(modelResults$group))),
       length(unique(modelResults$group))
     )
-    p <- ggplot(modelResults, aes_(x = ~X, y = ~estimate, colour = ~group)) +
+    p <- ggplot(modelResults, aes(x = .data$X, y = .data$estimate, colour = .data$group)) +
       geom_line(alpha = 0.65) +
       ylab(ylabel) +
       xlab(xlabel)
@@ -278,7 +278,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       length(acfData)
     )
 
-    p <- ggplot(acfDataNew, aes_(x = ~X, y = ~Value, colour = ~estimate)) +
+    p <- ggplot(acfDataNew, aes(x = .data$X, y = .data$Value, colour = .data$estimate)) +
       geom_line(alpha = 0.65) +
       ylab(ylabel) +
       xlab(xlabel)

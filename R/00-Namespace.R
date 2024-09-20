@@ -1,8 +1,7 @@
 #' @importFrom abind adrop abind
 #' @importFrom alphahull ashape
-#' @importFrom dplyr mutate_ filter_all any_vars tibble select_if as_tibble bind_rows
-#' mutate_all bind_cols select slice pull all_vars "%>%" arrange_ left_join filter_ group_by 
-#' group_by_ n summarise ungroup
+#' @importFrom dplyr .data any_vars arrange filter_all group_by mutate tibble select_if as_tibble bind_rows
+#' mutate_all bind_cols select slice pull all_vars "%>%" left_join n summarise ungroup
 #' @importFrom car ellipse
 #' @importFrom coda mcmc raftery.diag gelman.diag geweke.diag heidel.diag
 #' @importFrom colourpicker colourInput
@@ -10,9 +9,9 @@
 #'  importOptions downloadModelUI downloadModelServer 
 #' @importFrom DT dataTableOutput renderDataTable datatable coerceValue renderDT DTOutput
 #' @importFrom futile.logger flog.warn
-#' @importFrom ggplot2 ggplot ylab xlab aes_ geom_boxplot geom_density geom_histogram geom_line
+#' @importFrom ggplot2 aes ggplot ylab xlab geom_boxplot geom_density geom_histogram geom_line
 #' theme element_text scale_fill_brewer labs ylim scale_fill_manual scale_color_manual
-#' geom_point scale_color_brewer xlim aes geom_errorbar geom_smooth
+#' geom_point scale_color_brewer xlim geom_errorbar geom_smooth
 #' @importFrom grDevices chull colorRampPalette
 #' @importFrom htmltools save_html withTags
 #' @importFrom jsonlite fromJSON toJSON
