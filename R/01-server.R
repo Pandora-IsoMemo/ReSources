@@ -126,28 +126,26 @@ fruitsTab <- function(input,
     
     req(length(uploadedValues()) > 0, !is.null(uploadedValues()[[1]][["inputs"]]))
     
+    ### update default filename ----
     uploadedFileName <- names(uploadedValues())[1] %>%
       file_path_sans_ext()
     modelUploadBaseFileName(uploadedFileName)
     
+    ## update "Notes" input ----
     uploadedNotes(uploadedValues()[[1]][["notes"]])
-    valuesDat <- uploadedValues()[[1]][["inputs"]]
     
-    emptyTables <- checkForEmptyTables(valuesDat)
-    if (length(emptyTables) > 0) {
-      warningInputs <- paste(
-        "No data found for following input tables: \n",
-        paste0(emptyTables, collapse = ", "),
-        " ")
-      shinyalert(title = "Empty tables",
-                 text = warningInputs,
-                 type = "warning")
-    }
+    ## update values ----
+    valuesDat <- uploadedValues()[[1]] %>%
+      fillValuesFromUpload() %>%
+      shinyTryCatch(errorTitle = "Error during upload",
+                    warningTitle = "Warning during upload",
+                    alertStyle = "shinyalert")
     
     for (name in names(valuesDat)) {
       values[[name]] <- valuesDat[[name]]
     }
     
+    ## update other inputs ----
     if (ncol(values$targetValuesCovariates) > 0) {
       potentialCat <- extractPotentialCat(values$targetValuesCovariates)
       selectedCatVars <- intersect(values$categoricalVars, potentialCat)
@@ -166,6 +164,7 @@ fruitsTab <- function(input,
                         selected = selectedNumVars)
     }
     
+    ## update model ----
     if (!is.null(uploadedValues()[[1]][["model"]])) {
       model(uploadedValues()[[1]][["model"]])
     }
