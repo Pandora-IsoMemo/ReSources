@@ -271,6 +271,19 @@ outputPlot <- function(input, output, session, model, values) {
                    initText = plotTitlesOutputPlot,
                    initRanges = userRangesOutputPlot)
   
+  output$SourcePlot <- renderCachedPlot(
+    {
+      validate(validModelOutput(model()))
+      # we need to catch errors when printing the plot
+      # this only works with ggplots when print() is used 
+      plotFunTarget()() %>%
+        print()
+    },
+    cacheKeyExpr = {
+      plotParams()
+    }
+  )
+  
   dataFunTarget <- reactive({
     validate(validModelOutput(model()))
     function() {
@@ -282,29 +295,12 @@ outputPlot <- function(input, output, session, model, values) {
         plotTargets,
         params
       ) %>%
-        shinyTryCatch(errorTitle = "Error during plotting",
-                      warningTitle = "Warning during plotting",
+        shinyTryCatch(errorTitle = "Error during data export",
+                      warningTitle = "Warning during data export",
                       alertStyle = "shinyalert")
       
     }
   })
-  
-  output$SourcePlot <- renderCachedPlot(
-    {
-      validate(validModelOutput(model()))
-      # we need to catch errors when printing the plot
-      # this only works with ggplots when print() is used 
-      plotFunTarget()() %>%
-        print() %>%
-        shinyTryCatch(errorTitle = "Error during plotting",
-                      warningTitle = "Warning during plotting",
-                      alertStyle = "shinyalert")
-    },
-    cacheKeyExpr = {
-      plotParams()
-    }
-  )
-  
   
   callModule(exportData, "exportData", dataFunTarget)
   

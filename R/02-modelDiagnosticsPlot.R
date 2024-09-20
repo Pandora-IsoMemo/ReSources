@@ -149,10 +149,7 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
       # we need to catch errors when printing the plot
       # this only works with ggplots when print() is used 
       plotFunTargetDiagnostics()() %>%
-        print() %>%
-        shinyTryCatch(errorTitle = "Error during plotting",
-                      warningTitle = "Warning during plotting",
-                      alertStyle = "shinyalert")
+        print()
     },
     cacheKeyExpr = {
       plotParams()
@@ -181,8 +178,8 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
         plotTargets,
         params
       ) %>%
-        shinyTryCatch(errorTitle = "Error during plotting",
-                      warningTitle = "Warning during plotting",
+        shinyTryCatch(errorTitle = "Error during data export",
+                      warningTitle = "Warning during data export",
                       alertStyle = "shinyalert")
     }
   })
