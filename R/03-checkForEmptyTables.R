@@ -46,7 +46,10 @@ checkForEmptyTables <- function(values) {
 
   emptyTables <- c()
   for (i in tablesInUI[namesTablesToCheck]) {
-    if (isTableEmpty(values[[i]])) {
+    # if the entry is not a table, check if the first sub-entry is an empty table
+    isSubTableEmpty <- isTRUE(!is.data.frame(values[[i]]) && (length(values[[i]]) > 1) && isTableEmpty(values[[i]][[1]]))
+    
+    if (isTableEmpty(values[[i]]) || isSubTableEmpty) {
       emptyTables <- c(emptyTables, i)
     }
   }
