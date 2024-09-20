@@ -9,7 +9,7 @@ tagList(
     collapsible = TRUE,
     id = "tab",
     fruitsUI("fruits", "ReSources"),
-    if (isoInstalled()) MpiIsoApp::modelResults2DUI("model2D", "Local Average Model (Iso Memo App)", asFruitsTab = TRUE)
+    if (isoInstalled()) DSSM::modelResults2DUI("model2D", "Local Average Model (Iso Memo App)", asFruitsTab = TRUE)
     else NULL
   ),
   tags$head(

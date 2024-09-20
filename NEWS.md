@@ -3,6 +3,7 @@
 ## Bug Fixes
 - fix assue with the assignment of source names (#132)
 - remove warnings for deprecated functions from dplyr
+- fix old package name: MpiIsoApp -> DSSM
 
 # ReSources 24.08.2
 

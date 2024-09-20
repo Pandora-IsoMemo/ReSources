@@ -21,7 +21,7 @@ server <- function(input, output, session) {
   shiny::callModule(fruitsTab, "fruits", isoDataExport = isoDataExport)
 
   if (isoInstalled()) {
-    callModule(MpiIsoApp::modelResults2D, "model2D", isoData = isoData,
+    callModule(DSSM::modelResults2D, "model2D", isoData = isoData,
                savedMaps = savedMaps, fruitsData = fruitsData)
   }
 
