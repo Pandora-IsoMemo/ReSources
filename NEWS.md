@@ -1,3 +1,8 @@
+# ReSources 24.09.0
+
+## Bug Fixes
+- fix assue with the assignment of source names (#132)
+
 # ReSources 24.08.2
 
 ## New Features
