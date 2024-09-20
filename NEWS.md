@@ -2,6 +2,7 @@
 
 ## Bug Fixes
 - fix assue with the assignment of source names (#132)
+- remove warnings for deprecated functions from dplyr
 
 # ReSources 24.08.2
 
