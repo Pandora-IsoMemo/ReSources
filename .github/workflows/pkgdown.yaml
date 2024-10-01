@@ -30,13 +30,13 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - name: Setup R and Python environments with reticulate
+      - name: Install Python dependencies with reticulate
         run: |
-          Rscript -e "reticulate::install_miniconda()"
-          Rscript -e "reticulate::use_miniconda('r-reticulate')"
-          Rscript -e "reticulate::conda_install('r-reticulate', c('python-kaleido', 'packaging'))"
-          Rscript -e "reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly')"
-          Rscript -e "reticulate::use_miniconda('r-reticulate')
+          Rscript -e "reticulate::install_miniconda(); \
+                      reticulate::use_miniconda('r-reticulate'); \
+                      reticulate::conda_install('r-reticulate', c('python-kaleido', 'packaging')); \
+                      reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly'); \
+                      reticulate::use_miniconda('r-reticulate')"
 
       # R is already installed in the base-image
       # - uses: r-lib/actions/setup-r@v2

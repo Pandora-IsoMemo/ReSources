@@ -40,7 +40,7 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
  
-      - name: Setup R and Python environments with reticulate
+      - name: Install Python dependencies with reticulate
         run: |
           Rscript -e "reticulate::install_miniconda(); \
                       reticulate::use_miniconda('r-reticulate'); \
