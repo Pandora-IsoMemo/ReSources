@@ -11,8 +11,6 @@ Maintainer: Marcus Gross <marcus.gross@inwt-statistics.de>
 Description: Food Reconstruction Using Isotopic Transferred Signals (FRUITS): A Bayesian Model for Diet Reconstruction (<doi:10.1371/journal.pone.0087436>).
              This package provides a user-friendly shiny interface for human and animal diet reconstruction that rely on tissue chemical signatures.
 Depends: R (>= 3.5.0), nimble (>= 0.6.12)
-Remotes:
-  github::ben-aaron188/rgpt3
 Imports:
   abind,
   alphahull,
