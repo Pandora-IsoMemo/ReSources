@@ -49,5 +49,5 @@ LinkingTo: nimble (>= 0.12.2)
 Suggests:
   lintr,
   testthat,
-  MpiIsoApp (>= 1.2.5)
+  DSSM (>= 1.2.5)
 RoxygenNote: 7.3.1
