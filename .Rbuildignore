@@ -22,3 +22,6 @@ dia$
 ^\.github$
 ^deploy\.sh$
 ^\..*$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
