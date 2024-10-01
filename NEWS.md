@@ -1,3 +1,13 @@
+# ReSources 24.10.1
+
+## New Features
+
+- adjust Rprofile
+- add pkgdown doc
+- add github action workflow for r cmd check
+- remove rgpt3 dependency
+- cleanup dockerfile & DESCRIPTION - renaming of mpiisoapp -> DSSM
+
 # ReSources 24.05.1
 
 ## Bug Fixes
