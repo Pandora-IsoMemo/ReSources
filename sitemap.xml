@@ -100,10 +100,19 @@
     <loc>https://pandora-isomemo.github.io/ReSources/reference/exportXLSX.html</loc>
   </url>
   <url>
+    <loc>https://pandora-isomemo.github.io/ReSources/reference/extractContributionLimit.html</loc>
+  </url>
+  <url>
     <loc>https://pandora-isomemo.github.io/ReSources/reference/extractPotentialCat.html</loc>
   </url>
   <url>
     <loc>https://pandora-isomemo.github.io/ReSources/reference/extractPotentialNumerics.html</loc>
+  </url>
+  <url>
+    <loc>https://pandora-isomemo.github.io/ReSources/reference/fillValuesFromUpload.html</loc>
+  </url>
+  <url>
+    <loc>https://pandora-isomemo.github.io/ReSources/reference/fixMatrixCols.html</loc>
   </url>
   <url>
     <loc>https://pandora-isomemo.github.io/ReSources/reference/fruits.html</loc>
@@ -118,6 +127,9 @@
     <loc>https://pandora-isomemo.github.io/ReSources/reference/getDepthAndTable.html</loc>
   </url>
   <url>
+    <loc>https://pandora-isomemo.github.io/ReSources/reference/getFractionNames.html</loc>
+  </url>
+  <url>
     <loc>https://pandora-isomemo.github.io/ReSources/reference/getHelp.html</loc>
   </url>
   <url>
@@ -125,6 +137,9 @@
   </url>
   <url>
     <loc>https://pandora-isomemo.github.io/ReSources/reference/getResultStatistics.html</loc>
+  </url>
+  <url>
+    <loc>https://pandora-isomemo.github.io/ReSources/reference/getSourceNames.html</loc>
   </url>
   <url>
     <loc>https://pandora-isomemo.github.io/ReSources/reference/index.html</loc>

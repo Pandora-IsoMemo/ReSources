@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">ReSources</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">24.10.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">24.10.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,13 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">readStringWrapper</span><span class="op">(</span><span class="va">content</span>, <span class="va">mode</span>, <span class="va">class</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">readStringWrapper</span><span class="op">(</span></span>
+<span>  <span class="va">content</span>,</span>
+<span>  <span class="va">mode</span>,</span>
+<span>  <span class="va">class</span>,</span>
+<span>  withRownames <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  withColnames <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -60,6 +66,14 @@
 
 <dt>class</dt>
 <dd><p>(character) class of content, e.g. "numeric", "character"</p></dd>
+
+
+<dt>withRownames</dt>
+<dd><p>(logical) should the first column be used as rownames?</p></dd>
+
+
+<dt>withColnames</dt>
+<dd><p>(logical) should the first row be used as colnames?</p></dd>
 
 </dl></div>
 
