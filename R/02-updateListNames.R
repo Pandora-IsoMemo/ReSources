@@ -1,3 +1,52 @@
+#' Get Fraction Names
+#' 
+#' @param withComponents (logical) TRUE if "Include components"
+#' @param withConcentration (logical) TRUE if "Include concentration"
+#' @param weights (list) list of weights tables
+#' @param concentration (list) list of concentration tables
+#' @param targetNames (character) names of the targets
+getFractionNames <- function(withComponents, 
+                             withConcentration, 
+                             weights, 
+                             concentration, 
+                             targetNames) {
+  # default value
+  newValue <- targetNames
+  
+  if (withComponents) {
+    if (withConcentration) {
+      if (length(concentration) > 0) {
+        newValue <- unique(colnames(concentration[[1]]))
+      } # reset if no length??
+    } else {
+      if (length(weights) > 0) {
+        newValue <- unique(colnames(weights))
+      } # reset if no length??
+    }
+  }
+  
+  newValue
+}
+
+
+#' Get Source Names
+#' 
+#' @param withConcentration (logical) TRUE if "Include concentrations"
+#' @param concentration (list) list of concentration tables
+#' @param source (list) list of source tables
+getSourceNames <- function(withConcentration, concentration, source) {
+  if (withConcentration) {
+    if (length(concentration) > 0) {
+      newValue <- unique(rownames(concentration[[1]]))
+    } # reset if no length??
+  } else if (length(source) > 0 && length(source[[1]]) > 0) {
+    newValue <- unique(rownames(source[[1]][[1]][[1]]))
+  } # reset if no length??
+  
+  newValue
+}
+
+
 #' Update Targets In Lists
 #'
 #' Update all list entries named "name" from all lists that contain entries named by targets.

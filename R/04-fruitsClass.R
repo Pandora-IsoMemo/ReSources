@@ -150,7 +150,7 @@ fruits <- function(data,
   if(modelOptions$optimalPrior == TRUE){
     data$sourceDirichPrior <- rep(0.8 / constants[["nSources"]], constants[["nSources"]])
   } else {
-    data$sourceDirichPrior <- rep(modelOptions$alphaHyper, constants[["nSources"]])
+    data$sourceDirichPrior <- modelOptions$alphaHyper
   }
   
   if (modelOptions$inflatedBeta != "0") {

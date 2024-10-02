@@ -19,6 +19,7 @@ outputPlotUI <- function(id) {
       )
     ),
     sidebarPanel(
+      style = "position:fixed; width:15%; max-width:350px; overflow-y:auto; height:82%",
       width = 3,
       selectInput(
         inputId = ns("estType"),
@@ -56,68 +57,31 @@ outputPlotUI <- function(id) {
         label = "Select plot type:",
         choices = c(
           "BoxPlot", "KernelDensity",
-          "Histogram", "Line"
+          "Histogram", "Smooth Line" = "Line"
         )
+      ),
+      conditionalPanel(
+        ns = ns,
+        condition = "input.plotType == 'Line'",
+        lineSmoothingUI(ns("lineSmoothing"))
+      ),
+      conditionalPanel(
+        condition = "input.plotType == 'Histogram'",
+        ns = ns,
+        tags$hr(),
+        sliderInput(
+          inputId = ns("histBins"),
+          label = "Number of histogram bins",
+          min = 5,
+          max = 200,
+          value = 50
+        ),
+        tags$hr()
       ),
       checkboxInput(
         inputId = ns("showLegend"),
         label = "Show legend",
         value = FALSE
-      ),
-      conditionalPanel(
-        condition = "input.plotType == 'Histogram'",
-        ns = ns,
-        sliderInput(
-          inputId = ns("histBins"),
-          label = "Nmber of histogram bins",
-          min = 5,
-          max = 200,
-          value = 50
-        )
-      ),
-      checkboxInput(
-        inputId = ns("Teaser"),
-        label = "Show header",
-        value = FALSE
-      ),
-      conditionalPanel(
-        condition = "input.Teaser == true",
-        ns = ns,
-        textAreaInput(
-          inputId = ns("headerLabel"),
-          label = "Header",
-          value = ""
-        )
-      ),
-      textAreaInput(
-        inputId = ns("xlabel"),
-        label = "Title x-axis",
-        value = ""
-      ),
-      textAreaInput(
-        inputId = ns("ylabel"),
-        label = "Title y-axis",
-        value = ""
-      ),
-      numericInput(
-        inputId = ns("sizeTextX"),
-        label = "Font size x-axis title",
-        value = 24
-      ),
-      numericInput(
-        inputId = ns("sizeTextY"),
-        label = "Font size y-axis title",
-        value = 24
-      ),
-      numericInput(
-        inputId = ns("sizeAxisX"),
-        label = "Font size x-axis",
-        value = 18
-      ),
-      numericInput(
-        inputId = ns("sizeAxisY"),
-        label = "Font size y-axis",
-        value = 18
       ),
       selectInput(
         inputId = ns("colorPalette"),
@@ -134,13 +98,14 @@ outputPlotUI <- function(id) {
         choices = c("None", "0-1", "0-100%"),
         selected = "0-1"
       ),
-      selectInput(
-        inputId = ns("fontFamily"),
-        label = "Font",
-        selected = NULL,
-        choices = availableFonts()
-      ),
-      helpText("This will only have an effect on the pdf output"),
+      # removing fontFamily because it has side effects with plotTitles module
+      # selectInput(
+      #   inputId = ns("fontFamily"),
+      #   label = "Font",
+      #   selected = NULL,
+      #   choices = availableFonts()
+      # ),
+      #helpText("This will only have an effect on the pdf output"),
       sliderInput(
         inputId = ns("boxQuantile"),
         label = "Box upper quantile",
@@ -156,17 +121,46 @@ outputPlotUI <- function(id) {
         min = 0.5,
         max = 1,
         step = 0.001
-      )
+      ),
+      tags$hr(),
+      plotRangesUI(id = ns("outputPlotRanges"), title = "Axis Ranges"),
+      actionButton(ns("applyOutputPlotRanges"), "Apply"),
+      tags$hr(),
+      plotTitlesUI(id = ns("outputPlotTitles"), type = "ggplot"),
+      actionButton(ns("applyOutputPlotTitles"), "Apply")
     )
   )
 }
 
-outputPlot <- function(input, output, session, model, values) {
-  callModule(plotExport,
-             "exportSourcePlot",
-             plotFun = plotFunTarget,
-             type = "output"
+lineSmoothingUI <- function(id) {
+  ns <- NS(id)
+  
+  tagList(
+      tags$hr(),
+      selectInput(
+        inputId = ns("method"),
+        label = "Smoothing method",
+        choices = c("Linear Model" = "lm",
+                    "Locally Weighted Scatterplot Smoothing" = "loess"),
+        selected = "lm"
+      ),
+      conditionalPanel(
+        ns = ns,
+        condition = "input.method == 'loess'",
+        sliderInput(
+          inputId = ns("loessSpan"),
+          label = "Amount of smoothing (span)",
+          min = 0.01,
+          max = 1,
+          value = 0.75,
+          step = 0.01
+        )
+      ),
+      tags$hr()
   )
+}
+
+outputPlot <- function(input, output, session, model, values) {
   options(deparse.max.lines = 1)
   pointDat <- reactiveVal({
     data.frame(
@@ -212,37 +206,83 @@ outputPlot <- function(input, output, session, model, values) {
       groupVars = input$groupVars,
       individual = input$individuals,
       plotType = input$plotType,
+      lineSmoothingMethod = input[["lineSmoothing-method"]],
+      lineSmoothingSpan = input[["lineSmoothing-loessSpan"]],
       showLegend = input$showLegend,
       histBins = input$histBins,
       binSize = binSize,
-      Teaser = input$Teaser,
-      headerLabel = input$headerLabel,
-      ylabel = input$ylabel,
-      xlabel = input$xlabel,
-      xTextSize = input$sizeTextX,
-      yTextSize = input$sizeTextY,
-      xAxisSize = input$sizeAxisX,
-      yAxisSize = input$sizeAxisY,
       colorPalette = input$colorPalette,
       contributionLimit = input$contributionLimit,
       pointDat = na.omit(pointDat()),
-      fontFamily = input$fontFamily,
+      #fontFamily = input$fontFamily,
       boxQuantile = input$boxQuantile,
       whiskerMultiplier = input$whiskerMultiplier,
-      numCov = numCov
+      numCov = numCov,
+      applyRanges = input$applyOutputPlotRanges,
+      applyTitles = input$applyOutputPlotTitles
     )
   }) %>% debounce(100)
   
+  userRangesOutputPlot <- plotRangesServer("outputPlotRanges",
+                                     type = "ggplot",
+                                     initRanges = list(xAxis = config()[["plotRange"]],
+                                                       yAxis = config()[["plotRange"]]))
+  
+  plotTitlesOutputPlot <- plotTitlesServer("outputPlotTitles",
+                                           type = "ggplot",
+                                           availableElements = c("title", "axis"),
+                                           initText = list(plotTitle  = config()[["plotTitle"]],
+                                                           xAxisTitle = config()[["plotTitle"]],
+                                                           yAxisTitle = config()[["plotTitle"]],
+                                                           xAxisText  = config()[["plotText"]],
+                                                           yAxisText  = config()[["plotText"]]))
+  
   plotFunTarget <- reactive({
+    logDebug("Entering reactive plotFunTarget")
     validate(validModelOutput(model()))
     function() {
       params <- c(plotParams())
-      do.call(
+      p <- do.call(
         plotTargets,
         params
-      )
+      ) %>%
+        shinyTryCatch(errorTitle = "Error during plotting",
+                      warningTitle = "Warning during plotting",
+                      alertStyle = "shinyalert")
+      
+      # we need to trigger the update after pressing "Apply", that's why we use the if condition
+      if (input$applyOutputPlotRanges >= 0) {
+        p <- p %>%
+          formatRangesOfGGplot(ranges = userRangesOutputPlot)
+      }
+      
+      if (input$applyOutputPlotTitles >= 0) {
+        p <- p %>% 
+          formatTitlesOfGGplot(text = plotTitlesOutputPlot)
+      }
+      
+      p
     }
   })
+  
+  plotExportServer("exportSourcePlot",
+                   plotFun = plotFunTarget,
+                   filename = paste0(gsub("-", "", Sys.Date()), "_output"),
+                   initText = plotTitlesOutputPlot,
+                   initRanges = userRangesOutputPlot)
+  
+  output$SourcePlot <- renderCachedPlot(
+    {
+      validate(validModelOutput(model()))
+      # we need to catch errors when printing the plot
+      # this only works with ggplots when print() is used 
+      plotFunTarget()() %>%
+        print()
+    },
+    cacheKeyExpr = {
+      plotParams()
+    }
+  )
   
   dataFunTarget <- reactive({
     validate(validModelOutput(model()))
@@ -250,23 +290,17 @@ outputPlot <- function(input, output, session, model, values) {
       params <- c(plotParams(),
                   returnType = "data"
       )
+      # here only data is returned, no need to format titles or ranges
       do.call(
         plotTargets,
         params
-      )
+      ) %>%
+        shinyTryCatch(errorTitle = "Error during data export",
+                      warningTitle = "Warning during data export",
+                      alertStyle = "shinyalert")
+      
     }
   })
-  
-  output$SourcePlot <- renderCachedPlot(
-    {
-      validate(validModelOutput(model()))
-      plotFunTarget()()
-    },
-    cacheKeyExpr = {
-      plotParams()
-    }
-  )
-  
   
   callModule(exportData, "exportData", dataFunTarget)
   
@@ -301,24 +335,11 @@ outputPlot <- function(input, output, session, model, values) {
     updateSelectInput(session, "estType", choices = estTypChoices)
     
     updateSelectInput(session, "groupType", choices = groupTypChoices)
-    
-    observeEvent(input$estType, {
-      if (grepl(
-        paste(
-          c(
-            "Source contributions",
-            "Component contributions",
-            "Source contributions by proxy"
-          ),
-          collapse = "|"
-        ),
-        input$estType
-      )) {
-        updateSelectInput(session, "contributionLimit", selected = "0-1")
-      } else {
-        updateSelectInput(session, "contributionLimit", selected = "None")
-      }
-    })
+  })
+  
+  observeEvent(input$estType, {
+    contribLimit <- extractContributionLimit(input$estType, userEstimateGroups = values$userEstimateGroups)
+    updateSelectInput(session, "contributionLimit", selected = contribLimit)
   })
   
   observe({
@@ -491,6 +512,40 @@ outputPlot <- function(input, output, session, model, values) {
   outputOptions(output, "n", suspendWhenHidden = FALSE)
 }
 
+#' Extract contribution limit
+#' 
+#' @param estType (character) type of estimates, e.g. "Source contributions", 
+#'  "Component contributions", ...
+#' @param userEstimateGroups (list) list of user estimate groups
+extractContributionLimit <- function(estType, userEstimateGroups) {
+  # create general pattern
+  pattern <- c("Source contributions", "Component contributions", "Source contributions by proxy")
+  
+  if (length(userEstimateGroups) > 0) {
+    # create pattern for user estimates
+    userPattern <- sapply(userEstimateGroups, function(x) x$name) %>%
+      sprintf(fmt = "User estimate %s")
+    
+    # filter only normalized user groups
+    userPattern <- userPattern[sapply(userEstimateGroups, function(x) x$normalize)]
+    
+    # add to general pattern
+    pattern <- c(pattern, userPattern)
+  }
+  
+  # create pattern string
+  pattern <- paste(pattern, collapse = "|")
+  
+  # apply pattern
+  if (grepl(pattern = pattern, estType)) {
+    res <- "0-100%"
+  } else {
+    res <- "None"
+  }
+  
+  return(res)
+}
+
 createPointInputGroup <- function(df, groupChoices, ns) {
   lapply(seq_len(nrow(df)), function(i) {
     createPointInput(
@@ -554,6 +609,7 @@ createPointInput <- function(index,
   )
 }
 
-availableFonts <- function() {
-  intersect(names(postscriptFonts()), names(pdfFonts()))
-}
+# currently disabled feature
+# availableFonts <- function() {
+#   intersect(names(postscriptFonts()), names(pdfFonts()))
+# }

@@ -94,7 +94,7 @@ defaultValues <- function() {
     modelConcentrations = TRUE,
     modelWeightsContrained = TRUE,
     modelConcentrationsContrained = TRUE,
-    alphaHyper = 1,
+    alphaHyper = c(source_1 = 1),
     oxcalCheck = FALSE,
     optimalPrior = TRUE,
     covariateType = "0",
@@ -131,6 +131,13 @@ defaultValues <- function() {
     priors = character(),
     userEstimate = character()
   )
+}
+
+getAlphaHyperVec <- function(sourceNames, singleAlphaHyper = 1) {
+  alphaHyperVec <- rep(singleAlphaHyper, length(sourceNames))
+  names(alphaHyperVec) <- sourceNames
+  
+  return(alphaHyperVec)
 }
 
 allVariables <- function() {

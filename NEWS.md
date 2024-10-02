@@ -8,6 +8,79 @@
 - remove rgpt3 dependency
 - cleanup dockerfile & DESCRIPTION - renaming of mpiisoapp -> DSSM
 
+# ReSources 24.09.0
+
+## Bug Fixes
+- fix assue with the assignment of source names (#132)
+- remove warnings for deprecated functions from dplyr
+- fix old package name: MpiIsoApp -> DSSM
+
+# ReSources 24.08.2
+
+## New Features
+- Adds one-dimensional source mixture plot in addition to available 2- and 3dimensional ones
+
+# ReSources 24.08.1
+
+## Bug Fixes
+- fixes issue with missing labels in _Prior Info_ and in _User Estimates_ (#125)
+
+# ReSources 24.08.0
+
+## Updates
+- apply new faster version of model import from DataTools package
+
+## Bug Fixes
+- _Result graphs_: fix error when a covariate is selected in "Display by" (#126)
+- catch errors when plotting data and display as a popup message, prevents the app from crashing
+
+# ReSources 24.07.0
+
+## New Features
+- _Result graphs_: optionally select the smoothing method (default is "lm") and the amount of 
+  smoothing when displaying line plots, now called "Smooth Line" (#54)
+
+# ReSources 24.05.4
+
+## New Features
+- _Result graphs_: default y range is now set to 0-100% for several estimate types (#120)
+
+## Bug Fixes
+- _Result graphs_: add missing default (empty) header to fix the crashing of the app when selecting
+  an estimate type different than "Source contributions" (#121)
+
+# ReSources 24.05.3
+
+## New Features
+- _Data input tables_: new select input for the different tables in data input to signal (#54)
+  - if during the copying of data the first row and/or column are included
+  - if during the pasting of data the first row and/or column are included 
+
+# ReSources 24.05.2
+
+## New Features
+- _Result graphs_:
+  - new UI to format titles and axis labels which additionally enables to rotate the axis labels (#54)
+
+## Updates
+- _Plot export_:
+  - apply export module from package ShinyTools for improved error handling
+- _error handling_:
+  - improved error messages for the user with `shinyTools::shinyTryCatch()`
+
+# ReSources 24.05.1
+
+## New Features
+- _Model options:_
+  - new UI to specify individually hyper parameter values for different food sources (#54)
+  - if the number of food sources is changed after these are set then reset their values to 1 (#54)
+
+## Updates
+- _Download and Import of models_:
+  - when saving a model its default name is "model.resources" (#54)
+  - if a model was previously loaded the default name is that of the loaded model (#54)
+  - a reset returns the default name to "model.resources" (#54)
+
 # ReSources 24.05.1
 
 ## Bug Fixes

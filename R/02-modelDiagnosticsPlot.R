@@ -51,10 +51,6 @@ modelDiagnosticsPlotUI <- function(id) {
         label = "Select plot type:",
         choices = c("Trace", "AutoCorr")
       ),
-      tags$hr(),
-      plotRangesUI(id = ns("plotRangesDiag"), title = "Axis Ranges", titleTag = "strong"),
-      actionButton(ns("applyRangesDiag"), "Apply"),
-      tags$hr(),
       checkboxInput(
         inputId = ns("showLegendDiag"),
         label = "Show Legend",
@@ -68,22 +64,6 @@ modelDiagnosticsPlotUI <- function(id) {
           label = "Nmber of histogram bins", min = 5, max = 200, value = 50
         )
       ),
-      textAreaInput(
-        inputId = ns("headerLabelDiag"),
-        label = "Header", value = ""
-      ),
-      textAreaInput(
-        inputId = ns("xlabelDiag"),
-        label = "Title x-axis", value = ""
-      ),
-      textAreaInput(
-        inputId = ns("ylabelDiag"),
-        label = "Title y-axis", value = ""
-      ),
-      numericInput(inputId = ns("sizeTextXDiag"), label = "Font size x-axis title", value = 24),
-      numericInput(inputId = ns("sizeTextYDiag"), label = "Font size y-axis title", value = 24),
-      numericInput(inputId = ns("sizeAxisXDiag"), label = "Font size x-axis", value = 18),
-      numericInput(inputId = ns("sizeAxisYDiag"), label = "Font size y-axis", value = 18),
       selectInput(
         inputId = ns("contributionLimitDiag"),
         label = "Limit contribution axis", choices = c("None", "0-1", "0-100%"),
@@ -92,7 +72,13 @@ modelDiagnosticsPlotUI <- function(id) {
       selectInput(
         inputId = ns("colorPaletteDiag"), label = "Color Palette",
         choices = c("default", RColorBrewer::brewer.pal.info %>% row.names())
-      )
+      ),
+      tags$hr(),
+      plotRangesUI(id = ns("plotRangesDiag"), title = "Axis Ranges", titleTag = "strong"),
+      actionButton(ns("applyRangesDiag"), "Apply"),
+      tags$hr(),
+      plotTitlesUI(id = ns("diagPlotTitles"), type = "ggplot"),
+      actionButton(ns("applyTitlesDiag"), "Apply")
     )
   )
 }
@@ -110,19 +96,12 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
       # filterType2 = input$filterType2Diag,
       individual = input$individualsDiag,
       plotType = input$plotTypeDiag,
-      Teaser = FALSE,
       showLegend = input$showLegendDiag,
       histBins = input$histBinsDiag,
-      headerLabel = input$headerLabelDiag,
-      ylabel = input$ylabelDiag,
-      xlabel = input$xlabelDiag,
-      xTextSize = input$sizeTextXDiag,
-      yTextSize = input$sizeTextYDiag,
-      xAxisSize = input$sizeAxisXDiag,
-      yAxisSize = input$sizeAxisYDiag,
       contributionLimit = input$contributionLimitDiag,
       colorPalette = input$colorPaletteDiag,
-      applyRanges = input$applyRangesDiag
+      applyRanges = input$applyRangesDiag,
+      applyTitles = input$applyTitlesDiag
     )
   }) %>% debounce(100)
 
@@ -132,18 +111,31 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
                                                        yAxis = config()[["plotRange"]]))
   
   ## Plot Function
+  plotTitlesDiag <- plotTitlesServer("diagPlotTitles",
+                                     type = "ggplot",
+                                     availableElements = c("title", "axis"))
+  
   plotFunTargetDiagnostics <- reactive({
+    logDebug("Entering reactive plotFunTargetDiagnostics")
     validate(validModelOutput(model()))
     function() {
       p <- do.call(
         plotTargets,
         plotParams()
-      )
+      ) %>%
+        shinyTryCatch(errorTitle = "Error during plotting",
+                      warningTitle = "Warning during plotting",
+                      alertStyle = "shinyalert")
       
       # we need to trigger the update after pressing "Apply", that's why we use the if condition
       if (input$applyRangesDiag > 0) {
         p <- p %>%
-          formatRangesOfGGplot(ranges = userRangesDiag) 
+          formatRangesOfGGplot(ranges = userRangesDiag)
+      }
+      
+      if (input$applyTitlesDiag > 0) {
+        p <- p %>% 
+          formatTitlesOfGGplot(text = plotTitlesDiag)
       }
       
       p
@@ -154,7 +146,10 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
   output$DiagnosticsPlot <- renderCachedPlot(
     {
       validate(validModelOutput(model()))
-      plotFunTargetDiagnostics()()
+      # we need to catch errors when printing the plot
+      # this only works with ggplots when print() is used 
+      plotFunTargetDiagnostics()() %>%
+        print()
     },
     cacheKeyExpr = {
       plotParams()
@@ -162,8 +157,14 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
   )
 
   ## Export Plot
-  callModule(plotExport, "exportDiagnosticsPlot", plotFun = plotFunTargetDiagnostics, type = "diagnostics")
-
+  plotExportServer("exportDiagnosticsPlot",
+                   plotFun = plotFunTargetDiagnostics,
+                   filename = paste0(gsub("-", "", Sys.Date()), "_diagnostics"),
+                   initText = plotTitlesDiag,
+                   initRanges = userRangesDiag
+  )
+  
+  
   ## Export Data Function
   dataFunTargetDiag <- reactive({
     validate(validModelOutput(model()))
@@ -172,10 +173,14 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
         plotParams(),
         returnType = "data"
       )
+      # here only data is returned, no need to format titles or ranges
       do.call(
         plotTargets,
         params
-      )
+      ) %>%
+        shinyTryCatch(errorTitle = "Error during data export",
+                      warningTitle = "Warning during data export",
+                      alertStyle = "shinyalert")
     }
   })
 

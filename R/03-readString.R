@@ -5,15 +5,17 @@
 #' @param content (character) string from clipboard
 #' @param mode (character) paste mode, one of "auto", "comma-separated", "tab-separated", "semicolon"
 #' @param class (character) class of content, e.g. "numeric", "character"
-readStringWrapper <- function(content, mode, class) {
-  m <- try(readString(content, mode))
+#' @param withRownames (logical) should the first column be used as rownames?
+#' @param withColnames (logical) should the first row be used as colnames?
+readStringWrapper <- function(content, mode, class, withRownames = TRUE, withColnames = TRUE) {
+  m <- try(readString(content, mode, withColnames = withColnames))
   
   if (inherits(m, "try-error")) {
     alert(paste0("Could not parse text from clipboard. Error: ", as.character(m)))
     return(NULL)
   }
   
-  if (ncol(m) > 0) {
+  if (ncol(m) > 0 && withRownames) {
     rownames(m) <- m[, 1]
     m <- m[, -1, drop = FALSE]
   }
@@ -32,7 +34,7 @@ readStringWrapper <- function(content, mode, class) {
 #' Read String
 #'
 #' @inheritParams readStringWrapper
-readString <- function(content, mode) {
+readString <- function(content, mode, withColnames = TRUE) {
   opts <- list(
     "comma-separated" = ",",
     "tab-separated" = "\t",
@@ -52,7 +54,7 @@ readString <- function(content, mode) {
     read.table(
       textConnection(content),
       row.names = NULL,
-      header = TRUE,
+      header = withColnames,
       check.names = FALSE,
       sep = sep
     )

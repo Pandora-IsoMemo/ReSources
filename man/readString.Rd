@@ -4,12 +4,14 @@
 \alias{readString}
 \title{Read String}
 \usage{
-readString(content, mode)
+readString(content, mode, withColnames = TRUE)
 }
 \arguments{
 \item{content}{(character) string from clipboard}
 
 \item{mode}{(character) paste mode, one of "auto", "comma-separated", "tab-separated", "semicolon"}
+
+\item{withColnames}{(logical) should the first row be used as colnames?}
 }
 \description{
 Read String

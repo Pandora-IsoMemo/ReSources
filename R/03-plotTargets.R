@@ -1,45 +1,53 @@
 plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source contributions",
                         groupType = "Parameter", filterType = "",
-                        groupVars = "", ylabel = "", xlabel = "", headerLabel = "",
-                        xTextSize = 24, yTextSize = 24,
-                        xAxisSize = 18, yAxisSize = 18,
-                        plotType = "BoxPlot", returnType = "plot",
+                        groupVars = "", 
+                        plotType = "BoxPlot", 
+                        lineSmoothingMethod = "loess",
+                        lineSmoothingSpan = 0.75,
+                        returnType = "plot",
                         showLegend = FALSE, colorPalette = "default",
-                        Teaser = TRUE, contributionLimit = "None",
+                        contributionLimit = "None",
                         pointDat = data.frame(), histBins = 50,
                         binSize = NULL,
-                        fontFamily = NULL, whiskerMultiplier = 0.95, boxQuantile = 0.68,
+                        #fontFamily = NULL, 
+                        whiskerMultiplier = 0.95, boxQuantile = 0.68,
                         numCov = FALSE, ...) {
   if (length(groupVars) == 0 && numCov == FALSE) {
     return(NULL)
   }
-  if(numCov == TRUE){
+  
+  if (numCov == TRUE) {
     numVars <- matrix(t(apply(fruitsObj$covariatesNum, 1, function(r)r*attr(fruitsObj$covariatesNum,'scaled:scale') + attr(fruitsObj$covariatesNum, 'scaled:center'))), ncol = ncol(fruitsObj$covariatesNum))
     colnames(numVars) <- colnames(fruitsObj$covariatesNum)
     numCols <- cbind(Target = rownames(fruitsObj$covariatesNum), numVars[, groupType, drop = F] %>% as.data.frame)
     modelResults <- left_join(modelResults, numCols, by = "Target")
   }
+  
   modelResults <- modelResults[modelResults[, 1] == estType, ]
   filterRows <- which(individual == modelResults[, filterType])
   if (filterType != "all" & length(filterRows) > 0 & filterType != groupType) {
     modelResults <- modelResults[filterRows, ]
   }
-  if (length(groupVars) != 0){
+  if (length(groupVars) != 0) {
     modelResults <- modelResults[modelResults[, groupType] %in% groupVars, ]
   }
   modelResults$group <- factor(modelResults[, groupType], levels = unique(modelResults[, groupType]))
   modelResults <- modelResults[, c("estimate", "group")]
   if (contributionLimit == "0-100%") {
-    modelResults <- modelResults %>% mutate_(estimate = ~ estimate * 100)
+    modelResults <- modelResults %>% mutate(estimate = .data$estimate * 100)
     if (nrow(pointDat) > 0) {
-      pointDat <- pointDat %>% mutate_(y = ~ y * 100)
+      pointDat <- pointDat %>% mutate(y = .data$y * 100)
     }
   }
-  if (Teaser == TRUE & filterType != "Parameter" & estType == "Source contributions" & headerLabel == "") {
+  
+  # default header
+  headerLabel <- ""
+  if (filterType != "Parameter" & estType == "Source contributions") {
     headerLabel <- getTeaser(fruitsObj, individual, filterType)
   }
 
   if (returnType == "data") {
+    # return data ----
     if (!is.null(binSize)) {
       sequence <- seq(floor(100 * min(modelResults$estimate)) / 100,
         floor(100 * (max(modelResults$estimate) + binSize)) / 100,
@@ -51,7 +59,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       )
 
       modelResults <- modelResults %>%
-        group_by_(~group, ~bin) %>%
+        group_by(.data$group, .data$bin) %>%
         summarise(nSamples = n()) %>%
         ungroup()
     }
@@ -59,38 +67,34 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
   }
 
   if (plotType == "BoxPlot") {
-    # fix R CMD check warnings
-    lower <- upper <- middle <- q1 <- q3 <- group <- estimate <- iqr <- minim <- maxim <- meanEst <- q32 <- q68 <- q95 <- q05 <- NULL
-
-    # if (xlabel == ""){
-    #   xlabel <- groupType
-    # }
-
-    if (ylabel == "") {
+    # return BoxPlot ----
+    
+    # default labels
+      xlabel <- groupType
       if (contributionLimit == "0-100%") {
         ylabel <- "contribution (%)"
       } else {
         ylabel <- "contribution"
       }
-    }
+    
     dataSummary <- modelResults %>%
-      group_by(group) %>%
+      group_by(.data$group) %>%
       summarise(
-        # sd = sd(estimate),
-        median = median(estimate),
-        meanEst = mean(estimate),
-        q68 = quantile(estimate, boxQuantile),
-        q95 = quantile(estimate, 1 - ((1 - whiskerMultiplier) / 2)),
-        q32 = quantile(estimate, 1 - boxQuantile),
-        q05 = quantile(estimate, (1 - whiskerMultiplier) / 2),
+        # sd = sd(.data$estimate),
+        median = median(.data$estimate),
+        meanEst = mean(.data$estimate),
+        q68 = quantile(.data$estimate, boxQuantile),
+        q95 = quantile(.data$estimate, 1 - ((1 - whiskerMultiplier) / 2)),
+        q32 = quantile(.data$estimate, 1 - boxQuantile),
+        q05 = quantile(.data$estimate, (1 - whiskerMultiplier) / 2),
       ) %>%
       ungroup()
     if (colorPalette == "white") {
-      p <- ggplot(dataSummary, aes_(x = ~group)) +
+      p <- ggplot(dataSummary, aes(x = .data$group)) +
         ylab(ylabel) +
         xlab(xlabel)
     } else {
-      p <- ggplot(dataSummary, aes_(x = ~group, fill = ~group)) +
+      p <- ggplot(dataSummary, aes(x = .data$group, fill = .data$group)) +
         ylab(ylabel) +
         xlab(xlabel)
     }
@@ -98,14 +102,14 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
 
     p <- p + geom_boxplot(
       mapping = aes(
-        lower = q32,
-        upper = q68,
-        middle = median,
-        ymin = q05,
-        ymax = q95
+        lower = .data$q32,
+        upper = .data$q68,
+        middle = .data$median,
+        ymin = .data$q05,
+        ymax = .data$q95
       ),
       stat = "identity"
-    ) + geom_errorbar(aes(ymin = meanEst, ymax = meanEst), linetype = "dashed", data = dataSummary)
+    ) + geom_errorbar(aes(ymin = .data$meanEst, ymax = .data$meanEst), linetype = "dashed", data = dataSummary)
     if (contributionLimit == "0-100%") {
       p <- p + ylim(c(0, 100))
     }
@@ -118,35 +122,34 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
         pointDat$y <- pointDat$y / 100
       }
       p <- p + geom_point(
-        data = pointDat, mapping = aes_(x = ~group, y = ~y),
+        data = pointDat, mapping = aes(x = .data$group, y = .data$y),
         color = pointDat$pointColor,
         size = pointDat$pointSize, alpha = pointDat$pointAlpha,
         show.legend = FALSE
       )
     }
-    if (!is.null(fontFamily)) {
-      p <- p + theme(text = element_text(family = fontFamily))
-    }
+    # if (!is.null(fontFamily)) {
+    #   p <- p + theme(text = element_text(family = fontFamily))
+    # }
     if (colorPalette != "default") {
       colorPalette <- brewer.pal(n = 9, name = colorPalette)
       colorPaletteRamp <- colorRampPalette(colorPalette)
       p <- p + scale_fill_manual(values = colorPaletteRamp(p$data$group %>% unique() %>% length()))
     }
   }
+  
   if (plotType == "KernelDensity") {
-    if (xlabel == "") {
+    # return KernelDensity ----
+    
+    # default labels
       if (contributionLimit == "0-100%") {
         xlabel <- "contribution (%)"
       } else {
         xlabel <- "contribution"
       }
-    }
-
-    if (ylabel == "") {
       ylabel <- "density"
-    }
-
-    p <- ggplot(modelResults, aes_(x = ~estimate, fill = ~group)) +
+    
+    p <- ggplot(modelResults, aes(x = .data$estimate, fill = .data$group)) +
       geom_density(alpha = 0.3) +
       ylab(ylabel) +
       xlab(xlabel)
@@ -164,38 +167,43 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
   }
   
   if (plotType == "Line") {
-    if (xlabel == "") {
+    # return Line ----
+    
+    # default labels
       if (contributionLimit == "0-100%") {
         xlabel <- "contribution (%)"
       } else {
         xlabel <- "contribution"
       }
-    }
+      ylabel <- "mean"
     
     dataSummary <- modelResults %>%
-      group_by(group) %>%
+      group_by(.data$group) %>%
       summarise(
-        # sd = sd(estimate),
-        median = median(estimate),
-        meanEst = mean(estimate),
-        q68 = quantile(estimate, boxQuantile),
-        q95 = quantile(estimate, 1 - ((1 - whiskerMultiplier) / 2)),
-        q32 = quantile(estimate, 1 - boxQuantile),
-        q05 = quantile(estimate, (1 - whiskerMultiplier) / 2),
+        # sd = sd(.data$estimate),
+        median = median(.data$estimate),
+        meanEst = mean(.data$estimate),
+        q68 = quantile(.data$estimate, boxQuantile),
+        q95 = quantile(.data$estimate, 1 - ((1 - whiskerMultiplier) / 2)),
+        q32 = quantile(.data$estimate, 1 - boxQuantile),
+        q05 = quantile(.data$estimate, (1 - whiskerMultiplier) / 2),
       ) %>%
       ungroup()
     dataSummary$group <- as.numeric(dataSummary$group)
     
-    if(nrow(dataSummary) < 7){
+    if (nrow(dataSummary) < 4 && lineSmoothingMethod != "lm") { # before we had nrow(dataSummary) < 7 for "lm"
       method = "lm"
+      warning("Too few groups to use loess smoothing. Using linear regression instead.")
     } else {
-      method = "loess"
+      method = lineSmoothingMethod
     }
     
-    p <- ggplot(dataSummary, aes_(x = ~group, y = ~meanEst)) +
-      geom_point() + geom_smooth(method = "lm") +
-      ylab(ylabel) +
+    p <- ggplot(dataSummary, aes(x = .data$group, y = .data$meanEst)) + 
+      geom_point() + 
+      suppressWarnings(geom_smooth(method = method, span = lineSmoothingSpan)) +
+      ylab(ylabel) + 
       xlab(xlabel)
+    
     if (contributionLimit == "0-100%") {
       p <- p + ylim(c(0, 100))
     }
@@ -205,19 +213,17 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
   }
   
   if (plotType == "Histogram") {
-    if (xlabel == "") {
+    # return Histogram ----
+    
+    # default labels
       if (contributionLimit == "0-100%") {
         xlabel <- "contribution (%)"
       } else {
         xlabel <- "contribution"
       }
-    }
-
-    if (ylabel == "") {
       ylabel <- "number of observations"
-    }
-
-    p <- ggplot(modelResults, aes_(x = ~estimate, fill = ~group)) +
+    
+    p <- ggplot(modelResults, aes(x = .data$estimate, fill = .data$group)) +
       geom_histogram(alpha = 0.5, binwidth = NULL, bins = histBins, position = "identity") +
       ylab(ylabel) +
       xlab(xlabel)
@@ -228,19 +234,17 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
     }
   }
   if (plotType == "Trace") {
-    if (xlabel == "") {
+    # return Trace ----
+    
+    # default labels
       xlabel <- ""
-    }
-
-    if (ylabel == "") {
       ylabel <- "value"
-    }
-
+    
     modelResults$X <- rep(
       1:(nrow(modelResults) / length(unique(modelResults$group))),
       length(unique(modelResults$group))
     )
-    p <- ggplot(modelResults, aes_(x = ~X, y = ~estimate, colour = ~group)) +
+    p <- ggplot(modelResults, aes(x = .data$X, y = .data$estimate, colour = .data$group)) +
       geom_line(alpha = 0.65) +
       ylab(ylabel) +
       xlab(xlabel)
@@ -259,13 +263,12 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
     }
   }
   if (plotType == "AutoCorr") {
-    if (xlabel == "") {
+    # return AutoCorr ----
+    
+    # default labels
       xlabel <- "lag"
-    }
-
-    if (ylabel == "") {
       ylabel <- "autocorrelation"
-    }
+    
     acfData <- split(modelResults, modelResults$group)
     acfDataNew <- gather(bind_rows(lapply(acfData, function(x) {
       acf(x$estimate, lag.max = 50, plot = FALSE)$acf
@@ -275,7 +278,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       length(acfData)
     )
 
-    p <- ggplot(acfDataNew, aes_(x = ~X, y = ~Value, colour = ~estimate)) +
+    p <- ggplot(acfDataNew, aes(x = .data$X, y = .data$Value, colour = .data$estimate)) +
       geom_line(alpha = 0.65) +
       ylab(ylabel) +
       xlab(xlabel)
@@ -285,17 +288,11 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       p <- p + scale_color_manual(values = colorPalette(p$data$estimate %>% unique() %>% length()))
     }
   }
-  p <- p + theme(
-    axis.title.x = element_text(size = xTextSize),
-    axis.title.y = element_text(size = yTextSize),
-    axis.text.x = element_text(size = xAxisSize),
-    axis.text.y = element_text(size = yAxisSize)
-  )
-  if (headerLabel != "") {
+  
+  # default title
     p <- p + labs(title = headerLabel) +
       theme(plot.title = element_text(hjust = 0.5))
-  }
-
+  
   if (!showLegend) {
     p <- p + theme(legend.position = "none")
   }
@@ -314,7 +311,11 @@ getTeaser <- function(data, individual, filterType) {
     }
   } else {
     if (individual != "all") {
-      individuals <- which(data$covariates[, filterType] == individual)
+      if (filterType %in% names(data$covariates)) {
+        individuals <- which(data$covariates[, filterType] == individual)
+      } else {
+        individuals <- which(rownames(data$covariates) == individual)
+      }
     } else {
       individuals <- 1:NROW(data$covariates)
     }

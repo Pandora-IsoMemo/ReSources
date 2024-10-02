@@ -7,8 +7,8 @@ ckanFileTypes:
   - "odt"
   - "txt"
 ckanModelTypes:
-  - "zip"
   - "resources"
+  - "zip"
 githubRepo: "resources"        # for import of models
 defaultSourceModel: "file"           # for import of models
 fileExtension: "resources"      # for download of models
@@ -18,3 +18,27 @@ plotRange:
   min: 0
   max: 1
   fromData: true
+# default values for plot titles
+plotTitle:
+  text: ""
+  fontType: "plain"
+  color: "#000000"
+  size: 24
+  hide: false
+plotText:
+  fontType: "plain"
+  color: "#000000"
+  size: 18
+  hide: false
+# default format of graph and axis titles (for plotExport.R)
+availableElements:
+  title:
+    plot title: "plotTitle"
+  axis:
+    x axis title: "xAxisTitle"
+    x axis text: "xAxisText"
+    y axis title: "yAxisTitle"
+    y axis text: "yAxisText"
+  legend:
+    legend title: "legendTitle"
+    legend text: "legendText"

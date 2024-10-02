@@ -69,12 +69,31 @@ fruitsMatrixInput <- function(scope, row, col, cov = FALSE, fixedCols = FALSE, d
           "calculate covariance matrix from repeated measurements" = FALSE
         ))
       },
+      # copyButtonsUI ----
+      tags$div(
+        class = "inline-select",
+        selectInput(if (cov) ns("copyIncludeNamesCov") else ns("copyIncludeNames"), NULL, 
+                    choices = c("keep row & column names" = "withFirstRowCol",
+                                "keep row names" = "withFirstRow",
+                                "keep column names" = "withFirstCol", 
+                                "remove row & column names" = "withoutFirstRowCol"),
+                    width = "200px")
+      ),
       copyButton(if (cov) ns("copyCov") else ns("copy"), tableId = if (cov) ns("covariance") else ns("table")),
+      # pasteButtonsUI ----
       tags$div(
         class = "inline-select",
         selectInput(if (cov) ns("pasteModeCov") else ns("pasteMode"), NULL, choices = c("auto", "comma-separated", "tab-separated", "semicolon"))
       ),
-      # pasteButtonsUI ----
+      tags$div(
+        class = "inline-select",
+        selectInput(if (cov) ns("pasteIncludeNamesCov") else ns("pasteIncludeNames"), NULL, 
+                    choices = c("with row & column names" = "withFirstRowCol",
+                                "with row names" = "withFirstCol",
+                                "with column names" = "withFirstRow", 
+                                "without row & column names" = "withoutFirstRowCol"),
+                    width = "200px")
+      ),
       pasteButton(
         inputId = if (cov) ns("pasteCov") else ns("paste"),
         outputId = if (cov) ns("pastedCov") else ns("pasted"),
@@ -139,7 +158,9 @@ fruitsMatrix <- function(input, output, session,
                          row, col, namesCov = NULL,
                          filter = list(), filterCov = list(), fixedCols = FALSE) {
   ns <- session$ns
-
+  logDebug(sprintf("Initialize INPUT MATRIX for '%s'",
+                   substr(ns(""), 1, nchar(ns("")) - 1)))
+  
   colsFixed <- !is.logical(fixedCols)
 
   rowVar <- reactive({
@@ -745,7 +766,7 @@ fruitsMatrix <- function(input, output, session,
     logDebug("Process date from values -> UI for covariance (%s)", meanId)
     updateMatrixInput(session, "covariance", covarianceData())
   })
-
+  
   # input$copy / input$copyCov ----
   observeEvent(input$copy, {
     logDebug("ObserveEvent input$copy")
@@ -754,8 +775,9 @@ fruitsMatrix <- function(input, output, session,
     } else {
       data <- combineDoubleMatrix(meanData(), sdData())
     }
-    data <- rbind(colnames(data), data)
-    data <- cbind(rownames(data), data)
+    data <- data %>%
+      addRowColNames(userSelect = input$copyIncludeNames)
+    
     lines <- apply(data, 1, paste, collapse = "\t")
     tsv <- paste(lines, collapse = "\n")
 
@@ -770,10 +792,10 @@ fruitsMatrix <- function(input, output, session,
 
   observeEvent(input$copyCov, {
     logDebug("ObserveEvent input$copyCov")
-    data <- covarianceData()
+    
+    data <- covarianceData() %>%
+      addRowColNames(userSelect = input$copyIncludeNamesCov)
 
-    data <- rbind(colnames(data), data)
-    data <- cbind(rownames(data), data)
     lines <- apply(data, 1, paste, collapse = "\t")
     tsv <- paste(lines, collapse = "\n")
 
@@ -790,8 +812,12 @@ fruitsMatrix <- function(input, output, session,
   observeEvent(input$pasted, {
     logDebug("ObserveEvent input$pasted")
     
-    m <- readStringWrapper(content = input$pasted$content, mode = input$pasteMode, class = class)
-    if(is.null(m)) return()
+    m <- readStringWrapper(content = input$pasted$content, 
+                           mode = input$pasteMode, 
+                           class = class,
+                           withRownames = input$pasteIncludeNames %in% c("withFirstRowCol", "withFirstCol"),
+                           withColnames = input$pasteIncludeNames %in% c("withFirstRowCol", "withFirstRow"))
+    if (is.null(m)) return()
     
     if (is.null(sdId)) {
       m <- fixMatrixCols(m, colnames(meanData()), fixedCols, rowVar(), colVar())
@@ -804,7 +830,9 @@ fruitsMatrix <- function(input, output, session,
 
       setList(values[[meanId]], filterValues(), m)
     } else {
-      split <- splitDoubleMatrix(m, rownames = !is.null(rownames(m)))
+      split <- splitDoubleMatrix(m, 
+                                 rownames = !is.null(rownames(m)), 
+                                 colnames = !is.null(colnames(m)))
 
       split[[1]] <- defaultMatrixNames(split[[1]], sampleName(rowVar()), sampleName(colVar()))
       events$name <- c(
@@ -819,8 +847,13 @@ fruitsMatrix <- function(input, output, session,
 
   observeEvent(input$pastedCov, {
     logDebug("ObserveEvent input$pastedCov")
-    m <- readStringWrapper(content = input$pastedCov$content, mode = input$pasteModeCov, class = class)
-    if(is.null(m)) return()
+    m <- readStringWrapper(content = input$pastedCov$content,
+                           mode = input$pasteModeCov,
+                           class = class,
+                           withRownames = input$pasteIncludeNamesCov %in% c("withFirstRowCol", "withFirstCol"),
+                           withColnames = input$pasteIncludeNamesCov %in% c("withFirstRowCol", "withFirstRow"))
+    
+    if (is.null(m)) return()
     
     m <- dropEmptyRows(m)
     m <- dropEmptyCols(m)
@@ -859,9 +892,7 @@ fruitsMatrix <- function(input, output, session,
         }
       }
     ),
-    options = importOptions(
-      rPackageName = config()[["rPackageName"]]
-    )
+    options = importOptions(rPackageName = config()[["rPackageName"]])
   )
 
   # Process imported data
@@ -910,9 +941,7 @@ fruitsMatrix <- function(input, output, session,
         }
       }
     ),
-    options = importOptions(
-      rPackageName = config()[["rPackageName"]]
-    )
+    options = importOptions(rPackageName = config()[["rPackageName"]])
   )
 
   # Process imported data
@@ -1312,11 +1341,13 @@ fruitsMatrix <- function(input, output, session,
     }
 
     fun("covariance")
+    fun("copyIncludeNamesCov")
     fun("copyCov")
+    fun("pasteModeCov")
+    fun("pasteIncludeNamesCov")
     fun("pasteCov")
     fun("exportCov-export")
     fun("importCov-openPopup")
-    fun("pasteModeCov")
     fun("resetMatrixCov")
 
     lapply(ff, fun)
@@ -1347,6 +1378,19 @@ fruitsMatrix <- function(input, output, session,
   })
 }
 
+# HELPER FUNCTIONS ----
+
+addRowColNames <- function(data, userSelect) {
+  if (userSelect %in% c("withFirstRowCol", "withFirstRow")) {
+    data <- rbind(colnames(data), data)
+  }
+  
+  if (userSelect %in% c("withFirstRowCol", "withFirstCol")) {
+    data <- cbind(rownames(data), data)
+  }
+  
+  data
+}
 
 emptyMatrix <-
   function(rownames = NULL,

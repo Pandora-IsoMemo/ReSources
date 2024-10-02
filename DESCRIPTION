@@ -1,6 +1,6 @@
 Package: ReSources
 Title: Food Reconstruction Using Isotopic Transferred Signals
-Version: 24.10.1
+Version: 24.10.1.1
 Authors@R: c(
     person("Marcus", "Gross", email = "marcus.gross@inwt-statistics.de", role = c("aut", "cre")),
     person("Ricardo", "Fernandes", email = "ldv1452@gmail.com", role = c("aut")),
@@ -17,7 +17,7 @@ Imports:
   car,
   coda,
   colourpicker,
-  DataTools (>= 23.12.2),
+  DataTools (>= 24.05.1),
   dplyr,
   DT,
   jsonlite,
@@ -36,7 +36,7 @@ Imports:
   shinyjs,
   shinyMatrix (>= 0.6.3),
   shinythemes,
-  shinyTools (>= 24.05.0),
+  shinyTools (>= 24.05.3),
   shinyWidgets,
   templates,
   tibble,
@@ -49,6 +49,6 @@ LinkingTo: nimble (>= 0.12.2)
 Suggests:
   lintr,
   testthat,
-  DSSM (>= 1.2.5)
+  DSSM (>= 24.06.0)
 RoxygenNote: 7.3.1
 URL: https://pandora-isomemo.github.io/ReSources/

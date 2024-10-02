@@ -10,7 +10,7 @@ exampleValues <- function() {
     modelWeightsContrained = TRUE,
     modelConcentrations = TRUE,
     modelConcentrationsContrained = TRUE,
-    alphaHyper = 1,
+    alphaHyper = c(source_1 = 1),
     optimalPrior = TRUE,
     covariateType = 2,
     targetOffset = TRUE,

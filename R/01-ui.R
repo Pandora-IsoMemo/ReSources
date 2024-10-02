@@ -16,7 +16,7 @@ fruitsUI <- function(id, title = "FRUITS") {
       sidebarPanel(
         style = "position:fixed; width:15%; max-width:350px; overflow-y:auto; height:85%",
         width = 2,
-        importDataUI(ns("modelUpload"), label = "Import Model"),
+        importUI(ns("modelUpload"), label = "Import Model"),
         tags$br(), tags$br(),
         downloadModelUI(ns("modelDownload"), label = "Save Model"),
         # selectInput(
@@ -59,10 +59,7 @@ fruitsUI <- function(id, title = "FRUITS") {
           style = "display:none;",
           verbatimTextOutput(ns("status")),
           verbatimTextOutput(ns("statusSim"))
-        )#,
-        # tags$hr(),
-        # downloadModelUI(ns("modelDownload"), "Download Model"),
-        # uploadModelUI(ns("modelUpload"))
+        )
       ),
       # Main panel ----
       mainPanel(
@@ -161,13 +158,9 @@ fruitsUI <- function(id, title = "FRUITS") {
                     conditionalPanel(
                       condition = "input.optimalPrior == false && input.inflatedBeta == '0'",
                       ns = ns,
-                      numericInput(
-                        ns("alphaHyper"),
-                        "Hyperparameters for alpha/sources",
-                        value = 1,
-                        min = 0.0001,
-                        max = 100
-                      )
+                      vectorInputUI(ns("alphaHyper"),
+                                    "Hyperparameters for alpha/sources",
+                                    newValueRange = c(0.0001, 100))
                     ),
                     checkboxInput(
                       ns("oxcalCheck"),
@@ -695,10 +688,12 @@ fruitsUI <- function(id, title = "FRUITS") {
                 choices = c("horizontal", "vertical"),
                 selected = "vertical"
               ),
-              tags$p("Click on simulate for additional characteristics"),
+              tags$hr(),
+              helpText("Click on 'Simulate' for additional characteristics:"),
               div(foodIntakesButton(
                 ns("foodIntakes"), "Add Source Contributions"
               )),
+              tags$br(),
               div(
                 sliderInput(
                   ns("seqSim"),
@@ -716,6 +711,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                 multiple = TRUE
               ),
               div(actionButton(ns("runModelChar"), "Simulate")),
+              tags$br(),
               conditionalPanel(
                 condition = "output.statusSim == 'COMPLETED'",
                 ns = ns,
@@ -807,7 +803,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                   value = "sourceMixPlot",
                   pickerInput(
                     inputId = ns("sourceSelectMix"),
-                    label = "Select two or three proxies",
+                    label = "Select one, two or three proxies",
                     choices = NULL,
                     selected = NULL,
                     multiple = TRUE
@@ -1052,6 +1048,7 @@ fruitsUI <- function(id, title = "FRUITS") {
           navbarMenu(
             "Output",
             menuName = "Output",
+            ### Output Plots ----
             tabPanel(
               "Output Plots",
               value = "output",
@@ -1061,6 +1058,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                 outputPlotUI(ns("outputPlot"))
               )
             ),
+            ### Export Output to IsoMemo-App ----
             tabPanel(
               "Export Output to IsoMemo-App",
               value = "isomemo",
@@ -1132,7 +1130,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                 if (!isoInstalled()) {
                   helpText(
                     paste(
-                      "To export data to fruits you need the package MpiIsoApp installed in version >=",
+                      "To export data to fruits you need the package DSSM installed in version >=",
                       isoVersion()
                     )
                   )

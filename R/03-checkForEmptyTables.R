@@ -54,7 +54,7 @@ checkForEmptyTables <- function(values) {
     }
   }
 
-  namesEmptyTables <- names(tablesInUI[tablesInUI %in% emptyTables])
+  res <- tablesInUI[tablesInUI %in% emptyTables]
 
-  return(namesEmptyTables)
+  return(res)
 }

@@ -1,7 +1,8 @@
-splitDoubleMatrix <- function(x, rownames = FALSE) {
+splitDoubleMatrix <- function(x, rownames = FALSE, colnames = TRUE) {
   stopifnot(is.matrix(x))
   stopifnot(ncol(x) == 0 || !is.null(colnames(x)))
   stopifnot(!rownames || !is.null(rownames(x)))
+  stopifnot(!colnames || !is.null(colnames(x)))
 
   if (ncol(x) %% 2 == 1) {
     x <- cbind(x, NA)
@@ -15,8 +16,11 @@ splitDoubleMatrix <- function(x, rownames = FALSE) {
   x1 <- extractMatrixCols(x, remainder = 0)
   x2 <- extractMatrixCols(x, remainder = 1)
 
-  colnames(x1) <- extractColNames(x)
-  colnames(x2) <- extractColNames(x)
+  if (colnames) {
+    colnames(x1) <- extractColNames(x)
+    colnames(x2) <- extractColNames(x)
+  }
+  
   rownames(x1) <- rownames(x)
   rownames(x2) <- rownames(x)
 
@@ -102,6 +106,17 @@ combineColnames <- function(a, b) {
   paste(grid[, 2], grid[, 1], sep = "||")
 }
 
+#' Fix Matrix Cols
+#' 
+#' Fix columns of a matrix. If fixed colums are specified, they are used as column names otherwise
+#' oldNames are kept.
+#' 
+#' @param m matrix
+#' @param oldNames (character) old column names, e.g. of "meanData()" or "covarianceData()"
+#' @param fixedCols either FALSE or a character vector of column names to be kept, e.g. "Offset",
+#'  "longitude", "latitude", ...
+#' @param row (character) row variable, e.g. "obsvnNames"
+#' @param col (character) column variable, e.g. "targetNames"
 fixMatrixCols <- function(m, oldNames, fixedCols = FALSE, row, col) {
   colsFixed <- !is.logical(fixedCols)
 

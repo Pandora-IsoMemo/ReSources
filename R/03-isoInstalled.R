@@ -2,8 +2,8 @@
 #'
 #' @export
 isoInstalled <- function() {
-  "MpiIsoApp" %in% installed.packages()[, 1] &&
-    compareVersion(as.character(packageVersion("MpiIsoApp")), isoVersion()) > -1
+  "DSSM" %in% installed.packages()[, 1] &&
+    compareVersion(as.character(packageVersion("DSSM")), isoVersion()) > -1
 }
 
 isoVersion <- function() {

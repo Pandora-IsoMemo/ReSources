@@ -51,6 +51,7 @@ fruitsTab <- function(input,
   })
   
   ## Reset Input ----
+  uploadedNotes <- reactiveVal()
   observeEvent(input$reset, {
     logDebug("Entering observeEvent(input$reset)")
     vars <- defaultValues()
@@ -64,7 +65,6 @@ fruitsTab <- function(input,
     events$name <- list()
     uploadedNotes(character(0))
   })
-  
   
   ## Load Example Model
   # observeEvent(input$exampleModel,
@@ -97,50 +97,55 @@ fruitsTab <- function(input,
   
 
   # Download/Upload Model ----
-  uploadedNotes <- reactiveVal()
+  model <- reactiveVal(NULL)
+  modelUploadBaseFileName <- reactiveVal("")
   downloadModelServer("modelDownload",
                       dat = reactiveVal(NULL),
                       inputs = values,
                       model = model,
                       rPackageName = config()[["rPackageName"]],
+                      customFileName = modelUploadBaseFileName,
+                      defaultFileName = "model",
                       fileExtension = config()[["fileExtension"]],
                       modelNotes = uploadedNotes,
                       triggerUpdate = reactive(TRUE))
 
-  uploadedValues <- importDataServer("modelUpload",
-                                     title = "Import Model",
-                                     importType = "model",
-                                     ckanFileTypes = config()[["ckanModelTypes"]],
-                                     ignoreWarnings = TRUE,
-                                     defaultSource = config()[["defaultSourceModel"]],
-                                     fileExtension = config()[["fileExtension"]],
-                                     options = importOptions(
-                                       rPackageName = config()[["rPackageName"]]
-                                     ))
+  uploadedValues <- importServer(
+    "modelUpload",
+    title = "Import Model",
+    importType = "model",
+    ckanFileTypes = config()[["ckanModelTypes"]],
+    ignoreWarnings = TRUE,
+    defaultSource = config()[["defaultSourceModel"]],
+    fileExtension = config()[["fileExtension"]],
+    options = importOptions(rPackageName = config()[["rPackageName"]])
+  )
   
   observeEvent(uploadedValues(), {
     logDebug("Entering observeEvent(uploadedValues())")
     
     req(length(uploadedValues()) > 0, !is.null(uploadedValues()[[1]][["inputs"]]))
-
-    uploadedNotes(uploadedValues()[[1]][["notes"]])
-    valuesDat <- uploadedValues()[[1]][["inputs"]]
     
-    emptyTables <- checkForEmptyTables(valuesDat)
-    if (length(emptyTables) > 0) {
-      warningInputs <- paste(
-        "No data found for following input tables: \n",
-        paste0(emptyTables, collapse = ", "),
-        " ")
-      shinyalert(title = "Empty tables",
-                 text = warningInputs,
-                 type = "warning")
-    }
+    ### update default filename ----
+    uploadedFileName <- names(uploadedValues())[1] %>%
+      file_path_sans_ext()
+    modelUploadBaseFileName(uploadedFileName)
+    
+    ## update "Notes" input ----
+    uploadedNotes(uploadedValues()[[1]][["notes"]])
+    
+    ## update values ----
+    valuesDat <- uploadedValues()[[1]] %>%
+      fillValuesFromUpload() %>%
+      shinyTryCatch(errorTitle = "Error during upload",
+                    warningTitle = "Warning during upload",
+                    alertStyle = "shinyalert")
     
     for (name in names(valuesDat)) {
       values[[name]] <- valuesDat[[name]]
     }
     
+    ## update other inputs ----
     if (ncol(values$targetValuesCovariates) > 0) {
       potentialCat <- extractPotentialCat(values$targetValuesCovariates)
       selectedCatVars <- intersect(values$categoricalVars, potentialCat)
@@ -159,6 +164,7 @@ fruitsTab <- function(input,
                         selected = selectedNumVars)
     }
     
+    ## update model ----
     if (!is.null(uploadedValues()[[1]][["model"]])) {
       model(uploadedValues()[[1]][["model"]])
     }
@@ -298,43 +304,27 @@ fruitsTab <- function(input,
         })
       }
       
-      # first, keep old value
-      newValue <- values$fractionNames
+      # get fractionNames
+      newValue <- getFractionNames(withComponents = input$modelWeights, 
+                                   withConcentration = input$modelConcentrations, 
+                                   weights = values$weights, 
+                                   concentration = values$concentration, 
+                                   targetNames = values$targetNames) %>%
+        shinyTryCatch(errorTitle = "Error with fraction names")
       
-      # check fractionNames
-      if (input$modelWeights) { # "Include components" == TRUE
-        if (input$modelConcentrations) {
-          if (length(values$concentration) > 0) {
-            newValue <- unique(colnames(values$concentration[[1]]))
-          } # reset if no length??
-        } else {
-          if (length(values$weights) > 0) {
-            newValue <- unique(colnames(values$weights))
-          } # reset if no length??
-        }
-      } else {
-        newValue <- values$targetNames
+      # update fractionNames if newValue is different
+      if (!is.null(newValue) && !identical(values$fractionNames, newValue)) {
+        values$fractionNames <- newValue
       }
       
-      # update fractionNames
-      if (!identical(values$fractionNames, newValue)) {
-        values$fractionNames <- values$targetNames
-      }
+      # get sourceNames
+      newValue <- getSourceNames(withConcentration = input$modelConcentrations,
+                                 concentration = values$concentration,
+                                 source = values$source) %>%
+        shinyTryCatch(errorTitle = "Error with source names")
       
-      # first, keep old value
-      newValue <- values$sourceNames
-      
-      # check sourceNames
-      if (input$modelConcentrations) { # "Include concentrations" == TRUE
-        if (length(values$concentration) > 0) {
-          newValue <- unique(rownames(values$concentration[[1]]))
-        } # reset if no length??
-      } else if (length(values$source) > 0 && length(values$source[[1]]) > 1) {
-        newValue <- unique(rownames(values$source[[1]][[1]][[1]]))
-      } # reset if no length??
-      
-      # update sourceNames
-      if (!identical(values$sourceNames, newValue)) {
+      # update sourceNames if newValue is different
+      if (!is.null(newValue) && !identical(values$sourceNames, newValue)) {
         values$sourceNames <- newValue
       }
       
@@ -639,20 +629,46 @@ fruitsTab <- function(input,
     }
   })
   
-  
-  observeEvent(values$alphaHyper, {
+  defaultAlphaHyper <- reactiveVal()
+  observe({
     logDebug("Entering observeEvent(values$alphaHyper)")
-    if (!identical(input$alphaHyper, values$alphaHyper)) {
-      updateNumericInput(session, "alphaHyper", value = values$alphaHyper)
+    if (length(values$alphaHyper) == 1 && length(values$sourceNames) > 1) {
+      # catch case of depricated alphaHyper (single numeric value for all sources)
+      # when e.g. loading an older model
+      newValues <- getAlphaHyperVec(sourceNames = values$sourceNames,
+                                    singleAlphaHyper = values$alphaHyper)
+    } else {
+      # update to new values from values$alphaHyper
+      # when e.g. loading a recent model
+      newValues <- values$alphaHyper
     }
-  })
+    
+    req(!identical(unname(defaultAlphaHyper()), unname(newValues)), 
+        any(defaultAlphaHyper() != newValues))
+    
+    defaultAlphaHyper(newValues)
+  }) %>%
+    bindEvent(values$alphaHyper)
   
-  observeEvent(input$alphaHyper, {
+  observe({
+    # reset values to "1" only if the number of food sources is changed
+    req(length(defaultAlphaHyper()) != length(values$sourceNames)) 
+    logDebug("Entering update (defaultAlphaHyper)")
+    
+    newValues <- getAlphaHyperVec(sourceNames = values$sourceNames)
+    defaultAlphaHyper(newValues)
+  }) %>%
+    bindEvent(values$sourceNames)
+  
+  alphaHyperReactive <- vectorInputServer("alphaHyper", defaultInputs = defaultAlphaHyper)
+  
+  observe({
     logDebug("Entering observeEvent(input$alphaHyper)")
-    if (!identical(input$alphaHyper, values$alphaHyper)) {
-      values$alphaHyper <- input$alphaHyper
-    }
-  })
+    req(!identical(unname(alphaHyperReactive()), unname(values$alphaHyper)))
+    
+    values$alphaHyper <- alphaHyperReactive()
+  }) %>%
+    bindEvent(alphaHyperReactive())
   
   observeEvent(values$oxcalCheck, {
     logDebug("Entering observeEvent(values$oxcalCheck)")
@@ -1158,8 +1174,6 @@ fruitsTab <- function(input,
   })
   
   ## Run model ----
-  model <- reactiveVal(NULL)
-  
   observeEvent(input$run, {
     logDebug("Entering observeEvent(input$run)")
     values$status <- "RUNNING"
@@ -1173,8 +1187,7 @@ fruitsTab <- function(input,
         as.list(input$priors),
         as.list(input$userEstimate)
       ) %>%
-      tryCatchWithWarningsAndErrors(errorTitle = "Could not create model object: ",
-                                    alertStyle = "shinyalert")
+      shinyTryCatch(errorTitle = "Could not create model object: ", alertStyle = "shinyalert")
     
     if (is.null(fruitsObj)) {
       values$status <- "ERROR"
@@ -1260,8 +1273,7 @@ fruitsTab <- function(input,
         userDefinedAlphas = values$userDefinedAlphas,
         onlyShowNimbleInput = input$onlyShowNimbleInput
       ) %>%
-        tryCatchWithWarningsAndErrors(errorTitle = "Could not run model",
-                                      alertStyle = "shinyalert")
+        shinyTryCatch(errorTitle = "Could not run model", alertStyle = "shinyalert")
     },
     value = 0,
     message = "")
@@ -1298,8 +1310,7 @@ fruitsTab <- function(input,
         } else {
           diagnostic <-
             convergenceDiagnostics(modelResults$parameters, fruitsObj)$geweke[[1]] %>%
-            tryCatchWithWarningsAndErrors(errorTitle = "Could not create Diagnostics",
-                                          alertStyle = "shinyalert")
+            shinyTryCatch(errorTitle = "Could not create Diagnostics", alertStyle = "shinyalert")
           if (any(is.nan(diagnostic[which(grepl("alpha", names(diagnostic)))])) |
               any(is.na(diagnostic[which(grepl("alpha", names(diagnostic)))])) |
               any(is.infinite(diagnostic[which(grepl("alpha", names(diagnostic)))]))) {
@@ -1312,8 +1323,7 @@ fruitsTab <- function(input,
             return()
           }
           outText <- produceOutText(fruitsObj, diagnostic) %>%
-            tryCatchWithWarningsAndErrors(errorTitle = "Could not create output",
-                                          alertStyle = "shinyalert")
+            shinyTryCatch(errorTitle = "Could not create output", alertStyle = "shinyalert")
         }
       })
       
@@ -1327,8 +1337,7 @@ fruitsTab <- function(input,
           DT = FALSE,
           agg = FALSE
         ) %>%
-          tryCatchWithWarningsAndErrors(errorTitle = "Could not compute statistics",
-                                        alertStyle = "shinyalert")
+          shinyTryCatch(errorTitle = "Could not compute statistics", alertStyle = "shinyalert")
         values$status <- "COMPLETED"
       })
       
@@ -1362,8 +1371,7 @@ fruitsTab <- function(input,
           as.list(input$priors),
           as.list(input$userEstimate)
         ) %>%
-      tryCatchWithWarningsAndErrors(errorTitle = "Could not create model object: ",
-                                    alertStyle = "shinyalert")
+      shinyTryCatch(errorTitle = "Could not create model object: ", alertStyle = "shinyalert")
     
     if (is.null(fruitsObj)) {
       values$status <- "ERROR"
@@ -1379,8 +1387,7 @@ fruitsTab <- function(input,
         seqSim = 1 / input$seqSim,
         simSourceNames = input$simSpecSources
       ) %>%
-        tryCatchWithWarningsAndErrors(errorTitle = "Could not run model",
-                                      alertStyle = "shinyalert")
+        shinyTryCatch(errorTitle = "Could not run model", alertStyle = "shinyalert")
     },
     value = 0,
     message = "")
@@ -1493,7 +1500,11 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsTarget <- reactive({
+    logDebug("Call reactive 'plotFunCharacteristicsTarget'")
     function() {
+      req(length(values$obsvn) > 0, values$obsvnError, input$targetSelect)
+      req(input$targetSelect %in% colnames(values$obsvn[["default"]]))
+      
       sourceTargetPlot(
         simSources = NULL,
         simGrid = NULL,
@@ -1514,7 +1525,11 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsConc <- reactive({
+    logDebug("Call reactive 'plotFunCharacteristicsConc'")
     function() {
+      req(length(values$concentration) > 0, values$concentrationUncert, input$concentrationsSelect)
+      req(input$concentrationsSelect %in% colnames(values$concentration[[1]]))
+      
       sourceTargetPlot(
         simSources = NULL,
         simGrid = NULL,
@@ -1537,6 +1552,7 @@ fruitsTab <- function(input,
   
   plotFunCharacteristics <- reactive({
     validate(validModelOutput(modelCharacteristics()))
+    logDebug("Call reactive 'plotFunCharacteristics'")
     function() {
       sourceTargetPlot(
         simSources = modelCharacteristics()$modelResults$simSources$simSources,
@@ -1558,6 +1574,7 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsMix <- reactive({
+    logDebug("Call reactive 'plotFunCharacteristicsMix'")
     validate(validModelOutput(modelCharacteristics()))
     function() {
       sourceTargetPlot(
@@ -1752,58 +1769,60 @@ fruitsTab <- function(input,
   callModule(verbatimText, "corrMat", model = modelCharacteristics, class = "corrMat")
   
   output$targetPlot <- renderPlotly({
-    plotFunCharacteristicsTarget()()
+    plotFunCharacteristicsTarget()() %>%
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
   })
   
-  callModule(
-    plotExport,
-    "exportTargetPlot",
-    plotFun = plotFunCharacteristicsTarget,
-    type = "sourceCharacteristics",
-    plotly = TRUE
+  plotExportServer("exportTargetPlot",
+                   plotFun = plotFunCharacteristicsTarget,
+                   filename = paste0(gsub("-", "", Sys.Date()), "_sourceCharacteristics"),
+                   plotly = TRUE
   )
   
   output$concentrationsPlot <- renderPlotly({
-    plotFunCharacteristicsConc()()
+    plotFunCharacteristicsConc()() %>%
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
   })
   
-  callModule(
-    plotExport,
-    "exportConcentrationsPlot",
-    plotFun = plotFunCharacteristicsConc,
-    type = "sourceCharacteristics",
-    plotly = TRUE
+  plotExportServer("exportConcentrationsPlot",
+                   plotFun = plotFunCharacteristicsConc,
+                   filename = paste0(gsub("-", "", Sys.Date()), "_sourceCharacteristics"),
+                   plotly = TRUE
   )
-  
   
   output$SourceCharacteristicsPlot <- renderPlotly({
     validate(validModelOutput(modelCharacteristics()))
-    plotFunCharacteristics()()
+    plotFunCharacteristics()() %>%
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
   })
   
-  callModule(
-    plotExport,
-    "exportSourceCharacteristicsPlot",
-    plotFun = plotFunCharacteristics,
-    type = "sourceCharacteristics",
-    plotly = TRUE
+  plotExportServer("exportSourceCharacteristicsPlot",
+                   plotFun = plotFunCharacteristics,
+                   filename = paste0(gsub("-", "", Sys.Date()), "_sourceCharacteristics"),
+                   plotly = TRUE
   )
   
   # observeEvent(input$updateMix, {
   output$SourceCharacteristicsPlot2 <- renderPlotly({
     validate(validModelOutput(modelCharacteristics()))
-    plotFunCharacteristicsMix()()
+    plotFunCharacteristicsMix()() %>%
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
   })
   # })
   
-  callModule(
-    plotExport,
-    "exportSourceCharacteristicsPlot2",
-    plotFun = plotFunCharacteristicsMix,
-    type = "sourceCharacteristics",
-    plotly = TRUE
+  plotExportServer("exportSourceCharacteristicsPlot2",
+                   plotFun = plotFunCharacteristicsMix,
+                   filename = paste0(gsub("-", "", Sys.Date()), "_sourceCharacteristics"),
+                   plotly = TRUE
   )
-  
   
   #### Model Diagnostics Plot
   callModule(
