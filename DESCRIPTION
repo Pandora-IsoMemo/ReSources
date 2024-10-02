@@ -1,6 +1,6 @@
 Package: ReSources
 Title: Food Reconstruction Using Isotopic Transferred Signals
-Version: 24.09.0.2
+Version: 24.10.1
 Authors@R: c(
     person("Marcus", "Gross", email = "marcus.gross@inwt-statistics.de", role = c("aut", "cre")),
     person("Ricardo", "Fernandes", email = "ldv1452@gmail.com", role = c("aut")),
@@ -11,8 +11,6 @@ Maintainer: Marcus Gross <marcus.gross@inwt-statistics.de>
 Description: Food Reconstruction Using Isotopic Transferred Signals (FRUITS): A Bayesian Model for Diet Reconstruction (<doi:10.1371/journal.pone.0087436>).
              This package provides a user-friendly shiny interface for human and animal diet reconstruction that rely on tissue chemical signatures.
 Depends: R (>= 3.5.0), nimble (>= 0.6.12)
-Remotes:
-  github::ben-aaron188/rgpt3
 Imports:
   abind,
   alphahull,
@@ -51,5 +49,6 @@ LinkingTo: nimble (>= 0.12.2)
 Suggests:
   lintr,
   testthat,
-  DSSM
+  DSSM (>= 24.06.0)
 RoxygenNote: 7.3.1
+URL: https://pandora-isomemo.github.io/ReSources/
