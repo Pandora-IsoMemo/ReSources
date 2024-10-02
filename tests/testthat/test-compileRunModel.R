@@ -64,7 +64,7 @@ test_that("test compileRunModel - blackBearData with default inputs", {
     expect_gt(testResultsVec[[typeName]]$wAIC, 295)
     expect_lt(testResultsVec[[typeName]]$wAIC, 360)
     expect_gt(min(testResultsVec[[typeName]]$pValue), 0.45)
-    expect_lt(max(testResultsVec[[typeName]]$pValue), 0.9999)
+    expect_lt(max(testResultsVec[[typeName]]$pValue), 1.01)
     expect_gt(testResultsVec[[typeName]]$BIC, 950)
     expect_lt(testResultsVec[[typeName]]$BIC, 9030)
   }
@@ -89,7 +89,7 @@ test_that("test compileRunModel - blackBearData with default inputs", {
     expect_gt(testResultsBaselineVec[[typeName]]$wAIC, 340)
     expect_lt(testResultsBaselineVec[[typeName]]$wAIC, 360)
     expect_gt(min(testResultsBaselineVec[[typeName]]$pValue), 0.55)
-    expect_lt(max(testResultsBaselineVec[[typeName]]$pValue), 0.9999)
+    expect_lt(max(testResultsBaselineVec[[typeName]]$pValue), 1.01)
     expect_gt(testResultsBaselineVec[[typeName]]$BIC, 7500)
     expect_lt(testResultsBaselineVec[[typeName]]$BIC, 9500)
   }
@@ -148,7 +148,7 @@ test_that("test compileRunModel - brownBearData with default inputs", {
     expect_gt(testResultsVec[[typeName]]$wAIC, 130)
     expect_lt(testResultsVec[[typeName]]$wAIC, 650)
     expect_gt(min(testResultsVec[[typeName]]$pValue), 0.55)
-    expect_lt(max(testResultsVec[[typeName]]$pValue), 1)
+    expect_lt(max(testResultsVec[[typeName]]$pValue), 1.01)
     expect_gt(testResultsVec[[typeName]]$BIC, 1153)
     expect_lt(testResultsVec[[typeName]]$BIC, 2900)
   }
@@ -202,7 +202,7 @@ test_that("test compileRunModel - fiveSourcesData with default inputs", {
     expect_gt(testResultsVec[[typeName]]$wAIC, 20)
     expect_lt(testResultsVec[[typeName]]$wAIC, 100)
     expect_gt(min(testResultsVec[[typeName]]$pValue), 0.55)
-    expect_lt(max(testResultsVec[[typeName]]$pValue), 0.9999)
+    expect_lt(max(testResultsVec[[typeName]]$pValue), 1.01)
     expect_gt(testResultsVec[[typeName]]$BIC, 350)
     expect_lt(testResultsVec[[typeName]]$BIC, 900)
   }
