@@ -238,9 +238,11 @@ outputPlot <- function(input, output, session, model, values) {
                                                            yAxisText  = config()[["plotText"]]))
   
   plotFunTarget <- reactive({
-    logDebug("Entering reactive plotFunTarget")
-    validate(validModelOutput(model()))
     function() {
+      if (is.null(model()) || is.null(model()$modelResults)) {
+        return(NULL)
+      }
+      
       params <- c(plotParams())
       p <- do.call(
         plotTargets,

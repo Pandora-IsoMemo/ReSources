@@ -116,9 +116,11 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
                                      availableElements = c("title", "axis"))
   
   plotFunTargetDiagnostics <- reactive({
-    logDebug("Entering reactive plotFunTargetDiagnostics")
-    validate(validModelOutput(model()))
     function() {
+      if (is.null(model()) || is.null(model()$modelResults)) {
+        return(NULL)
+      }
+      
       p <- do.call(
         plotTargets,
         plotParams()
