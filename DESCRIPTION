@@ -1,6 +1,6 @@
 Package: ReSources
 Title: Food Reconstruction Using Isotopic Transferred Signals
-Version: 24.10.1.1
+Version: 24.11.0
 Authors@R: c(
     person("Marcus", "Gross", email = "marcus.gross@inwt-statistics.de", role = c("aut", "cre")),
     person("Ricardo", "Fernandes", email = "ldv1452@gmail.com", role = c("aut")),
@@ -36,7 +36,7 @@ Imports:
   shinyjs,
   shinyMatrix (>= 0.6.3),
   shinythemes,
-  shinyTools (>= 24.05.3),
+  shinyTools (>= 24.11.2),
   shinyWidgets,
   templates,
   tibble,

@@ -1500,10 +1500,13 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsTarget <- reactive({
-    logDebug("Call reactive 'plotFunCharacteristicsTarget'")
     function() {
-      req(length(values$obsvn) > 0, values$obsvnError, input$targetSelect)
-      req(input$targetSelect %in% colnames(values$obsvn[["default"]]))
+      if (length(values$obsvn) == 0 || 
+          is.null(values$obsvnError) || any(values$obsvnError == "") ||
+          is.null(input$targetSelect) || any(input$targetSelect == "") ||
+          !(input$targetSelect %in% colnames(values$obsvn[["default"]]))) {
+        return(NULL)
+      }
       
       sourceTargetPlot(
         simSources = NULL,
@@ -1525,10 +1528,13 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsConc <- reactive({
-    logDebug("Call reactive 'plotFunCharacteristicsConc'")
     function() {
-      req(length(values$concentration) > 0, values$concentrationUncert, input$concentrationsSelect)
-      req(input$concentrationsSelect %in% colnames(values$concentration[[1]]))
+      if (length(values$concentration) == 0 || 
+          is.null(values$concentrationUncert) || any(values$concentrationUncert == "") ||
+          is.null(input$concentrationsSelect) || any(input$concentrationsSelect == "") ||
+          !(input$concentrationsSelect %in% colnames(values$concentration[[1]]))) {
+        return(NULL)
+      }
       
       sourceTargetPlot(
         simSources = NULL,
@@ -1551,9 +1557,11 @@ fruitsTab <- function(input,
   
   
   plotFunCharacteristics <- reactive({
-    validate(validModelOutput(modelCharacteristics()))
-    logDebug("Call reactive 'plotFunCharacteristics'")
     function() {
+      if (is.null(modelCharacteristics()) || is.null(modelCharacteristics()$modelResults)) {
+        return(NULL)
+      }
+      
       sourceTargetPlot(
         simSources = modelCharacteristics()$modelResults$simSources$simSources,
         simSourcesAll = modelCharacteristics()$modelResults$simSources$simSourcesAll,
@@ -1574,9 +1582,11 @@ fruitsTab <- function(input,
   })
   
   plotFunCharacteristicsMix <- reactive({
-    logDebug("Call reactive 'plotFunCharacteristicsMix'")
-    validate(validModelOutput(modelCharacteristics()))
     function() {
+      if (is.null(modelCharacteristics()) || is.null(modelCharacteristics()$modelResults)) {
+        return(NULL)
+      }
+      
       sourceTargetPlot(
         simSources = modelCharacteristics()$modelResults$simSources$simSources,
         simSourcesAll = modelCharacteristics()$modelResults$simSources$simSourcesAll,
@@ -1769,6 +1779,9 @@ fruitsTab <- function(input,
   callModule(verbatimText, "corrMat", model = modelCharacteristics, class = "corrMat")
   
   output$targetPlot <- renderPlotly({
+    req(length(values$obsvn) > 0, values$obsvnError, input$targetSelect)
+    req(input$targetSelect %in% colnames(values$obsvn[["default"]]))
+    
     plotFunCharacteristicsTarget()() %>%
       shinyTryCatch(errorTitle = "Error during plotting",
                     warningTitle = "Warning during plotting",
@@ -1782,6 +1795,9 @@ fruitsTab <- function(input,
   )
   
   output$concentrationsPlot <- renderPlotly({
+    req(length(values$concentration) > 0, values$concentrationUncert, input$concentrationsSelect)
+    req(input$concentrationsSelect %in% colnames(values$concentration[[1]]))
+    
     plotFunCharacteristicsConc()() %>%
       shinyTryCatch(errorTitle = "Error during plotting",
                     warningTitle = "Warning during plotting",

@@ -1,3 +1,8 @@
+# ReSources 24.11.0
+
+## Bug Fixes
+- use _shinyTools_ version 24.11.2 to fix issues with plotExport module (#136)
+
 # ReSources 24.10.1
 
 ## New Features
