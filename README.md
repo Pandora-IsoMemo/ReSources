@@ -4,8 +4,11 @@
 - MAIN version: https://isomemoapp.com/app/resources
 - BETA version: https://isomemoapp.com/app/resources-beta
 
-### Help and installation instructions:
-- https://github.com/Pandora-IsoMemo/resources/wiki
+### Documentation
+- https://pandora-isomemo.github.io/ReSources/
+
+### Installation instructions
+- https://pandora-isomemo.github.io/docs/apps.html#resources---food-reconstruction-using-isotopic-transferred-signals
 
 ### Release notes:
 - see `NEWS.md`
