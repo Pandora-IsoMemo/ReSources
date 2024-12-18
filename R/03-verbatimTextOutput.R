@@ -22,7 +22,7 @@ verbatimText <-
     content <- reactive({
       switch(
         class,
-        modelCode = as.character(model()$fruitsObj$modelCode),
+        #modelCode = as.character(model()$fruitsObj$modelCode), # deprecated
         modelInput = capture.output({
           returnType <- function(type, obj) {
             if (type != "userEstimates" |

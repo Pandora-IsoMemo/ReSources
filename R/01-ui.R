@@ -936,7 +936,6 @@ fruitsUI <- function(id, title = "FRUITS") {
             tabPanel(
               "Model code",
               tags$h4("Model code"),
-              #verbatimTextOutput(ns("modelCode"), download = TRUE)
               aceEditor(
                 ns("modelCode-text"),
                 value = NULL,
