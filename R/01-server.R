@@ -1173,23 +1173,41 @@ fruitsTab <- function(input,
     values$userEstimateGroups <- userEstimateGroups()
   })
   
+  fruitsObj <- reactive({
+    valuesList <- reactiveValuesToList(values)
+    
+    shinyInputToClass(
+      valuesList,
+      as.list(input$priors),
+      as.list(input$userEstimate)
+    ) %>%
+      shinyTryCatch(errorTitle = "Could not create model input object: ", alertStyle = "shinyalert")
+  })
+  
+  ## Preview model ----
+  observe({
+    logDebug("Entering observe() (preview model)")
+    if (is.null(fruitsObj())) {
+      values$status <- "ERROR"
+      return()
+    }
+    
+    # return only fruits object since there are no real model results
+    model(list(fruitsObj = fruitsObj()))
+    values$status <- "COMPLETED"
+  }) %>%
+    bindEvent(input$preview)
+  
   ## Run model ----
+  modelCharacteristics <- reactiveVal(NULL)
+  
   observeEvent(input$run, {
     logDebug("Entering observeEvent(input$run)")
-    values$status <- "RUNNING"
     
     model(NULL)
     modelCharacteristics(NULL)
-    valuesList <- reactiveValuesToList(values)
     
-    fruitsObj <- shinyInputToClass(
-        valuesList,
-        as.list(input$priors),
-        as.list(input$userEstimate)
-      ) %>%
-      shinyTryCatch(errorTitle = "Could not create model object: ", alertStyle = "shinyalert")
-    
-    if (is.null(fruitsObj)) {
+    if (is.null(fruitsObj())) {
       values$status <- "ERROR"
       return()
     }
@@ -1241,7 +1259,7 @@ fruitsTab <- function(input,
                         strsplit(x, "=")[[1]][1]
                       }))
     )
-    if (length(fruitsObj$userEstimates[[1]]) > 0) {
+    if (length(fruitsObj()$userEstimates[[1]]) > 0) {
       updateRadioButtons(
         session,
         "exportType",
@@ -1266,12 +1284,13 @@ fruitsTab <- function(input,
       )
     }
     
+    values$status <- "RUNNING"
+    
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj,
+        fruitsObj(),
         progress = TRUE,
-        userDefinedAlphas = values$userDefinedAlphas,
-        onlyShowNimbleInput = input$onlyShowNimbleInput
+        userDefinedAlphas = values$userDefinedAlphas
       ) %>%
         shinyTryCatch(errorTitle = "Could not run model", alertStyle = "shinyalert")
     },
@@ -1284,13 +1303,6 @@ fruitsTab <- function(input,
     }
     
     values$status <- "COMPLETED"
-    
-    # nimble in here <--  ----
-    if (input$onlyShowNimbleInput) {
-      # return only fruits object since there are no real model results
-      model(list(fruitsObj = modelResults))
-      return()
-    }
     
     if (!inherits(modelResults, "try-error")) {
       withProgress({
@@ -1305,7 +1317,7 @@ fruitsTab <- function(input,
           return()
         } else {
           diagnostic <-
-            convergenceDiagnostics(modelResults$parameters, fruitsObj)$geweke[[1]] %>%
+            convergenceDiagnostics(modelResults$parameters, fruitsObj())$geweke[[1]] %>%
             shinyTryCatch(errorTitle = "Could not create Diagnostics", alertStyle = "shinyalert")
           if (any(is.nan(diagnostic[which(grepl("alpha", names(diagnostic)))])) |
               any(is.na(diagnostic[which(grepl("alpha", names(diagnostic)))])) |
@@ -1318,18 +1330,18 @@ fruitsTab <- function(input,
             diagnostic[is.na(diagnostic)] <- 0
             return()
           }
-          outText <- produceOutText(fruitsObj, diagnostic) %>%
+          outText <- produceOutText(fruitsObj(), diagnostic) %>%
             shinyTryCatch(errorTitle = "Could not create output", alertStyle = "shinyalert")
         }
       })
       
       withProgress({
         setProgress(message = "Compute summary statistics", value = 0.95)
-        model(list(fruitsObj = fruitsObj, modelResults = modelResults))
+        model(list(fruitsObj = fruitsObj(), modelResults = modelResults))
         values$modelResultSummary <- getResultStatistics(
-          model()$modelResults$parameters,
-          model()$modelResults$userEstimateSamples,
-          model()$fruitsObj,
+          modelResults$parameters,
+          modelResults$userEstimateSamples,
+          fruitsObj(),
           DT = FALSE,
           agg = FALSE
         ) %>%
@@ -1350,8 +1362,6 @@ fruitsTab <- function(input,
     }
   })
   
-  modelCharacteristics <- reactiveVal(NULL)
-  
   observeEvent(input$runModelChar, {
     logDebug("Entering observeEvent(input$runModelChar)")
     values$statusSim <- "RUNNING"
@@ -1367,7 +1377,7 @@ fruitsTab <- function(input,
           as.list(input$priors),
           as.list(input$userEstimate)
         ) %>%
-      shinyTryCatch(errorTitle = "Could not create model object: ", alertStyle = "shinyalert")
+      shinyTryCatch(errorTitle = "Could not create model input object: ", alertStyle = "shinyalert")
     
     if (is.null(fruitsObj)) {
       values$status <- "ERROR"

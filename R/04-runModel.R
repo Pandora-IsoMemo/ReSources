@@ -6,12 +6,9 @@
 #' @param userDefinedAlphas list of matrices: for simulation only: food source intakes values
 #' @param seqSim numeric grid of mixture steps
 #' @param simSourceNames names of sources to simulate
-#' @param onlyShowNimbleInput boolean: run the model if FALSE, only show input for nimbleModel() if
-#' TRUE
 #' @export
 compileRunModel <- function(fruitsObj, progress = FALSE, onlySim = FALSE,
-                            userDefinedAlphas = NULL, seqSim = 0.2, simSourceNames = NULL,
-                            onlyShowNimbleInput = FALSE) {
+                            userDefinedAlphas = NULL, seqSim = 0.2, simSourceNames = NULL) {
   if (!inherits(fruitsObj, "fruits")) {
     stop('fruitsObj must be class "fruits"')
   }
@@ -42,10 +39,6 @@ compileRunModel <- function(fruitsObj, progress = FALSE, onlySim = FALSE,
   }
   if (any(fruitsObj$data$weights <= 0) & any(unlist(fruitsObj$modelOptions$weightsDist) == "log-normal")) {
     stop("need positive means in components for log normal distribution")
-  }
-  
-  if (onlyShowNimbleInput) {
-    return(fruitsObj)
   }
   
   if (onlySim == TRUE) {
