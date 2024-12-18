@@ -89,10 +89,7 @@ compileRunModel <- function(fruitsObj, progress = FALSE, onlySim = FALSE,
   }
   
   if (onlyShowNimbleInput) {
-    return(list(code = fruitsObj$modelCode,
-                name = "FRUITS",
-                constants = fruitsObj$constants,
-                data = fruitsObj$data[!(names(fruitsObj$data) %in% c("covariates"))]))
+    return(fruitsObj)
   }
   
   model <- try(

@@ -1287,12 +1287,8 @@ fruitsTab <- function(input,
     
     # nimble in here <--  ----
     if (input$onlyShowNimbleInput) {
-      # update fruits object after final data preparation
-      fruitsObj$data <- modelResults$data
-      fruitsObj$constants <- modelResults$constants
-      fruitsObj$modelCode <- modelResults$code
       # return only fruits object since there are no real model results
-      model(list(fruitsObj = fruitsObj))
+      model(list(fruitsObj = modelResults))
       return()
     }
     
