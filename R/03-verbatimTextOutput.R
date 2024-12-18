@@ -78,7 +78,7 @@ verbatimText <-
 
   output$download <- downloadHandler(
     filename = function() {
-      paste0(class, "_", type, ".txt")
+      paste0(paste(c(class, type), collapse = "_"), ".txt")
     },
     content = function(file) {
       writeLines(content(), file)

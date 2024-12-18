@@ -1611,12 +1611,40 @@ fruitsTab <- function(input,
     }
   })
   
+  # callModule(verbatimText,
+  #            "modelCode",
+  #            model = model,
+  #            class = "modelCode"
+  # )
   
-  callModule(verbatimText,
-             "modelCode",
-             model = model,
-             class = "modelCode"
+  observe({
+    req("fruitsObj" %in% names(model()))
+    updateAceEditor(
+      session = session,
+      "modelCode-text",
+      value = paste(as.character(model()$fruitsObj$modelCode), collapse = "\n"),
+      autoCompleters = c("snippet", "text", "static", "keyword")
+    )
+  }) %>%
+    bindEvent(model())
+  
+  # this will not work since there will be a loop
+  # observe({
+  #   newModel <- model()
+  #   newModel$fruitsObj$modelCode <- input$`modelCode-text`
+  #   model(newModel)
+  # }) %>%
+  #   bindEvent(input$`modelCode-text`)
+  
+  output$`modelCode-download` <- downloadHandler(
+    filename = function() {
+      paste0("modelCode.txt")
+    },
+    content = function(file) {
+      writeLines(input$`modelCode-text`, file)
+    }
   )
+  
   callModule(
     verbatimText,
     "modelInputData",

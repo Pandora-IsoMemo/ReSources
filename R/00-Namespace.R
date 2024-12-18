@@ -33,6 +33,7 @@
 #'  textAreaInput textInput textOutput uiOutput updateCheckboxInput updateNumericInput
 #'  updateRadioButtons updateSelectInput updateSelectizeInput updateTextAreaInput updateTextInput
 #'  validate withProgress
+#' @importFrom shinyAce aceEditor updateAceEditor
 #' @importFrom shinyalert shinyalert
 #' @importFrom shinyjs reset useShinyjs alert show hide
 #' @importFrom shinyMatrix matrixInput updateMatrixInput

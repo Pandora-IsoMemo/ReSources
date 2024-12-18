@@ -946,7 +946,19 @@ fruitsUI <- function(id, title = "FRUITS") {
             tabPanel(
               "Model code",
               tags$h4("Model code"),
-              verbatimTextOutput(ns("modelCode"), download = TRUE)
+              #verbatimTextOutput(ns("modelCode"), download = TRUE)
+              aceEditor(
+                ns("modelCode-text"),
+                value = NULL,
+                mode = "r",
+                theme = "cobalt",
+                fontSize = 16,
+                autoScrollEditorIntoView = TRUE,
+                minLines = 50,
+                maxLines = 100,
+                autoComplete = "live"
+              ),
+              downloadButton(ns("modelCode-download"), "Download")
             ),
             tabPanel(
               "Model inputs",
