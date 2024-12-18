@@ -43,6 +43,11 @@ compileRunModel <- function(fruitsObj, progress = FALSE, onlySim = FALSE,
   if (any(fruitsObj$data$weights <= 0) & any(unlist(fruitsObj$modelOptions$weightsDist) == "log-normal")) {
     stop("need positive means in components for log normal distribution")
   }
+  
+  if (onlyShowNimbleInput) {
+    return(fruitsObj)
+  }
+  
   if (onlySim == TRUE) {
     if (length(simSourceNames) < 2) {
       stop("Number of sources to simulate must be larger than 1")
@@ -86,10 +91,6 @@ compileRunModel <- function(fruitsObj, progress = FALSE, onlySim = FALSE,
     fruitsObj$data$obsvnCovT2 <- matrix(0, ncol = nrow(simGrid), nrow = nrow(simGrid))
     fruitsObj$data$obsvnCovT3 <- matrix(0, ncol = nrow(simGrid), nrow = nrow(simGrid))
     fruitsObj$data$hierMatch <- rep(0, nrow(simGrid))
-  }
-  
-  if (onlyShowNimbleInput) {
-    return(fruitsObj)
   }
   
   model <- try(
