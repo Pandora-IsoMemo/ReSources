@@ -946,7 +946,7 @@ fruitsMatrix <- function(input, output, session,
 
   # Process imported data
   observeEvent(dataImportedCov(), {
-    logDebug("Process imported data (%s)", meanId)
+    logDebug("Process imported cov data (%s)", meanId)
     req(length(dataImportedCov()) > 0, !is.null(dataImportedCov()[[1]]))
     m <- dataImportedCov()[[1]]
     
@@ -1020,7 +1020,7 @@ fruitsMatrix <- function(input, output, session,
   )
 
   observeEvent(dataImportedBatch(), {
-    logDebug("Process imported data (%s)", meanId)
+    logDebug("Process imported batch data (%s)", meanId)
     req(length(dataImportedBatch()) > 0, !is.null(dataImportedBatch()[[1]]))
     fullm <- dataImportedBatch()[[1]]
     
@@ -1166,7 +1166,7 @@ fruitsMatrix <- function(input, output, session,
   )
 
   observeEvent(dataImportedBatchCov(), {
-    logDebug("Process imported data (%s)", meanId)
+    logDebug("Process imported batch cov data (%s)", meanId)
     req(length(dataImportedBatchCov()) > 0, !is.null(dataImportedBatchCov()[[1]])) 
     fullm <- dataImportedBatchCov()[[1]]
     

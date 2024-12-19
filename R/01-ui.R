@@ -32,20 +32,10 @@ fruitsUI <- function(id, title = "FRUITS") {
         # ),
         # actionButton(ns("exampleModel"), "Load selected model"),
         tags$hr(),
-        checkboxInput(ns("onlyShowNimbleInput"),
-                      "Only show nimbleModel() input", 
-                      width = "100%"),
-        conditionalPanel(
-          ns = ns,
-          condition = "input.onlyShowNimbleInput == true",
-          helpText("After 'Run': Check in 'Results Report' the sections 'Model code' and 'Model inputs'.")
-        ),
-        fluidRow(
-          actionButton(ns("run"), "Run", width = "100%") %>%
-            column(width = 5),
-          actionButton(ns("reset"), "Reset", width = "100%") %>%
-            column(width = 5, align = "right", offset = 2)
-        ),
+        helpText("Press 'Preview' to check 'Model code' and 'Model inputs' under the tab 'Results Report'."),
+        actionButton(ns("preview"), "Preview"),
+        actionButton(ns("run"), "Run"),
+        actionButton(ns("reset"), "Reset"),
         #checkboxInput(ns("adaptiveNames"), "Adaptive Names", value = FALSE),
         tags$hr(),
         dbContentSelectUI(ns("popUpTables"), label = "Data table"),
@@ -945,8 +935,7 @@ fruitsUI <- function(id, title = "FRUITS") {
             ),
             tabPanel(
               "Model code",
-              tags$h4("Model code"),
-              verbatimTextOutput(ns("modelCode"), download = TRUE)
+              modelCodeUI(ns("modelCode"))
             ),
             tabPanel(
               "Model inputs",
@@ -992,7 +981,6 @@ fruitsUI <- function(id, title = "FRUITS") {
             tabPanel(
               "Convergence plots",
               value = "modelDiagnosticsTab",
-              tags$h4("Convergence plots"),
               conditionalPanel(
                 condition = "output.status == 'COMPLETED'",
                 ns = ns,

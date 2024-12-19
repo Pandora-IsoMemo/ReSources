@@ -4,12 +4,14 @@ modelDiagnosticsPlotUI <- function(id) {
   fluidRow(
     mainPanel(
       width = 8,
+      tags$h4("Convergence plots"),
       plotOutput(outputId = ns("DiagnosticsPlot")),
       plotExportButton(ns("exportDiagnosticsPlot")),
       exportDataUI(ns("exportDataDiag"), "Export Data"),
       exportDataUI(ns("exportDataChainsAll"), "Export all chains")
     ),
     sidebarPanel(
+      style = "position:fixed; width:15%; max-width:350px; overflow-y:auto; height:82%",
       width = 3,
       selectInput(
         inputId = ns("estTypeDiag"),
