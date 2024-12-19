@@ -1318,8 +1318,6 @@ fruitsTab <- function(input,
             diagnostic[is.na(diagnostic)] <- 0
             return()
           }
-          outText <- produceOutText(fruitsObj(), diagnostic) %>%
-            shinyTryCatch(errorTitle = "Could not create output", alertStyle = "shinyalert")
         }
       })
       
@@ -1338,6 +1336,9 @@ fruitsTab <- function(input,
       })
       
       if (values$status == "COMPLETED") {
+        outText <- produceOutText(fruitsObj(), diagnostic) %>%
+          shinyTryCatch(errorTitle = "Could not create output", alertStyle = "shinyalert")
+        
         showModal(
           modalDialog(
             title = "Model computation completed ",

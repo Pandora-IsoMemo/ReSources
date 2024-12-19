@@ -1,11 +1,14 @@
 # ReSources 24.12.0
 
+## New Features
+- optionally edit the model code before running the model (#139)
+
 ## Updates
 - update to shinyTools 24.12.0 to integrate the new header
 - update links in the ReadMe file
 
-## New Features
-- optionally edit the model code before running the model (#139)
+## Bug Fixes
+- fix issue with missing _outText_ object after model run for some special case
 
 # ReSources 24.11.0
 
