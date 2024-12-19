@@ -936,11 +936,12 @@ fruitsUI <- function(id, title = "FRUITS") {
             tabPanel(
               "Model code",
               tags$h4("Model code"),
+              helpText("Edit the code if needed, and press 'Run' to execute the model."),
               aceEditor(
                 ns("modelCode-text"),
                 value = NULL,
                 mode = "r",
-                theme = "cobalt",
+                theme = "chrome",
                 fontSize = 16,
                 autoScrollEditorIntoView = TRUE,
                 minLines = 50,

@@ -1185,18 +1185,11 @@ fruitsTab <- function(input,
     updateAceEditor(
       session = session,
       "modelCode-text",
-      value = paste(as.character(model()$fruitsObj$modelCode), collapse = "\n"),
+      value = paste(deparse(model()$fruitsObj$modelCode), collapse = "\n"),
       autoCompleters = c("snippet", "text", "static", "keyword")
     )
   }) %>%
     bindEvent(model())
-  
-  # observe({
-  #   newfruitsObj <- fruitsObj()
-  #   newfruitsObj$modelCode <- input$`modelCode-text`
-  #   #fruitsObj(newfruitsObj) # cannot update, not a reactiveVal yet ...
-  # }) %>%
-  #   bindEvent(input$`modelCode-text`)
   
   output$`modelCode-download` <- downloadHandler(
     filename = function() {
@@ -1296,7 +1289,7 @@ fruitsTab <- function(input,
     
     withProgress({
       modelResults <- compileRunModel(
-        updateModelCode(fruitsObj(), newModelCode = input$`modelCode-text`),
+        fruitsObj = updateModelCode(fruitsObj(), newModelCode = input$`modelCode-text`),
         progress = TRUE,
         userDefinedAlphas = values$userDefinedAlphas
       ) %>%
@@ -1396,7 +1389,7 @@ fruitsTab <- function(input,
     
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj,
+        fruitsObj = updateModelCode(fruitsObj(), newModelCode = input$`modelCode-text`),
         progress = TRUE,
         onlySim = TRUE,
         userDefinedAlphas = values$userDefinedAlphas,
