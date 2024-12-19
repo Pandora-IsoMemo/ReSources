@@ -1,3 +1,23 @@
+modelCodeUI <- function(id) {
+  ns <- NS(id)
+  tagList(
+    tags$h4("Model code"),
+    helpText("Edit the code if needed, and press 'Run' to execute the model."),
+    aceEditor(
+      ns("text"),
+      value = NULL,
+      mode = "r",
+      theme = "chrome",
+      fontSize = 16,
+      autoScrollEditorIntoView = TRUE,
+      minLines = 50,
+      maxLines = 100,
+      autoComplete = "live"
+    ),
+    downloadButton(ns("download"), "Download")
+  )
+}
+
 # Update model code in fruits object
 # 
 # @param fruitsObj fruits object
