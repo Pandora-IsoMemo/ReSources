@@ -1180,34 +1180,14 @@ fruitsTab <- function(input,
   }) %>%
     bindEvent(input$preview)
   
-  observe({
-    req("fruitsObj" %in% names(model()))
-    updateAceEditor(
-      session = session,
-      "modelCode-text",
-      value = paste(deparse(model()$fruitsObj$modelCode), collapse = "\n"),
-      autoCompleters = c("snippet", "text", "static", "keyword")
-    )
-  }) %>%
-    bindEvent(model())
-  
-  output$`modelCode-download` <- downloadHandler(
-    filename = function() {
-      paste0("modelCode.txt")
-    },
-    content = function(file) {
-      writeLines(input$`modelCode-text`, file)
-    }
-  )
-  
-  modelCharacteristics <- reactiveVal(NULL)
+  modelCodeServer("modelCode", model)
   
   ## Run model ----
   observeEvent(input$run, {
     logDebug("Entering observeEvent(input$run)")
     
-    model(NULL)
-    modelCharacteristics(NULL)
+    # do not reset model(), this would remove fruitsObj in model!
+    
     values$status <- "RUNNING"
     
     if (is.null(fruitsObj())) {
@@ -1298,8 +1278,15 @@ fruitsTab <- function(input,
     value = 0,
     message = "")
     
-    if (is.null(modelResults)) {
+    if (is.null(modelResults) && !("fruitsObj" %in% names(model()))) {
+      # hide model output tabs:
       values$status <- "ERROR"
+      return()
+    }
+    
+    if (is.null(modelResults) && ("fruitsObj" %in% names(model()))) {
+      # keep showing model output tabs (helpfull to check the modelCode)
+      values$status <- "COMPLETED"
       return()
     }
     
@@ -1363,8 +1350,9 @@ fruitsTab <- function(input,
     }
   })
   
-  ## Run model simulation ----
+  modelCharacteristics <- reactiveVal(NULL)
   
+  ## Run model simulation ----
   observeEvent(input$runModelChar, {
     logDebug("Entering observeEvent(input$runModelChar)")
     values$statusSim <- "RUNNING"

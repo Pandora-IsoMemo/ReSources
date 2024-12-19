@@ -18,6 +18,33 @@ modelCodeUI <- function(id) {
   )
 }
 
+modelCodeServer <- function(id, model) {
+  moduleServer(
+    id,
+    function(input, output, session) {
+      observe({
+        req("fruitsObj" %in% names(model()))
+        updateAceEditor(
+          session = session,
+          "text",
+          value = paste(deparse(model()$fruitsObj$modelCode), collapse = "\n"),
+          autoCompleters = c("snippet", "text", "static", "keyword")
+        )
+      }) %>%
+        bindEvent(model())
+      
+      output$download <- downloadHandler(
+        filename = function() {
+          paste0("modelCode.txt")
+        },
+        content = function(file) {
+          writeLines(input$text, file)
+        }
+      )
+    }
+  )
+}
+
 # Update model code in fruits object
 # 
 # @param fruitsObj fruits object
