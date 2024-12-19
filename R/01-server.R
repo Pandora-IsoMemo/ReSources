@@ -79,9 +79,9 @@ fruitsTab <- function(input,
   #              priority = 500
   # )
   
-
   # Download/Upload Model ----
   model <- reactiveVal(NULL)
+  uploadedNotes <- reactiveVal(NULL)
   modelUploadBaseFileName <- reactiveVal("")
   downloadModelServer("modelDownload",
                       dat = reactiveVal(NULL),
@@ -1191,12 +1191,12 @@ fruitsTab <- function(input,
   }) %>%
     bindEvent(model())
   
-  observe({
-    newfruitsObj <- fruitsObj()
-    newfruitsObj$modelCode <- input$`modelCode-text`
-    #fruitsObj(newfruitsObj) # cannot update, not a reactiveVal yet ...
-  }) %>%
-    bindEvent(input$`modelCode-text`)
+  # observe({
+  #   newfruitsObj <- fruitsObj()
+  #   newfruitsObj$modelCode <- input$`modelCode-text`
+  #   #fruitsObj(newfruitsObj) # cannot update, not a reactiveVal yet ...
+  # }) %>%
+  #   bindEvent(input$`modelCode-text`)
   
   output$`modelCode-download` <- downloadHandler(
     filename = function() {
@@ -1296,7 +1296,7 @@ fruitsTab <- function(input,
     
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj(),
+        updateModelCode(fruitsObj(), newModelCode = input$`modelCode-text`),
         progress = TRUE,
         userDefinedAlphas = values$userDefinedAlphas
       ) %>%
