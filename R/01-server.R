@@ -50,22 +50,6 @@ fruitsTab <- function(input,
     }
   })
   
-  ## Reset Input ----
-  uploadedNotes <- reactiveVal()
-  observeEvent(input$reset, {
-    logDebug("Entering observeEvent(input$reset)")
-    vars <- defaultValues()
-    
-    for (name in names(vars)) {
-      values[[name]] <- vars[[name]]
-    }
-    
-    values$status <- values$statusSim <- "INITIALIZE"
-    values$reset <- runif(1)
-    events$name <- list()
-    uploadedNotes(character(0))
-  })
-  
   ## Load Example Model
   # observeEvent(input$exampleModel,
   #              {
@@ -1223,9 +1207,9 @@ fruitsTab <- function(input,
     }
   )
   
-  ## Run model ----
   modelCharacteristics <- reactiveVal(NULL)
   
+  ## Run model ----
   observeEvent(input$run, {
     logDebug("Entering observeEvent(input$run)")
     
@@ -1386,6 +1370,8 @@ fruitsTab <- function(input,
     }
   })
   
+  ## Run model simulation ----
+  
   observeEvent(input$runModelChar, {
     logDebug("Entering observeEvent(input$runModelChar)")
     values$statusSim <- "RUNNING"
@@ -1444,6 +1430,25 @@ fruitsTab <- function(input,
     if (values$statusSim == "COMPLETED") {
       modelCharacteristics(list(fruitsObj = fruitsObj, modelResults = modelResults))
     }
+  })
+  
+  ## Reset Input ----
+  observeEvent(input$reset, {
+    logDebug("Entering observeEvent(input$reset)")
+    vars <- defaultValues()
+    
+    for (name in names(vars)) {
+      values[[name]] <- vars[[name]]
+    }
+    
+    values$status <- values$statusSim <- "INITIALIZE"
+    values$reset <- runif(1)
+    events$name <- list()
+    uploadedNotes(character(0))
+    
+    fruitsObj(NULL)
+    model(NULL)
+    modelCharacteristics(NULL)
   })
   
   observe({
