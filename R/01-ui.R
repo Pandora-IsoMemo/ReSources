@@ -981,7 +981,6 @@ fruitsUI <- function(id, title = "FRUITS") {
             tabPanel(
               "Convergence plots",
               value = "modelDiagnosticsTab",
-              tags$h4("Convergence plots"),
               conditionalPanel(
                 condition = "output.status == 'COMPLETED'",
                 ns = ns,

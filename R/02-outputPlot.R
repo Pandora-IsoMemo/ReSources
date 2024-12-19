@@ -4,6 +4,7 @@ outputPlotUI <- function(id) {
   fluidRow(
     mainPanel(
       width = 8,
+      tags$h4("Output plots"),
       plotOutput(outputId = ns("SourcePlot")),
       plotExportButton(ns("exportSourcePlot")),
       exportDataUI(ns("exportData"), "Export Data"),
