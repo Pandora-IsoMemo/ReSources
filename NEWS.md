@@ -1,3 +1,8 @@
+# ReSources 25.01.0
+
+## Updates
+- optionally edit model inputs before running the model (#139)
+
 # ReSources 24.12.0
 
 ## New Features

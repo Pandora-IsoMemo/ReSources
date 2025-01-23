@@ -22,17 +22,6 @@ verbatimText <-
     content <- reactive({
       switch(
         class,
-        modelInput = capture.output({
-          returnType <- function(type, obj) {
-            if (type != "userEstimates" |
-                length(obj[["userEstimates"]][[1]]) > 0) {
-              return(obj[[type]])
-            } else {
-              return("")
-            }
-          }
-          returnType(type, model()$fruitsObj)
-        }),
         modelDiagnostics = capture.output(
           convergenceDiagnostics(model()$modelResults$parameters,
                                  model()$fruitsObj)[[type]]
