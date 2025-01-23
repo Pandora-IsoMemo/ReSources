@@ -83,5 +83,5 @@ updateModelCode <- function(fruitsObj, newModelCode, newModelInputs = NULL) {
 }
 
 isRunningOnline <- function() {
-  as.logical(Sys.getenv("SHINYPROXY") != "")
+  as.logical(Sys.getenv("SHINYPROXY") != "", unset = "FALSE")
 }
