@@ -3,7 +3,7 @@ modelCodeUI <- function(id, title = NULL) {
   tagList(
     if (!is.null(title)) tags$h4(title) else NULL,
     if (isRunningOnline()) {
-      helpText(HTML("Use the local version to edit the code, as editing is ignored in the online version. Please check the <a href='https://pandora-isomemo.github.io/docs/apps.html#resources---food-reconstruction-using-isotopic-transferred-signals' target='_blank'>installation instructions</a>. We recommend the Docker installation."))
+      helpText(HTML("Use the local version to edit the code, as editing is disabled in the online version. Please check the <a href='https://pandora-isomemo.github.io/docs/apps.html#resources---food-reconstruction-using-isotopic-transferred-signals' target='_blank'>installation instructions</a>. We recommend the Docker installation."))
     } else {
       helpText("Edit the code if necessary, then press 'Run' to start modeling.")
     },
@@ -16,7 +16,8 @@ modelCodeUI <- function(id, title = NULL) {
       autoScrollEditorIntoView = TRUE,
       minLines = 50,
       maxLines = 100,
-      autoComplete = "live"
+      autoComplete = "live",
+      readOnly = isRunningOnline()
     ),
     downloadButton(ns("download"), "Download")
   )
