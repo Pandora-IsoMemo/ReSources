@@ -933,44 +933,23 @@ fruitsUI <- function(id, title = "FRUITS") {
                 mainPanel(DT::dataTableOutput(ns("SummaryResults")), width = 8)
               )
             ),
-            tabPanel(
-              "Model code",
-              modelCodeUI(ns("modelCode"))
-            ),
+            tabPanel("Model code", modelCodeUI(ns("modelCode"), title = "Model code")), 
             tabPanel(
               "Model inputs",
               tags$h4("Model inputs"),
               tabsetPanel(
                 id = ns("ModelInput"),
-                tabPanel(
-                  "Data",
-                  verbatimTextOutput(ns("modelInputData"), download = TRUE)
-                ),
-                tabPanel(
-                  "Names",
-                  verbatimTextOutput(ns(
-                    "modelInputValueNames"
-                  ), download = TRUE)
-                ),
-                tabPanel(
-                  "Model options",
-                  verbatimTextOutput(
-                    ns("modelInputModelOptions"),
-                    download = TRUE
-                  )
-                ),
-                tabPanel(
-                  "Priors",
-                  verbatimTextOutput(ns(
-                    "modelInputPriors"
-                  ), download = TRUE)
-                ),
-                tabPanel(
-                  "User estimates",
-                  verbatimTextOutput(ns(
-                    "modelUserEstimates"
-                  ), download = TRUE)
-                )
+                tabPanel("Data", modelCodeUI(ns("modelInputData"))),
+                tabPanel("Names", modelCodeUI(ns(
+                  "modelInputValueNames"
+                ))),
+                tabPanel("Model options", modelCodeUI(ns(
+                  "modelInputModelOptions"
+                ))),
+                tabPanel("Priors", modelCodeUI(ns("modelInputPriors"))),
+                tabPanel("User estimates", modelCodeUI(ns(
+                  "modelInputUserEstimates"
+                )))
               )
             )
           ),

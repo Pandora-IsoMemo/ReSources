@@ -1180,7 +1180,15 @@ fruitsTab <- function(input,
   }) %>%
     bindEvent(input$preview)
   
-  modelCodeServer("modelCode", model)
+  # preview model inputs
+  modelCodeServer("modelInputData", model, class = "modelInput", type = "data")
+  modelCodeServer("modelInputValueNames", model, class = "modelInput", type = "valueNames")
+  modelCodeServer("modelInputModelOptions", model, class = "modelInput", type = "modelOptions")
+  modelCodeServer("modelInputPriors", model, class = "modelInput", type = "priors")
+  modelCodeServer("modelInputUserEstimates", model, class = "modelInput", type = "userEstimates")
+  
+  # preview model code
+  modelCodeServer("modelCode", model, class = "modelCode")
   
   ## Run model ----
   observeEvent(input$run, {
@@ -1266,17 +1274,24 @@ fruitsTab <- function(input,
         )
       )
     }
-    
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj = updateModelCode(fruitsObj(), newModelCode = input$`modelCode-text`),
+        fruitsObj = updateModelCode(
+          fruitsObj(),
+          newModelCode = input$`modelCode-text`,
+          newModelInputs = list(
+            data = input$`modelInputData-text`,
+            valueNames = input$`modelInputValueNames-text`,
+            modelOptions = input$`modelInputModelOptions-text`,
+            priors = input$`modelInputPriors-text`,
+            userEstimates = input$`modelInputUserEstimates-text`
+          )
+        ),
         progress = TRUE,
         userDefinedAlphas = values$userDefinedAlphas
       ) %>%
         shinyTryCatch(errorTitle = "Could not run model", alertStyle = "shinyalert")
-    },
-    value = 0,
-    message = "")
+    }, value = 0, message = "")
     
     if (is.null(modelResults) && !("fruitsObj" %in% names(model()))) {
       # hide model output tabs:
@@ -1378,7 +1393,17 @@ fruitsTab <- function(input,
     
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj = updateModelCode(fruitsObj(), newModelCode = input$`modelCode-text`),
+        fruitsObj = updateModelCode(
+          fruitsObj(),
+          newModelCode = input$`modelCode-text`,
+          newModelInputs = list(
+            data = input$`modelInputData-text`,
+            valueNames = input$`modelInputValueNames-text`,
+            modelOptions = input$`modelInputModelOptions-text`,
+            priors = input$`modelInputPriors`,
+            userEstimate = input$`modelInputUserEstimate`
+          )
+        ),
         progress = TRUE,
         onlySim = TRUE,
         userDefinedAlphas = values$userDefinedAlphas,
@@ -1386,9 +1411,7 @@ fruitsTab <- function(input,
         simSourceNames = input$simSpecSources
       ) %>%
         shinyTryCatch(errorTitle = "Could not run model", alertStyle = "shinyalert")
-    },
-    value = 0,
-    message = "")
+    }, value = 0, message = "")
     
     if (is.null(modelResults)) {
       values$statusSim <- "ERROR"
@@ -1628,41 +1651,6 @@ fruitsTab <- function(input,
     }
   })
   
-  callModule(
-    verbatimText,
-    "modelInputData",
-    model = model,
-    class = "modelInput",
-    type = "data"
-  )
-  callModule(
-    verbatimText,
-    "modelInputValueNames",
-    model = model,
-    class = "modelInput",
-    type = "valueNames"
-  )
-  callModule(
-    verbatimText,
-    "modelInputModelOptions",
-    model = model,
-    class = "modelInput",
-    type = "modelOptions"
-  )
-  callModule(
-    verbatimText,
-    "modelInputPriors",
-    model = model,
-    class = "modelInput",
-    type = "priors"
-  )
-  callModule(
-    verbatimText,
-    "modelUserEstimates",
-    model = model,
-    class = "modelInput",
-    type = "userEstimates"
-  )
   callModule(
     verbatimText,
     "wAIC",
