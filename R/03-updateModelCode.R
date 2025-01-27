@@ -84,7 +84,7 @@ updateModelCode <- function(fruitsObj, newModelCode, newModelInputs = NULL) {
 }
 
 isRunningOnline <- function() {
-  as.logical(Sys.getenv("SHINYPROXY") != "", unset = "FALSE")
+  as.logical(Sys.getenv("IS_SHINYPROXY") != "", unset = "FALSE")
 }
 
 sanitizeInput <- function(input) {
