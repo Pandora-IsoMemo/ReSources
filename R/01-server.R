@@ -23,6 +23,18 @@ fruitsTab <- function(input,
     defaultValues()
   )
   
+  # push default values to inputs ----
+  once_push_defaults <- reactiveVal(TRUE)
+  observe({
+    if (once_push_defaults()) {
+      logDebug("PUSH defaultValues TO USER INPUTS <------------------------------------")
+      defaultInputs <- defaultValues()
+      updateUserInputs(input, output, session, userInputs = defaultInputs)
+      once_push_defaults(FALSE)
+    }
+  }) %>%
+    bindEvent(once_push_defaults())
+  
   events <-
     reactiveValues(
       name = list(),
@@ -128,6 +140,9 @@ fruitsTab <- function(input,
     for (name in names(valuesDat)) {
       values[[name]] <- valuesDat[[name]]
     }
+    
+    ## update all inputs ----
+    updateUserInputs(input, output, session, userInputs = valuesDat)
     
     ## update other inputs ----
     if (ncol(values$targetValuesCovariates) > 0) {
@@ -454,21 +469,6 @@ fruitsTab <- function(input,
     updateRadioButtons(session, "modelType", selected = selected)
   })
   
-  observeEvent(values$includeSourceOffset, {
-    logDebug("Entering observeEvent(values$includeSourceOffset)")
-    updateCheckboxInput(session,
-                        "includeSourceOffset",
-                        value = values$includeSourceOffset
-    )
-  })
-  
-  observeEvent(input$includeSourceOffset, {
-    logDebug("Entering observeEvent(input$includeSourceOffset)")
-    if (!identical(input$includeSourceOffset, values$includeSourceOffset)) {
-      values$includeSourceOffset <- input$includeSourceOffset
-    }
-  })
-  
   observeEvent(values$modelWeights, {
     logDebug("Entering observeEvent(values$modelWeights)")
     if (values$modelWeights == TRUE) {
@@ -536,14 +536,6 @@ fruitsTab <- function(input,
     values$modelWeights <- input$modelWeights
   })
   
-  observeEvent(values$modelWeightsContrained, {
-    logDebug("Entering observeEvent(values$modelWeightsContrained)")
-    updateCheckboxInput(session,
-                        "modelWeightsContrained",
-                        value = values$modelWeightsContrained
-    )
-  })
-  
   observeEvent(input$modelWeightsContrained, {
     logDebug("Entering observeEvent(input$modelWeightsContrained)")
     values$modelWeightsContrained <- input$modelWeightsContrained
@@ -570,14 +562,6 @@ fruitsTab <- function(input,
       input$optimalPrior
   })
   
-  observeEvent(values$modelConcentrations, {
-    logDebug("Entering observeEvent(values$modelConcentrations)")
-    updateCheckboxInput(session,
-                        "modelConcentrations",
-                        value = values$modelConcentrations
-    )
-  })
-  
   observeEvent(input$modelConcentrations, {
     logDebug("Entering observeEvent(input$modelConcentrations)")
     values$modelConcentrations <- input$modelConcentrations
@@ -598,12 +582,6 @@ fruitsTab <- function(input,
         session = session
       )
     }
-  })
-  
-  
-  observeEvent(values$burnin, {
-    logDebug("Entering observeEvent(values$burnin)")
-    updateNumericInput(session, "burnin", value = values$burnin)
   })
   
   observeEvent(input$burnin, {
@@ -654,38 +632,16 @@ fruitsTab <- function(input,
   }) %>%
     bindEvent(alphaHyperReactive())
   
-  observeEvent(values$oxcalCheck, {
-    logDebug("Entering observeEvent(values$oxcalCheck)")
-    
-    updateRadioButtons(session, "oxcalCheck",
-                       selected = values$oxcalCheck
-    )
-  })
-  
   observeEvent(input$oxcalCheck, {
     logDebug("Entering observeEvent(input$oxcalCheck)")
     values$oxcalCheck <- input$oxcalCheck
   })
-  
-  observeEvent(values$covariateType, {
-    logDebug("Entering observeEvent(input$covariateType)")
-    if (!identical(input$covariateType, values$covariateType)) {
-      updateRadioButtons(session, "covariateType", selected = values$covariateType)
-    }
-  })
-  
   
   observeEvent(input$covariateType, {
     logDebug("Entering observeEvent(input$covariateType)")
     if (!identical(input$covariateType, values$covariateType)) {
       values$covariateType <- input$covariateType
     }
-  })
-  
-  
-  observeEvent(values$inflatedBeta, {
-    logDebug("Entering observeEvent(values$inflatedBeta)")
-    updateRadioButtons(session, "inflatedBeta", selected = values$inflatedBeta)
   })
   
   observeEvent(input$inflatedBeta, {
@@ -695,12 +651,6 @@ fruitsTab <- function(input,
     }
   })
   
-  
-  observeEvent(values$iterations, {
-    logDebug("Entering observeEvent(values$iterations)")
-    updateNumericInput(session, "iterations", value = values$iterations)
-  })
-  
   observeEvent(input$iterations, {
     logDebug("Entering observeEvent(input$iterations)")
     if (!identical(input$iterations, values$iterations)) {
@@ -708,21 +658,11 @@ fruitsTab <- function(input,
     }
   })
   
-  observeEvent(values$thinning, {
-    logDebug("Entering observeEvent(values$thinning)")
-    updateNumericInput(session, "thinning", value = values$thinning)
-  })
-  
   observeEvent(input$thinning, {
     logDebug("Entering observeEvent(input$thinning)")
     if (!identical(input$thinning, values$thinning)) {
       values$thinning <- input$thinning
     }
-  })
-  
-  observeEvent(values$nchains, {
-    logDebug("Entering observeEvent(values$nchains)")
-    updateNumericInput(session, "nchains", value = values$nchains)
   })
   
   observeEvent(input$nchains, {
@@ -757,12 +697,11 @@ fruitsTab <- function(input,
   observeEvent(input$minUnc, {
     logDebug("Entering observeEvent(input$minUnc)")
     values$minUnc <- input$minUnc
+    
+    # this updates "Unc" input under "Priors" with the input value of "minUnc"
+    updateNumericInput(session, "Unc", value = input$minUnc)
   })
   
-  observeEvent(values$minUnc, {
-    logDebug("Entering observeEvent(values$minUnc)")
-    updateNumericInput(session, "Unc", value = values$minUnc)
-  })
   
   observeEvent(input$addPrior, {
     logDebug("Entering observeEvent(input$addPrior)")
@@ -1454,6 +1393,8 @@ fruitsTab <- function(input,
     fruitsObj(NULL)
     model(NULL)
     modelCharacteristics(NULL)
+    
+    updateUserInputs(input, output, session, userInputs = values)
   })
   
   observe({

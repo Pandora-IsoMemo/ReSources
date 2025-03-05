@@ -117,6 +117,7 @@ targetValuesServer <-
                    
                    observeEvent(values$targetOffset, {
                      logDebug("Entering observeEvent(values$targetOffset)")
+                     # explicitly update input
                      updateCheckboxInput(session, "targetOffset",
                                          value = values$targetOffset
                      )
@@ -144,6 +145,7 @@ targetValuesServer <-
                    
                    observeEvent(values$targetValuesShowCovariates, {
                      logDebug("Entering observeEvent(values$targetValuesShowCovariates)")
+                     # explicitly update input
                      updateCheckboxInput(session,
                                          "targetValuesShowCovariates",
                                          value = values$targetValuesShowCovariates
@@ -188,6 +190,7 @@ targetValuesServer <-
                    
                    observeEvent(values$targetValuesShowCoordinates, {
                      logDebug("Entering observeEvent(values$targetValuesShowCoordinates)")
+                     # explicitly update input
                      updateCheckboxInput(session,
                                          "targetValuesShowCoordinates",
                                          value = values$targetValuesShowCoordinates
@@ -421,6 +424,22 @@ sourcesServer <-
                        )
                      )
                    )
+                   
+                   observeEvent(values$includeSourceOffset, {
+                     logDebug("Entering observeEvent(values$includeSourceOffset)")
+                     # explicitly update input
+                     updateCheckboxInput(session,
+                                         "includeSourceOffset",
+                                         value = values$includeSourceOffset
+                     )
+                   })
+                   
+                   observeEvent(input$includeSourceOffset, {
+                     logDebug("Entering observeEvent(input$includeSourceOffset)")
+                     if (!identical(input$includeSourceOffset, values$includeSourceOffset)) {
+                       values$includeSourceOffset <- input$includeSourceOffset
+                     }
+                   })
                    
                    ## Hide Input for 0 weights
                    observe({

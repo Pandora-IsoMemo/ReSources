@@ -1,3 +1,9 @@
+# ReSources 25.03.0
+
+## Bug Fixes
+- fix the update of user inputs after model import, ensuring that the input 
+  'Optimal objective prior' is updated (#142)
+
 # ReSources 25.01.0
 
 ## Updates
