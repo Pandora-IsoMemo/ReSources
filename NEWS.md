@@ -1,7 +1,7 @@
 # ReSources 23.03.1
 
 ## Bug Fixes
-- fix issues with updates of fruitsObj after editing model code or model inputs (#142)
+- fix the update of model inputs after editing model code or model inputs locally (#142)
 
 # ReSources 25.03.0
 
