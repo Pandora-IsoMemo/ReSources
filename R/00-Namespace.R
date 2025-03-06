@@ -39,7 +39,7 @@
 #' @importFrom shinyMatrix matrixInput updateMatrixInput
 #' @importFrom shinyTools formatRangesOfGGplot formatTitlesOfGGplot headerButtonsUI plotExportButton 
 #'  plotExportServer plotRangesUI plotRangesServer plotTitlesServer plotTitlesUI shinyTryCatch
-#'  vectorInputServer vectorInputUI
+#'  updateUserInputs vectorInputServer vectorInputUI
 #' @importFrom shinyWidgets pickerInput updatePickerInput
 #' @importFrom stats dist setNames runif acf na.omit qnorm cov pnorm rbeta dbeta pchisq dnorm manova
 #' var sd cov2cor p.adjust var.test t.test shapiro.test median quantile rnorm pbeta qbeta qchisq 
