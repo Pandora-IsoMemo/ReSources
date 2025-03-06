@@ -1096,25 +1096,17 @@ fruitsTab <- function(input,
     values$userEstimateGroups <- userEstimateGroups()
   })
   
-  fruitsObj <- reactive({
-    shinyInputToClass(
-      reactiveValuesToList(values),
-      as.list(input$priors),
-      as.list(input$userEstimate)
-    ) %>%
-      shinyTryCatch(errorTitle = "Could not create model input object: ", alertStyle = "shinyalert")
-  })
-  
   ## Preview model ----
   observe({
     logDebug("Entering observe() (preview model)")
-    if (is.null(fruitsObj())) {
+    currentFruitsObj <- getCurrentFruitsObject(values = values, input = input)
+    if (is.null(currentFruitsObj)) {
       values$status <- "ERROR"
       return()
     }
     
     # return only fruits object since there are no real model results
-    model(list(fruitsObj = fruitsObj()))
+    model(list(fruitsObj = currentFruitsObj))
     values$status <- "COMPLETED"
   }) %>%
     bindEvent(input$preview)
@@ -1137,7 +1129,12 @@ fruitsTab <- function(input,
     
     values$status <- "RUNNING"
     
-    if (is.null(fruitsObj())) {
+    currentFruitsObj <- getCurrentFruitsObject(values = values, input = input) 
+    if (isTRUE(input$applyCodeEdits)) {
+      currentFruitsObj <- currentFruitsObj %>% getUpdatedFruitsObj(input)
+    }
+    
+    if (is.null(currentFruitsObj)) {
       values$status <- "ERROR"
       return()
     }
@@ -1189,7 +1186,7 @@ fruitsTab <- function(input,
                         strsplit(x, "=")[[1]][1]
                       }))
     )
-    if (length(fruitsObj()$userEstimates[[1]]) > 0) {
+    if (length(currentFruitsObj$userEstimates[[1]]) > 0) {
       updateRadioButtons(
         session,
         "exportType",
@@ -1213,19 +1210,10 @@ fruitsTab <- function(input,
         )
       )
     }
+      
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj = updateModelCode(
-          fruitsObj(),
-          newModelCode = input$`modelCode-text`,
-          newModelInputs = list(
-            data = input$`modelInputData-text`,
-            valueNames = input$`modelInputValueNames-text`,
-            modelOptions = input$`modelInputModelOptions-text`,
-            priors = input$`modelInputPriors-text`,
-            userEstimates = input$`modelInputUserEstimates-text`
-          )
-        ),
+        fruitsObj = currentFruitsObj,
         progress = TRUE,
         userDefinedAlphas = values$userDefinedAlphas
       ) %>%
@@ -1259,7 +1247,7 @@ fruitsTab <- function(input,
           return()
         } else {
           diagnostic <-
-            convergenceDiagnostics(modelResults$parameters, fruitsObj())$geweke[[1]] %>%
+            convergenceDiagnostics(modelResults$parameters, currentFruitsObj)$geweke[[1]] %>%
             shinyTryCatch(errorTitle = "Could not create Diagnostics", alertStyle = "shinyalert")
           if (any(is.nan(diagnostic[which(grepl("alpha", names(diagnostic)))])) |
               any(is.na(diagnostic[which(grepl("alpha", names(diagnostic)))])) |
@@ -1277,11 +1265,11 @@ fruitsTab <- function(input,
       
       withProgress({
         setProgress(message = "Compute summary statistics", value = 0.95)
-        model(list(fruitsObj = fruitsObj(), modelResults = modelResults))
+        model(list(fruitsObj = currentFruitsObj, modelResults = modelResults))
         values$modelResultSummary <- getResultStatistics(
           modelResults$parameters,
           modelResults$userEstimateSamples,
-          fruitsObj(),
+          currentFruitsObj,
           DT = FALSE,
           agg = FALSE
         ) %>%
@@ -1290,7 +1278,7 @@ fruitsTab <- function(input,
       })
       
       if (values$status == "COMPLETED") {
-        outText <- produceOutText(fruitsObj(), diagnostic) %>%
+        outText <- produceOutText(currentFruitsObj, diagnostic) %>%
           shinyTryCatch(errorTitle = "Could not create output", alertStyle = "shinyalert")
         
         showModal(
@@ -1313,36 +1301,25 @@ fruitsTab <- function(input,
     values$statusSim <- "RUNNING"
     modelCharacteristics(NULL)
     
-    valuesList <- reactiveValuesToList(values)
-    if (valuesList[["modelType"]] == "1") {
-      valuesList[["modelType"]] <- "2"
+    valuesSim <- reactiveValuesToList(values)
+    if (valuesSim[["modelType"]] == "1") {
+      valuesSim[["modelType"]] <- "2"
     }
     
-    fruitsObj <- shinyInputToClass(
-          valuesList,
-          as.list(input$priors),
-          as.list(input$userEstimate)
-        ) %>%
-      shinyTryCatch(errorTitle = "Could not create model input object: ", alertStyle = "shinyalert")
+    fruitsObjSim <- getCurrentFruitsObject(values = valuesSim, input = input)
     
-    if (is.null(fruitsObj)) {
+    if (isTRUE(input$applyCodeEditsSim)) {
+      fruitsObjSim <- fruitsObjSim %>% getUpdatedFruitsObj(input)
+    }
+    
+    if (is.null(fruitsObjSim)) {
       values$status <- "ERROR"
       return()
     }
     
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj = updateModelCode(
-          fruitsObj(),
-          newModelCode = input$`modelCode-text`,
-          newModelInputs = list(
-            data = input$`modelInputData-text`,
-            valueNames = input$`modelInputValueNames-text`,
-            modelOptions = input$`modelInputModelOptions-text`,
-            priors = input$`modelInputPriors`,
-            userEstimate = input$`modelInputUserEstimate`
-          )
-        ),
+        fruitsObj = fruitsObjSim,
         progress = TRUE,
         onlySim = TRUE,
         userDefinedAlphas = values$userDefinedAlphas,
@@ -2050,7 +2027,6 @@ fruitsTab <- function(input,
   ## food intakes
   callModule(foodIntakes, "foodIntakes", values = values)
 }
-
 
 #' Extract Potential Numerics
 #' 

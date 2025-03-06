@@ -64,8 +64,8 @@ shinyInputToClass <- function(values, priors, userEstimates) {
     concentrationDistCovRep = values[["concentrationDistCovRep"]],
     obsvnDist = values[["obsvnDistribution"]],
     inflatedBeta = values[["inflatedBeta"]],
-    alphaHyper = values[["alphaHyper"]],
-    optimalPrior = values[["optimalPrior"]],
+    alphaHyper = values[["alphaHyper"]],       # this defines "sourceDirichPrior"
+    optimalPrior = values[["optimalPrior"]],   # this defines "sourceDirichPrior"
     covariateType = values[["covariateType"]]
   )
 
@@ -84,4 +84,13 @@ shinyInputToClass <- function(values, priors, userEstimates) {
   )
 
   res
+}
+
+getCurrentFruitsObject <- function(values, input) {
+  shinyInputToClass(
+    reactiveValuesToList(values),
+    as.list(input$priors),
+    as.list(input$userEstimate)
+  ) %>%
+    shinyTryCatch(errorTitle = "Could not create model input object: ", alertStyle = "shinyalert")
 }

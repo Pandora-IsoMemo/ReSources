@@ -52,6 +52,21 @@ modelCodeServer <- function(id, model, class, type = NULL) {
   })
 }
 
+getUpdatedFruitsObj <- function(fruitsObj, input) {
+  fruitsObj %>%
+    updateModelCode(
+      newModelCode = input$`modelCode-text`,
+      newModelInputs = list(
+        data = input$`modelInputData-text`,
+        valueNames = input$`modelInputValueNames-text`,
+        modelOptions = input$`modelInputModelOptions-text`,
+        priors = input$`modelInputPriors-text`,
+        userEstimates = input$`modelInputUserEstimates-text`
+      )
+    ) %>%
+    shinyTryCatch(errorTitle = "Could not update model code", alertStyle = "shinyalert")
+}
+
 # Update model code in fruits object
 #
 # @param fruitsObj fruits object
