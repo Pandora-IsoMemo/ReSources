@@ -1210,7 +1210,6 @@ fruitsTab <- function(input,
         )
       )
     }
-      
     withProgress({
       modelResults <- compileRunModel(
         fruitsObj = currentFruitsObj,

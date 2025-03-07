@@ -3,7 +3,8 @@
 #' @param priors list: input$priors
 #' @param userEstimates list: input$userEstimates
 shinyInputToClass <- function(values, priors, userEstimates) {
-  if (is.null(priors)) priors <- list()
+  if (is.null(priors))
+    priors <- list()
   data <- list(
     obsvn = values[["obsvn"]][["default"]],
     obsvnError = values[["obsvnError"]][["default"]],
@@ -40,7 +41,7 @@ shinyInputToClass <- function(values, priors, userEstimates) {
     sourceOffsetUnc = values[["sourceOffsetUncert"]],
     covariates = values[["targetValuesCovariates"]]
   )
-
+  
   modelOptions <- list(
     modelType = values[["modelType"]],
     modelWeights = values[["modelWeights"]],
@@ -64,17 +65,15 @@ shinyInputToClass <- function(values, priors, userEstimates) {
     concentrationDistCovRep = values[["concentrationDistCovRep"]],
     obsvnDist = values[["obsvnDistribution"]],
     inflatedBeta = values[["inflatedBeta"]],
-    alphaHyper = values[["alphaHyper"]],       # this defines "sourceDirichPrior"
-    optimalPrior = values[["optimalPrior"]],   # this defines "sourceDirichPrior"
+    alphaHyper = values[["alphaHyper"]],
+    optimalPrior = values[["optimalPrior"]],
     covariateType = values[["covariateType"]]
   )
-
-  valueNames <- list(
-    targets = values[["targetNames"]],
-    fractions = values[["fractionNames"]],
-    sources = values[["sourceNames"]]
-  )
-
+  
+  valueNames <- list(targets = values[["targetNames"]],
+                     fractions = values[["fractionNames"]],
+                     sources = values[["sourceNames"]])
+  
   res <- fruits(
     data = data,
     modelOptions = modelOptions,
@@ -82,7 +81,7 @@ shinyInputToClass <- function(values, priors, userEstimates) {
     priors = priors,
     userEstimates = list(userEstimates, values[["userEstimateGroups"]])
   )
-
+  
   res
 }
 
