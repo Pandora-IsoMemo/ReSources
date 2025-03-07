@@ -1132,5 +1132,5 @@ fruitsUI <- function(id, title = "FRUITS") {
 }
 
 helpTextApplyCodeEdits <- function() {
-  helpText("This overwrites all changes of user inputs made after pressing 'Preview'. Only the code visible under 'Model code' and 'Model inputs' will be used.")
+  helpText("This will overwrite any user input changes made after pressing 'Preview'. Only the code visible under 'Model code' and 'Model inputs' will be used.")
 }
