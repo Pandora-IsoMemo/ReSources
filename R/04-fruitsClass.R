@@ -150,7 +150,7 @@ fruits <- function(data,
   if(modelOptions$optimalPrior == TRUE){
     data$sourceDirichPrior <- rep(0.8 / constants[["nSources"]], constants[["nSources"]])
   } else {
-    data$sourceDirichPrior <- modelOptions$alphaHyper
+    data$sourceDirichPrior <- unname(modelOptions$alphaHyper) # remove names to avoid issues with nimble::nimbleModel()
   }
   
   if (modelOptions$inflatedBeta != "0") {

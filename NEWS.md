@@ -1,3 +1,9 @@
+# ReSources 23.03.1
+
+## Bug Fixes
+- fix the logic to update model inputs after editing model code or model inputs locally (#142)
+- update displayed help texts respectively to the new logic
+
 # ReSources 25.03.0
 
 ## Bug Fixes

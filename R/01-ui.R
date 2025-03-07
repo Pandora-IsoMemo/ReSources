@@ -32,8 +32,14 @@ fruitsUI <- function(id, title = "FRUITS") {
         # ),
         # actionButton(ns("exampleModel"), "Load selected model"),
         tags$hr(),
-        helpText("Press 'Preview' to check 'Model code' and 'Model inputs' under the tab 'Results Report'."),
+        helpText("Press 'Preview' to create or update 'Model code' and 'Model inputs' under the 'Results Report' tab."),
         actionButton(ns("preview"), "Preview"),
+        if (!isRunningOnline()) checkboxInput(ns("applyCodeEdits"), "Run with edited 'Model code' or 'Model inputs'", value = FALSE) else NULL,
+        if (!isRunningOnline()) conditionalPanel(
+          condition = "input.applyCodeEdits == true",
+          ns = ns,
+          helpTextApplyCodeEdits(),
+        ) else NULL,
         actionButton(ns("run"), "Run"),
         actionButton(ns("reset"), "Reset"),
         #checkboxInput(ns("adaptiveNames"), "Adaptive Names", value = FALSE),
@@ -700,6 +706,12 @@ fruitsUI <- function(id, title = "FRUITS") {
                 selected = NULL,
                 multiple = TRUE
               ),
+              if (!isRunningOnline()) checkboxInput(ns("applyCodeEditsSim"), "Simulate with edited 'Model code' or 'Model inputs'", value = FALSE) else NULL,
+              if (!isRunningOnline()) conditionalPanel(
+                condition = "input.applyCodeEditsSim == true",
+                ns = ns,
+                helpTextApplyCodeEdits(),
+              ) else NULL,
               div(actionButton(ns("runModelChar"), "Simulate")),
               tags$br(),
               conditionalPanel(
@@ -1117,4 +1129,8 @@ fruitsUI <- function(id, title = "FRUITS") {
       )
     )
   )
+}
+
+helpTextApplyCodeEdits <- function() {
+  helpText("This will overwrite any user input changes made after pressing 'Preview'. Only the code visible under 'Model code' and 'Model inputs' will be used.")
 }
