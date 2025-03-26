@@ -114,7 +114,7 @@ test_that("getCodeAquatic", {
 })
 
 test_that("Create OxCal Output", {
-  model <- readRDS("test-oxcalModelData.rds")
+  model <- readRDS(testthat::test_path("test-oxcalModelData.rds"))
   basicCode <-
     c(
       "Plot()",

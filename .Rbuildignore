@@ -25,3 +25,5 @@ dia$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^inst/app/predefinedModels/
+^inst/app/dataQueries/

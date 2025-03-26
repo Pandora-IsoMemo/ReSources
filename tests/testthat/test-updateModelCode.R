@@ -1,5 +1,5 @@
 test_that("updateModelCode", {
-  testData <- readRDS(file.path(testthat::test_path(), "test-04-modelSummary_dataExmpl.rds"))
+  testData <- readRDS(testthat::test_path("test-04-modelSummary_dataExmpl.rds"))
   
   # test empty new code
   testRes <- updateModelCode(fruitsObj = testData$fruitsObj, newModelCode = "")

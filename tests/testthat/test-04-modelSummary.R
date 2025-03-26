@@ -2,7 +2,7 @@ context("Model Summary")
 
 
 test_that("extractResultMatrixOfChain with Exmpl data", {
-  testData <- readRDS("test-04-modelSummary_dataExmpl.rds")
+  testData <- readRDS(testthat::test_path("test-04-modelSummary_dataExmpl.rds"))
   renamedChains <- testData$renamedChains
   fruitsObj <- testData$fruitsObj
   
@@ -95,7 +95,7 @@ test_that("extractResultMatrixOfChain with Exmpl data", {
 
 
 test_that("extractResultMatrixOfChain with User data", {
-  testData <- readRDS("test-04-modelSummary_dataUser.rds")
+  testData <- readRDS(testthat::test_path("test-04-modelSummary_dataUser.rds"))
   renamedChains <- testData$renamedChains
   fruitsObj <- testData$fruitsObj
   

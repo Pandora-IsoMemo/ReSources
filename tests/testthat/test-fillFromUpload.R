@@ -1,8 +1,8 @@
 test_that("test compileRunModel - blackBearData with default inputs", {
   testEmptyUpload <-
-    readRDS(testthat::test_path("dataUpload_emptyInput.rds"))
+    readRDS(testthat::test_path("upload_empty.rds"))
   testCompleteUpload <-
-    readRDS(testthat::test_path("dataUpload_complete.rds"))
+    readRDS(testthat::test_path("upload_complete.rds"))
   
   # expect 3 missing tables after filling values
   expect_length(suppressWarnings(checkForEmptyTables(fillValuesFromUpload(testEmptyUpload))), 3)
