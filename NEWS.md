@@ -1,3 +1,8 @@
+# ReSources 25.03.2
+
+## Updates
+- reduce package size by updating test data and including example files into the `.Rbuildignore`
+
 # ReSources 25.03.1
 
 ## Bug Fixes
