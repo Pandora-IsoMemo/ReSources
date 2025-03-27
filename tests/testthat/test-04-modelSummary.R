@@ -2,7 +2,9 @@ context("Model Summary")
 
 
 test_that("extractResultMatrixOfChain with Exmpl data", {
-  testData <- readRDS(testthat::test_path("test-04-modelSummary_dataExmpl.rds"))
+  skip_if_not(Sys.getenv("RUN_LOCAL_TESTS") == "true", "Skipping large data test on CI")
+  
+  testData <- readRDS(testthat::test_path("testdata_large", "test-04-modelSummary_dataExmpl.rds"))
   renamedChains <- testData$renamedChains
   fruitsObj <- testData$fruitsObj
   
@@ -95,7 +97,9 @@ test_that("extractResultMatrixOfChain with Exmpl data", {
 
 
 test_that("extractResultMatrixOfChain with User data", {
-  testData <- readRDS(testthat::test_path("test-04-modelSummary_dataUser.rds"))
+  skip_if_not(Sys.getenv("RUN_LOCAL_TESTS") == "true", "Skipping large data test on CI")
+  
+  testData <- readRDS(testthat::test_path("testdata_large", "test-04-modelSummary_dataUser.rds"))
   renamedChains <- testData$renamedChains
   fruitsObj <- testData$fruitsObj
   

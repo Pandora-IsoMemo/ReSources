@@ -27,3 +27,4 @@ dia$
 ^pkgdown$
 ^inst/app/predefinedModels/
 ^inst/app/dataQueries/
+^tests/testthat/testdata_large/

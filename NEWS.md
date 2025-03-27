@@ -2,6 +2,7 @@
 
 ## Updates
 - reduce package size by updating test data and including example files into the `.Rbuildignore`
+- skip large data tests in CI and add large test data to the `.Rbuildignore`
 
 # ReSources 25.03.1
 

@@ -114,7 +114,9 @@ test_that("getCodeAquatic", {
 })
 
 test_that("Create OxCal Output", {
-  model <- readRDS(testthat::test_path("test-oxcalModelData.rds"))
+  skip_if_not(Sys.getenv("RUN_LOCAL_TESTS") == "true", "Skipping large data test on CI")
+  
+  model <- readRDS(testthat::test_path("testdata_large", "test-oxcalModelData.rds"))
   basicCode <-
     c(
       "Plot()",
