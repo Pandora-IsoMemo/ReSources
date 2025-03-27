@@ -6,6 +6,6 @@ test_that("Create Model", {
   # ...
 })
 
-test_that("Alter Model", {
-  # ...
-})
+# test_that("Alter Model", {
+#    ...
+# })
