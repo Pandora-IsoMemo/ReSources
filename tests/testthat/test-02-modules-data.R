@@ -1,6 +1,6 @@
 test_that("Test module targetValuesServer", {
   testData <-
-    readRDS(testthat::test_path("dataWithPriors_default.rds"))
+    readRDS(testthat::test_path("testdata", "dataWithPriors_default.rds"))
   testData$optimalPrior <- TRUE
   
   testEvents <-
