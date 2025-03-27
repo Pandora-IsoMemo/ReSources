@@ -1,0 +1,27 @@
+#First curve
+@@@
+Marine20
+@@@
+Curve("Marine20","Marine20.14c");
+Delta_R("Aquatic2",%%Delta_R_2%%,%%Delta_R_SD_2%%);
+
+@@@
+Mix_Curve(%%TARGET_ID%%,"Aquatic1","Aquatic2", %%MEAN_B%%,%%SD_B%%);
+
+@@@
+Mix_Curve(%%TARGET_ID%%,"Aquatic1","Aquatic2", P(0,100,[0,%%BINS_B%%,0]));
+
+@@@
+#Second curve
+@@@
+IntCal20
+@@@
+Curve("IntCal20","IntCal20.14c");
+Delta_R("Aquatic2",%%Delta_R_2%%,%%Delta_R_SD_2%%);
+@@@
+Mix_Curve(%%TARGET_ID%%,"Aquatic1","Aquatic2", %%MEAN_B%%,%%SD_B%%);
+
+@@@
+Mix_Curve(%%TARGET_ID%%,"Aquatic1","Aquatic2", P(0,100,[0,%%BINS_B%%,0]));
+
+@@@

@@ -1,5 +1,8 @@
 test_that("updateModelCode", {
-  testData <- readRDS(file.path(testthat::test_path(), "test-04-modelSummary_dataExmpl.rds"))
+  data_path <- testthat::test_path("testdata_large", "test-04-modelSummary_dataExmpl.rds")
+  skip_if_not(file.exists(data_path), "Skipping large data test on CI or for devtools:check()")
+  
+  testData <- readRDS(data_path)
   
   # test empty new code
   testRes <- updateModelCode(fruitsObj = testData$fruitsObj, newModelCode = "")

@@ -1,9 +1,9 @@
 # blackBearData ----
 test_that("test compileRunModel - blackBearData with default inputs", {
   testData <-
-    readRDS(testthat::test_path("blackBearData_default.rds"))
+    readRDS(testthat::test_path("testdata", "blackBearData_default.rds"))
   testDataBaseline <-
-    readRDS(testthat::test_path("blackBearData_baselineModel.rds"))
+    readRDS(testthat::test_path("testdata", "blackBearData_baselineModel.rds"))
   
   print("Testing with blackBearData ----------")
   
@@ -98,7 +98,7 @@ test_that("test compileRunModel - blackBearData with default inputs", {
 # brownBearData ----
 test_that("test compileRunModel - brownBearData with default inputs", {
   testData <-
-    readRDS(testthat::test_path("brownBearData_default.rds"))
+    readRDS(testthat::test_path("testdata", "brownBearData_default.rds"))
   
   print("Testing with brownBearData ----------")
   
@@ -150,7 +150,7 @@ test_that("test compileRunModel - brownBearData with default inputs", {
 # fiveSourcesData ----
 test_that("test compileRunModel - fiveSourcesData with default inputs", {
   testData <-
-    readRDS(testthat::test_path("fiveSourcesData_default.rds"))
+    readRDS(testthat::test_path("testdata", "fiveSourcesData_default.rds"))
   
   print("Testing with fiveSourcesData ----------")
   
@@ -201,7 +201,7 @@ test_that("test compileRunModel - fiveSourcesData with default inputs", {
 # romanData ----
 test_that("test compileRunModel - romanData with default inputs", {
   testData <-
-    readRDS(testthat::test_path("romanData_default.rds"))
+    readRDS(testthat::test_path("testdata", "romanData_default.rds"))
   
   print("Testing with romanData ----------")
   
@@ -246,7 +246,7 @@ test_that("test compileRunModel - romanData with default inputs", {
 # dataWithPriors ----
 test_that("test compileRunModel - dataWithPriors with default inputs", {
   testData <-
-    readRDS(testthat::test_path("dataWithPriors_default.rds"))
+    readRDS(testthat::test_path("testdata", "dataWithPriors_default.rds"))
   
   print("Testing with dataWithPriors ----------")
   
