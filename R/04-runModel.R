@@ -16,7 +16,9 @@ compileRunModel <- function(fruitsObj, progress = FALSE, onlySim = FALSE,
   nimbleOptions(
     showCompilerOutput = FALSE,
     verboseErrors = FALSE,
-    checkNimbleFunction = FALSE
+    checkNimbleFunction = FALSE,
+    MCMCusePredictiveDependenciesInCalculations = TRUE,
+    MCMCorderPosteriorPredictiveSamplersLast = FALSE
   )
   # nimble bug mitigation
   if (fruitsObj$constants$nFractions == 1) {

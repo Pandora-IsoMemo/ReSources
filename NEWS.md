@@ -1,3 +1,9 @@
+# ReSources 25.06.0
+
+## Bug Fixes
+- fixed an issue with nimble versions newer than 0.13.0, where different settings need to be applied
+  to receive the previous behavior (#142)
+
 # ReSources 25.03.2
 
 ## Updates
