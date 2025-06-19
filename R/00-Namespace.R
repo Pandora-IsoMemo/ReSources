@@ -37,8 +37,9 @@
 #' @importFrom shinyalert shinyalert
 #' @importFrom shinyjs reset useShinyjs alert show hide
 #' @importFrom shinyMatrix matrixInput updateMatrixInput
-#' @importFrom shinyTools formatRangesOfGGplot formatTitlesOfGGplot headerButtonsUI plotExportButton 
-#'  plotExportServer plotRangesUI plotRangesServer plotTitlesServer plotTitlesUI shinyTryCatch
+#' @importFrom shinyTools addCustomPointsToGGplot customPointsUI customPointsServer
+#'  formatRangesOfGGplot formatTitlesOfGGplot headerButtonsUI plotExportButton plotExportServer
+#'  plotRangesUI plotRangesServer plotTitlesServer plotTitlesUI shinyTryCatch
 #'  updateUserInputs vectorInputServer vectorInputUI
 #' @importFrom shinyWidgets pickerInput updatePickerInput
 #' @importFrom stats dist setNames runif acf na.omit qnorm cov pnorm rbeta dbeta pchisq dnorm manova

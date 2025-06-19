@@ -1,3 +1,13 @@
+# ReSources 25.06.1
+
+## New Features
+- One can now optionally add custom points:
+  - to plots in the _Model Diagnostics_ tab, or
+  - to line plots in the _Output Plots_ tab.
+
+## Bug Fixes
+- Fixed an issue when importing batch data using _DataTools_ version 25.06.0 (#147).
+
 # ReSources 25.06.0
 
 ## Bug Fixes
