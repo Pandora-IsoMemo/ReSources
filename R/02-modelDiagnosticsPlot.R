@@ -6,10 +6,17 @@ modelDiagnosticsPlotUI <- function(id) {
       width = 8,
       tags$h4("Convergence plots"),
       plotOutput(outputId = ns("DiagnosticsPlot")),
-      plotExportButton(ns("exportDiagnosticsPlot")),
-      exportDataUI(ns("exportDataDiag"), "Export Data"),
-      exportDataUI(ns("exportDataChainsAll"), "Export all chains")
-    ),
+      fluidRow(
+        column(6, customPointsUI(id = ns("diagPlotCustomPoints"), plot_type = "ggplot")),
+        column(
+          6,
+          align = "right",
+          plotExportButton(ns("exportDiagnosticsPlot")),
+          exportDataUI(ns("exportDataDiag"), "Export Data"),
+          exportDataUI(ns("exportDataChainsAll"), "Export all chains")
+        )
+      )
+    ), 
     sidebarPanel(
       style = "position:fixed; width:15%; max-width:350px; overflow-y:auto; height:82%",
       width = 3,
@@ -87,6 +94,8 @@ modelDiagnosticsPlotUI <- function(id) {
 
 
 modelDiagnosticsPlot <- function(input, output, session, model, values) {
+  customePointsDiag <- customPointsServer("diagPlotCustomPoints", plot_type = "ggplot")
+  
   plotParams <- reactive({
     list(
       fruitsObj = model()$fruitsObj$data,
@@ -102,8 +111,9 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
       histBins = input$histBinsDiag,
       contributionLimit = input$contributionLimitDiag,
       colorPalette = input$colorPaletteDiag,
-      applyRanges = input$applyRangesDiag,
-      applyTitles = input$applyTitlesDiag
+      applyRanges = input$applyRangesDiag, # needed only for plot update
+      applyTitles = input$applyTitlesDiag, # needed only for plot update
+      customePointsDiag = customePointsDiag() # needed only for plot update
     )
   }) %>% debounce(100)
 
@@ -142,6 +152,10 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
           formatTitlesOfGGplot(text = plotTitlesDiag)
       }
       
+      p <- p |>
+        addCustomPointsToGGplot(customePointsDiag()) |>
+        shinyTryCatch(errorTitle = "Plotting failed")
+        
       p
     }
   })

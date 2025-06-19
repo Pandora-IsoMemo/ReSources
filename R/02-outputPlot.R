@@ -6,17 +6,28 @@ outputPlotUI <- function(id) {
       width = 8,
       tags$h4("Output plots"),
       plotOutput(outputId = ns("SourcePlot")),
-      plotExportButton(ns("exportSourcePlot")),
-      exportDataUI(ns("exportData"), "Export Data"),
-      HTML("<br><br>"),
-      conditionalPanel(
-        condition = "input.plotType == 'BoxPlot'",
-        ns = ns,
-        actionButton(ns("add_btn"), "Add data point"),
-        actionButton(ns("rm_btn"), "Remove data point"),
-        # colourInput(ns("col_btn"), "Select colour of data point"),
-        # sliderInput(ns("size_btn"), "Size data point", min = 0.1, max = 10, value = 1),
-        uiOutput(ns("pointInput"))
+      fluidRow(
+        column(6,
+               conditionalPanel(
+                 condition = "input.plotType == 'Line'",
+                 ns = ns,
+                 customPointsUI(id = ns("outputPlotCustomPoints"), plot_type = "ggplot")
+               ),
+               conditionalPanel(
+                 condition = "input.plotType == 'BoxPlot'",
+                 ns = ns,
+                 actionButton(ns("add_btn"), "Add data point"),
+                 actionButton(ns("rm_btn"), "Remove data point"),
+                 # colourInput(ns("col_btn"), "Select colour of data point"),
+                 # sliderInput(ns("size_btn"), "Size data point", min = 0.1, max = 10, value = 1),
+                 uiOutput(ns("pointInput"))
+               )
+        ),
+        column(6,
+               align = "right",
+               plotExportButton(ns("exportSourcePlot")),
+               exportDataUI(ns("exportData"), "Export Data")
+        )
       )
     ),
     sidebarPanel(
@@ -186,6 +197,9 @@ outputPlot <- function(input, output, session, model, values) {
       )
     )
   })
+  
+  customePointsOutputPlot <- customPointsServer("outputPlotCustomPoints", plot_type = "ggplot")
+  
   plotParams <- reactive({
     binSize <- NULL
     if (!is.null(input$`exportData-bins`) &&
@@ -219,8 +233,9 @@ outputPlot <- function(input, output, session, model, values) {
       boxQuantile = input$boxQuantile,
       whiskerMultiplier = input$whiskerMultiplier,
       numCov = numCov,
-      applyRanges = input$applyOutputPlotRanges,
-      applyTitles = input$applyOutputPlotTitles
+      applyRanges = input$applyOutputPlotRanges, # only needed to trigger update of plot
+      applyTitles = input$applyOutputPlotTitles, # only needed to trigger update of plot
+      customePointsOutputPlot = customePointsOutputPlot() # only needed to trigger update of plot
     )
   }) %>% debounce(100)
   
@@ -262,6 +277,12 @@ outputPlot <- function(input, output, session, model, values) {
       if (input$applyOutputPlotTitles >= 0) {
         p <- p %>% 
           formatTitlesOfGGplot(text = plotTitlesOutputPlot)
+      }
+      
+      if (input$plotType == "Line") {
+        p <- p |>
+          addCustomPointsToGGplot(customePointsOutputPlot()) |>
+          shinyTryCatch(errorTitle = "Plotting failed")
       }
       
       p
@@ -456,11 +477,19 @@ outputPlot <- function(input, output, session, model, values) {
   }
   
   observeEvent(input$add_btn, {
-    pointDat(addRow(pointDat()))
+    new_point_data <- addRow(pointDat()) %>%
+      shinyTryCatch(errorTitle = "Error adding data point",
+                    warningTitle = "Warning adding data point",
+                    alertStyle = "shinyalert")
+    pointDat(new_point_data)
   })
   
   observeEvent(input$rm_btn, {
-    pointDat(rmRow(pointDat()))
+    new_point_data <- rmRow(pointDat()) %>%
+      shinyTryCatch(errorTitle = "Error adding data point",
+                    warningTitle = "Warning adding data point",
+                    alertStyle = "shinyalert")
+    pointDat(new_point_data)
   })
   
   observe({
