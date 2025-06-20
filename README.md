@@ -15,3 +15,4 @@
 
 ### Folder for online models
 - [`inst/app/predefinedModels`](https://github.com/Pandora-IsoMemo/resources/tree/main/inst/app/predefinedModels)
+  
