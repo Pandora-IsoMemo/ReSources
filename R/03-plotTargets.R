@@ -122,7 +122,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
         pointDat$y <- pointDat$y / 100
       }
       p <- p + geom_point(
-        data = pointDat, mapping = aes(x = .data$group, y = .data$y),
+        data = pointDat, mapping = aes(x = pointDat$group, y = pointDat$y),
         color = pointDat$pointColor,
         size = pointDat$pointSize, alpha = pointDat$pointAlpha,
         show.legend = FALSE

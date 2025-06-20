@@ -1,3 +1,9 @@
+# ReSources 25.06.2
+
+## Bug Fixes
+- use most recent DataTools version to fix a bug in the deployment of the app
+- fix an issue when adding a point to a boxplot
+
 # ReSources 25.06.1
 
 ## New Features

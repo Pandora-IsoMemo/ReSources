@@ -486,7 +486,7 @@ outputPlot <- function(input, output, session, model, values) {
   
   observeEvent(input$rm_btn, {
     new_point_data <- rmRow(pointDat()) %>%
-      shinyTryCatch(errorTitle = "Error adding data point",
+      shinyTryCatch(errorTitle = "Error removing data point",
                     warningTitle = "Warning adding data point",
                     alertStyle = "shinyalert")
     pointDat(new_point_data)
