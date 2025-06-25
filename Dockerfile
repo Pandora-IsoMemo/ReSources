@@ -1,7 +1,7 @@
 FROM ghcr.io/pandora-isomemo/base-image:latest
 
 RUN adduser --system --disabled-password --home /home/inwt inwt
-ENV HOME /home/inwt 
+ENV HOME=/home/inwt 
 USER inwt
 
 ADD . .
@@ -11,7 +11,7 @@ RUN Rscript -e "reticulate::install_miniconda(); \
                 reticulate::conda_install('r-reticulate', c('python-kaleido', 'packaging')); \
                 reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly'); \
                 reticulate::use_miniconda('r-reticulate'); \
-                install.packages('https://cran.r-project.org/src/contrib/Archive/nimble/nimble_1.0.1.tar.gz', repos = NULL)" \
+                install.packages('nimble', repos = 'https://packagemanager.posit.co/cran/__linux__/noble/2025-03-01', version = '1.3.0')" \
     && installPackage DSSM \
     && installPackage
 
