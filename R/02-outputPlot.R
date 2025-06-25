@@ -8,19 +8,16 @@ outputPlotUI <- function(id) {
       plotOutput(outputId = ns("SourcePlot")),
       fluidRow(
         column(6,
-               conditionalPanel(
-                 condition = "input.plotType == 'Line'",
-                 ns = ns,
-                 customPointsUI(id = ns("outputPlotCustomPoints"), plot_type = "ggplot")
-               ),
-               conditionalPanel(
-                 condition = "input.plotType == 'BoxPlot'",
-                 ns = ns,
-                 actionButton(ns("add_btn"), "Add data point"),
-                 actionButton(ns("rm_btn"), "Remove data point"),
-                 # colourInput(ns("col_btn"), "Select colour of data point"),
-                 # sliderInput(ns("size_btn"), "Size data point", min = 0.1, max = 10, value = 1),
-                 uiOutput(ns("pointInput"))
+               
+              conditionalPanel(
+                condition = "input.plotType == 'BoxPlot' | input.plotType == 'Line'",
+                ns = ns,
+                customPointsUI(id = ns("outputPlotCustomPoints"), plot_type = "ggplot")
+                # actionButton(ns("add_btn"), "Add data point"),
+                # actionButton(ns("rm_btn"), "Remove data point"),
+                # # colourInput(ns("col_btn"), "Select colour of data point"),
+                # # sliderInput(ns("size_btn"), "Size data point", min = 0.1, max = 10, value = 1),
+                # uiOutput(ns("pointInput"))
                )
         ),
         column(6,
@@ -198,8 +195,6 @@ outputPlot <- function(input, output, session, model, values) {
     )
   })
   
-  customePointsOutputPlot <- customPointsServer("outputPlotCustomPoints", plot_type = "ggplot")
-  
   plotParams <- reactive({
     binSize <- NULL
     if (!is.null(input$`exportData-bins`) &&
@@ -233,11 +228,57 @@ outputPlot <- function(input, output, session, model, values) {
       boxQuantile = input$boxQuantile,
       whiskerMultiplier = input$whiskerMultiplier,
       numCov = numCov,
-      applyRanges = input$applyOutputPlotRanges, # only needed to trigger update of plot
-      applyTitles = input$applyOutputPlotTitles, # only needed to trigger update of plot
-      customePointsOutputPlot = customePointsOutputPlot() # only needed to trigger update of plot
+      applyRanges = input$applyOutputPlotRanges, # only needed to trigger the plot update
+      applyTitles = input$applyOutputPlotTitles, # only needed to trigger the plot update
+      customePointsOutputPlot = customePointsOutputPlot() # only needed to trigger the plot update
     )
   }) %>% debounce(100)
+  
+  basePlot <- reactive({
+    if (is.null(model()) || is.null(model()$modelResults)) {
+      return(NULL)
+    }
+    
+    validate(validModelOutput(model()))
+    
+    params <- c(plotParams())
+    p <- do.call(
+      plotTargets,
+      params
+    ) %>%
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
+    return(p)
+  })
+  
+  x_choices <- reactive({
+    if (input$plotType == "Line") return(NULL)
+
+    if (input$plotType != "BoxPlot") return(NULL)
+
+    if (is.null(model()) || is.null(model()$modelResults) || is.null(basePlot())) {
+      return(c("No groups found ... " = ""))
+    } else {
+      p <- basePlot()
+      
+      choices <- p$data$group |> unique() |> as.character()
+      attr(choices, "x") <- "group"
+      
+      return(choices)
+    }
+  })
+  
+  customePointsOutputPlot <- customPointsServer("outputPlotCustomPoints",
+                                                plot_type = "ggplot",
+                                                x_choices = x_choices)
+  
+  # we need different custom points, one for each plot
+  customePointsOutputPlot_list <- reactiveValues()
+  observe({
+    customePointsOutputPlot_list[[input$plotType]] <- customePointsOutputPlot()
+  }) |>
+    bindEvent(customePointsOutputPlot())
   
   userRangesOutputPlot <- plotRangesServer("outputPlotRanges",
                                      type = "ggplot",
@@ -255,18 +296,7 @@ outputPlot <- function(input, output, session, model, values) {
   
   plotFunTarget <- reactive({
     function() {
-      if (is.null(model()) || is.null(model()$modelResults)) {
-        return(NULL)
-      }
-      
-      params <- c(plotParams())
-      p <- do.call(
-        plotTargets,
-        params
-      ) %>%
-        shinyTryCatch(errorTitle = "Error during plotting",
-                      warningTitle = "Warning during plotting",
-                      alertStyle = "shinyalert")
+      p <- basePlot()
       
       # we need to trigger the update after pressing "Apply", that's why we use the if condition
       if (input$applyOutputPlotRanges >= 0) {
@@ -279,12 +309,14 @@ outputPlot <- function(input, output, session, model, values) {
           formatTitlesOfGGplot(text = plotTitlesOutputPlot)
       }
       
-      if (input$plotType == "Line") {
+      if (input$plotType %in% c("Line", "BoxPlot")) {
+        #browser()
+        # only the first point is displayed <-- --------- 
         p <- p |>
-          addCustomPointsToGGplot(customePointsOutputPlot()) |>
+          addCustomPointsToGGplot(customePointsOutputPlot_list[[input$plotType]]) |>
           shinyTryCatch(errorTitle = "Plotting failed")
       }
-      
+    
       p
     }
   })
