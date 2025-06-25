@@ -1,3 +1,8 @@
+# ReSources 25.06.3
+
+## Updates
+- fixed the nimble version to the current (nimble 1.0.1) that is used in the docker container (#150)
+
 # ReSources 25.06.2
 
 ## Bug Fixes
