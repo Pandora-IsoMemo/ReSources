@@ -1,3 +1,8 @@
+# ReSources 25.06.3
+
+## Updates
+- fixed the nimble version to nimble 1.3.0 (#142, #150)
+
 # ReSources 25.06.2
 
 ## Bug Fixes
