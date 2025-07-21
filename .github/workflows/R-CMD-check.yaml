@@ -21,7 +21,7 @@ jobs:
       matrix:
         config:
           # We only test only a subset of os & r combination for non CRAN packages
-          
+
           # We can't test on mac-os, because Docker in Mac images aren't 
           # available due to licensing issues
           # - {os: macos-latest,   r: 'release'}
@@ -46,7 +46,7 @@ jobs:
                       reticulate::use_miniconda('r-reticulate'); \
                       reticulate::conda_install('r-reticulate', c('python-kaleido', 'packaging')); \
                       reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly'); \
-                      reticulate::use_miniconda('r-reticulate'); \
+                      reticulate::use_miniconda('r-reticulate');
                       install.packages('nimble', repos = 'https://packagemanager.posit.co/cran/__linux__/jammy/2025-03-01', version = '1.3.0')"
 
       # R is already installed in the base-image
@@ -56,10 +56,12 @@ jobs:
       #     http-user-agent: ${{ matrix.config.http-user-agent }}
       #     use-public-rspm: true
       #     extra-repositories: https://Pandora-IsoMemo.github.io/drat/
-      
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
+          extra-repositories: |
+            NIMBLE=https://packagemanager.posit.co/cran/__linux__/jammy/2025-03-01
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
