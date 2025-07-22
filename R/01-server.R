@@ -23,6 +23,18 @@ fruitsTab <- function(input,
     defaultValues()
   )
   
+  # push default values to inputs ----
+  once_push_defaults <- reactiveVal(TRUE)
+  observe({
+    if (once_push_defaults()) {
+      logDebug("PUSH defaultValues TO USER INPUTS <------------------------------------")
+      defaultInputs <- defaultValues()
+      updateUserInputs(input, output, session, userInputs = defaultInputs)
+      once_push_defaults(FALSE)
+    }
+  }) %>%
+    bindEvent(once_push_defaults())
+  
   events <-
     reactiveValues(
       name = list(),
@@ -48,22 +60,6 @@ fruitsTab <- function(input,
       invalidateLater(500)
       events$processedCache <- events$processed
     }
-  })
-  
-  ## Reset Input ----
-  uploadedNotes <- reactiveVal()
-  observeEvent(input$reset, {
-    logDebug("Entering observeEvent(input$reset)")
-    vars <- defaultValues()
-    
-    for (name in names(vars)) {
-      values[[name]] <- vars[[name]]
-    }
-    
-    values$status <- values$statusSim <- "INITIALIZE"
-    values$reset <- runif(1)
-    events$name <- list()
-    uploadedNotes(character(0))
   })
   
   ## Load Example Model
@@ -95,9 +91,9 @@ fruitsTab <- function(input,
   #              priority = 500
   # )
   
-
   # Download/Upload Model ----
   model <- reactiveVal(NULL)
+  uploadedNotes <- reactiveVal(NULL)
   modelUploadBaseFileName <- reactiveVal("")
   downloadModelServer("modelDownload",
                       dat = reactiveVal(NULL),
@@ -144,6 +140,9 @@ fruitsTab <- function(input,
     for (name in names(valuesDat)) {
       values[[name]] <- valuesDat[[name]]
     }
+    
+    ## update all inputs ----
+    updateUserInputs(input, output, session, userInputs = valuesDat)
     
     ## update other inputs ----
     if (ncol(values$targetValuesCovariates) > 0) {
@@ -470,21 +469,6 @@ fruitsTab <- function(input,
     updateRadioButtons(session, "modelType", selected = selected)
   })
   
-  observeEvent(values$includeSourceOffset, {
-    logDebug("Entering observeEvent(values$includeSourceOffset)")
-    updateCheckboxInput(session,
-                        "includeSourceOffset",
-                        value = values$includeSourceOffset
-    )
-  })
-  
-  observeEvent(input$includeSourceOffset, {
-    logDebug("Entering observeEvent(input$includeSourceOffset)")
-    if (!identical(input$includeSourceOffset, values$includeSourceOffset)) {
-      values$includeSourceOffset <- input$includeSourceOffset
-    }
-  })
-  
   observeEvent(values$modelWeights, {
     logDebug("Entering observeEvent(values$modelWeights)")
     if (values$modelWeights == TRUE) {
@@ -552,14 +536,6 @@ fruitsTab <- function(input,
     values$modelWeights <- input$modelWeights
   })
   
-  observeEvent(values$modelWeightsContrained, {
-    logDebug("Entering observeEvent(values$modelWeightsContrained)")
-    updateCheckboxInput(session,
-                        "modelWeightsContrained",
-                        value = values$modelWeightsContrained
-    )
-  })
-  
   observeEvent(input$modelWeightsContrained, {
     logDebug("Entering observeEvent(input$modelWeightsContrained)")
     values$modelWeightsContrained <- input$modelWeightsContrained
@@ -586,14 +562,6 @@ fruitsTab <- function(input,
       input$optimalPrior
   })
   
-  observeEvent(values$modelConcentrations, {
-    logDebug("Entering observeEvent(values$modelConcentrations)")
-    updateCheckboxInput(session,
-                        "modelConcentrations",
-                        value = values$modelConcentrations
-    )
-  })
-  
   observeEvent(input$modelConcentrations, {
     logDebug("Entering observeEvent(input$modelConcentrations)")
     values$modelConcentrations <- input$modelConcentrations
@@ -614,12 +582,6 @@ fruitsTab <- function(input,
         session = session
       )
     }
-  })
-  
-  
-  observeEvent(values$burnin, {
-    logDebug("Entering observeEvent(values$burnin)")
-    updateNumericInput(session, "burnin", value = values$burnin)
   })
   
   observeEvent(input$burnin, {
@@ -670,38 +632,16 @@ fruitsTab <- function(input,
   }) %>%
     bindEvent(alphaHyperReactive())
   
-  observeEvent(values$oxcalCheck, {
-    logDebug("Entering observeEvent(values$oxcalCheck)")
-    
-    updateRadioButtons(session, "oxcalCheck",
-                       selected = values$oxcalCheck
-    )
-  })
-  
   observeEvent(input$oxcalCheck, {
     logDebug("Entering observeEvent(input$oxcalCheck)")
     values$oxcalCheck <- input$oxcalCheck
   })
-  
-  observeEvent(values$covariateType, {
-    logDebug("Entering observeEvent(input$covariateType)")
-    if (!identical(input$covariateType, values$covariateType)) {
-      updateRadioButtons(session, "covariateType", selected = values$covariateType)
-    }
-  })
-  
   
   observeEvent(input$covariateType, {
     logDebug("Entering observeEvent(input$covariateType)")
     if (!identical(input$covariateType, values$covariateType)) {
       values$covariateType <- input$covariateType
     }
-  })
-  
-  
-  observeEvent(values$inflatedBeta, {
-    logDebug("Entering observeEvent(values$inflatedBeta)")
-    updateRadioButtons(session, "inflatedBeta", selected = values$inflatedBeta)
   })
   
   observeEvent(input$inflatedBeta, {
@@ -711,12 +651,6 @@ fruitsTab <- function(input,
     }
   })
   
-  
-  observeEvent(values$iterations, {
-    logDebug("Entering observeEvent(values$iterations)")
-    updateNumericInput(session, "iterations", value = values$iterations)
-  })
-  
   observeEvent(input$iterations, {
     logDebug("Entering observeEvent(input$iterations)")
     if (!identical(input$iterations, values$iterations)) {
@@ -724,21 +658,11 @@ fruitsTab <- function(input,
     }
   })
   
-  observeEvent(values$thinning, {
-    logDebug("Entering observeEvent(values$thinning)")
-    updateNumericInput(session, "thinning", value = values$thinning)
-  })
-  
   observeEvent(input$thinning, {
     logDebug("Entering observeEvent(input$thinning)")
     if (!identical(input$thinning, values$thinning)) {
       values$thinning <- input$thinning
     }
-  })
-  
-  observeEvent(values$nchains, {
-    logDebug("Entering observeEvent(values$nchains)")
-    updateNumericInput(session, "nchains", value = values$nchains)
   })
   
   observeEvent(input$nchains, {
@@ -773,12 +697,11 @@ fruitsTab <- function(input,
   observeEvent(input$minUnc, {
     logDebug("Entering observeEvent(input$minUnc)")
     values$minUnc <- input$minUnc
+    
+    # this updates "Unc" input under "Priors" with the input value of "minUnc"
+    updateNumericInput(session, "Unc", value = input$minUnc)
   })
   
-  observeEvent(values$minUnc, {
-    logDebug("Entering observeEvent(values$minUnc)")
-    updateNumericInput(session, "Unc", value = values$minUnc)
-  })
   
   observeEvent(input$addPrior, {
     logDebug("Entering observeEvent(input$addPrior)")
@@ -1173,23 +1096,45 @@ fruitsTab <- function(input,
     values$userEstimateGroups <- userEstimateGroups()
   })
   
+  ## Preview model ----
+  observe({
+    logDebug("Entering observe() (preview model)")
+    currentFruitsObj <- getCurrentFruitsObject(values = values, input = input)
+    if (is.null(currentFruitsObj)) {
+      values$status <- "ERROR"
+      return()
+    }
+    
+    # return only fruits object since there are no real model results
+    model(list(fruitsObj = currentFruitsObj))
+    values$status <- "COMPLETED"
+  }) %>%
+    bindEvent(input$preview)
+  
+  # preview model inputs
+  modelCodeServer("modelInputData", model, class = "modelInput", type = "data")
+  modelCodeServer("modelInputValueNames", model, class = "modelInput", type = "valueNames")
+  modelCodeServer("modelInputModelOptions", model, class = "modelInput", type = "modelOptions")
+  modelCodeServer("modelInputPriors", model, class = "modelInput", type = "priors")
+  modelCodeServer("modelInputUserEstimates", model, class = "modelInput", type = "userEstimates")
+  
+  # preview model code
+  modelCodeServer("modelCode", model, class = "modelCode")
+  
   ## Run model ----
   observeEvent(input$run, {
     logDebug("Entering observeEvent(input$run)")
+    
+    # do not reset model(), this would remove fruitsObj in model!
+    
     values$status <- "RUNNING"
     
-    model(NULL)
-    modelCharacteristics(NULL)
-    valuesList <- reactiveValuesToList(values)
+    currentFruitsObj <- getCurrentFruitsObject(values = values, input = input) 
+    if (isTRUE(input$applyCodeEdits)) {
+      currentFruitsObj <- currentFruitsObj %>% getUpdatedFruitsObj(input)
+    }
     
-    fruitsObj <- shinyInputToClass(
-        valuesList,
-        as.list(input$priors),
-        as.list(input$userEstimate)
-      ) %>%
-      shinyTryCatch(errorTitle = "Could not create model object: ", alertStyle = "shinyalert")
-    
-    if (is.null(fruitsObj)) {
+    if (is.null(currentFruitsObj)) {
       values$status <- "ERROR"
       return()
     }
@@ -1241,7 +1186,7 @@ fruitsTab <- function(input,
                         strsplit(x, "=")[[1]][1]
                       }))
     )
-    if (length(fruitsObj$userEstimates[[1]]) > 0) {
+    if (length(currentFruitsObj$userEstimates[[1]]) > 0) {
       updateRadioButtons(
         session,
         "exportType",
@@ -1265,36 +1210,28 @@ fruitsTab <- function(input,
         )
       )
     }
-    
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj,
+        fruitsObj = currentFruitsObj,
         progress = TRUE,
-        userDefinedAlphas = values$userDefinedAlphas,
-        onlyShowNimbleInput = input$onlyShowNimbleInput
+        userDefinedAlphas = values$userDefinedAlphas
       ) %>%
         shinyTryCatch(errorTitle = "Could not run model", alertStyle = "shinyalert")
-    },
-    value = 0,
-    message = "")
+    }, value = 0, message = "")
     
-    if (is.null(modelResults)) {
+    if (is.null(modelResults) && !("fruitsObj" %in% names(model()))) {
+      # hide model output tabs:
       values$status <- "ERROR"
       return()
     }
     
-    values$status <- "COMPLETED"
-    
-    # nimble in here <--  ----
-    if (input$onlyShowNimbleInput) {
-      # update fruits object after final data preparation
-      fruitsObj$data <- modelResults$data
-      fruitsObj$constants <- modelResults$constants
-      fruitsObj$modelCode <- modelResults$code
-      # return only fruits object since there are no real model results
-      model(list(fruitsObj = fruitsObj))
+    if (is.null(modelResults) && ("fruitsObj" %in% names(model()))) {
+      # keep showing model output tabs (helpfull to check the modelCode)
+      values$status <- "COMPLETED"
       return()
     }
+    
+    values$status <- "COMPLETED"
     
     if (!inherits(modelResults, "try-error")) {
       withProgress({
@@ -1309,7 +1246,7 @@ fruitsTab <- function(input,
           return()
         } else {
           diagnostic <-
-            convergenceDiagnostics(modelResults$parameters, fruitsObj)$geweke[[1]] %>%
+            convergenceDiagnostics(modelResults$parameters, currentFruitsObj)$geweke[[1]] %>%
             shinyTryCatch(errorTitle = "Could not create Diagnostics", alertStyle = "shinyalert")
           if (any(is.nan(diagnostic[which(grepl("alpha", names(diagnostic)))])) |
               any(is.na(diagnostic[which(grepl("alpha", names(diagnostic)))])) |
@@ -1322,18 +1259,16 @@ fruitsTab <- function(input,
             diagnostic[is.na(diagnostic)] <- 0
             return()
           }
-          outText <- produceOutText(fruitsObj, diagnostic) %>%
-            shinyTryCatch(errorTitle = "Could not create output", alertStyle = "shinyalert")
         }
       })
       
       withProgress({
         setProgress(message = "Compute summary statistics", value = 0.95)
-        model(list(fruitsObj = fruitsObj, modelResults = modelResults))
+        model(list(fruitsObj = currentFruitsObj, modelResults = modelResults))
         values$modelResultSummary <- getResultStatistics(
-          model()$modelResults$parameters,
-          model()$modelResults$userEstimateSamples,
-          model()$fruitsObj,
+          modelResults$parameters,
+          modelResults$userEstimateSamples,
+          currentFruitsObj,
           DT = FALSE,
           agg = FALSE
         ) %>%
@@ -1342,6 +1277,9 @@ fruitsTab <- function(input,
       })
       
       if (values$status == "COMPLETED") {
+        outText <- produceOutText(currentFruitsObj, diagnostic) %>%
+          shinyTryCatch(errorTitle = "Could not create output", alertStyle = "shinyalert")
+        
         showModal(
           modalDialog(
             title = "Model computation completed ",
@@ -1356,31 +1294,31 @@ fruitsTab <- function(input,
   
   modelCharacteristics <- reactiveVal(NULL)
   
+  ## Run model simulation ----
   observeEvent(input$runModelChar, {
     logDebug("Entering observeEvent(input$runModelChar)")
     values$statusSim <- "RUNNING"
     modelCharacteristics(NULL)
     
-    valuesList <- reactiveValuesToList(values)
-    if (valuesList[["modelType"]] == "1") {
-      valuesList[["modelType"]] <- "2"
+    valuesSim <- reactiveValuesToList(values)
+    if (valuesSim[["modelType"]] == "1") {
+      valuesSim[["modelType"]] <- "2"
     }
     
-    fruitsObj <- shinyInputToClass(
-          valuesList,
-          as.list(input$priors),
-          as.list(input$userEstimate)
-        ) %>%
-      shinyTryCatch(errorTitle = "Could not create model object: ", alertStyle = "shinyalert")
+    fruitsObjSim <- getCurrentFruitsObject(values = valuesSim, input = input)
     
-    if (is.null(fruitsObj)) {
+    if (isTRUE(input$applyCodeEditsSim)) {
+      fruitsObjSim <- fruitsObjSim %>% getUpdatedFruitsObj(input)
+    }
+    
+    if (is.null(fruitsObjSim)) {
       values$status <- "ERROR"
       return()
     }
     
     withProgress({
       modelResults <- compileRunModel(
-        fruitsObj,
+        fruitsObj = fruitsObjSim,
         progress = TRUE,
         onlySim = TRUE,
         userDefinedAlphas = values$userDefinedAlphas,
@@ -1388,9 +1326,7 @@ fruitsTab <- function(input,
         simSourceNames = input$simSpecSources
       ) %>%
         shinyTryCatch(errorTitle = "Could not run model", alertStyle = "shinyalert")
-    },
-    value = 0,
-    message = "")
+    }, value = 0, message = "")
     
     if (is.null(modelResults)) {
       values$statusSim <- "ERROR"
@@ -1414,6 +1350,27 @@ fruitsTab <- function(input,
     if (values$statusSim == "COMPLETED") {
       modelCharacteristics(list(fruitsObj = fruitsObj, modelResults = modelResults))
     }
+  })
+  
+  ## Reset Input ----
+  observeEvent(input$reset, {
+    logDebug("Entering observeEvent(input$reset)")
+    vars <- defaultValues()
+    
+    for (name in names(vars)) {
+      values[[name]] <- vars[[name]]
+    }
+    
+    values$status <- values$statusSim <- "INITIALIZE"
+    values$reset <- runif(1)
+    events$name <- list()
+    uploadedNotes(character(0))
+    
+    fruitsObj(NULL)
+    model(NULL)
+    modelCharacteristics(NULL)
+    
+    updateUserInputs(input, output, session, userInputs = values)
   })
   
   observe({
@@ -1611,47 +1568,6 @@ fruitsTab <- function(input,
     }
   })
   
-  
-  callModule(verbatimText,
-             "modelCode",
-             model = model,
-             class = "modelCode"
-  )
-  callModule(
-    verbatimText,
-    "modelInputData",
-    model = model,
-    class = "modelInput",
-    type = "data"
-  )
-  callModule(
-    verbatimText,
-    "modelInputValueNames",
-    model = model,
-    class = "modelInput",
-    type = "valueNames"
-  )
-  callModule(
-    verbatimText,
-    "modelInputModelOptions",
-    model = model,
-    class = "modelInput",
-    type = "modelOptions"
-  )
-  callModule(
-    verbatimText,
-    "modelInputPriors",
-    model = model,
-    class = "modelInput",
-    type = "priors"
-  )
-  callModule(
-    verbatimText,
-    "modelUserEstimates",
-    model = model,
-    class = "modelInput",
-    type = "userEstimates"
-  )
   callModule(
     verbatimText,
     "wAIC",
@@ -2110,7 +2026,6 @@ fruitsTab <- function(input,
   ## food intakes
   callModule(foodIntakes, "foodIntakes", values = values)
 }
-
 
 #' Extract Potential Numerics
 #' 

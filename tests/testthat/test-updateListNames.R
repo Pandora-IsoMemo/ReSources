@@ -1,6 +1,6 @@
 test_that("Test matching of names for non-baseline model", {
   testValues <-
-    readRDS(testthat::test_path("fiveSourcesData_default.rds"))
+    readRDS(testthat::test_path("testdata", "fiveSourcesData_default.rds"))
   
   targetNames <- colnames(testValues[["obsvn"]][[1]])
   obsvnNames <- rownames(testValues[["obsvn"]][[1]])
@@ -31,7 +31,7 @@ test_that("Test matching of names for non-baseline model", {
 
 test_that("Test matching of names for baseline model", {
   testValues <-
-    readRDS(testthat::test_path("blackBearData_baselineModel.rds"))
+    readRDS(testthat::test_path("testdata", "blackBearData_baselineModel.rds"))
   
   targetNames <- colnames(testValues[["obsvn"]][[1]])
   obsvnNames <- rownames(testValues[["obsvn"]][[1]])
@@ -69,7 +69,7 @@ test_that("Test getDepthAndTable", {
       "fiveSourcesData_default.rds"
     ) %>%
     sample(size = 1)
-  testValues <- readRDS(testthat::test_path(testFile))
+  testValues <- readRDS(testthat::test_path("testdata", testFile))
   
   # isEntryFun = isDeepestEntry -> here level of targetNames (colnames of obsvn)
   expect_equal(getDepthAndTable(testValues[["source"]], isEntryFun = isDeepestEntry)$nFlatten,
@@ -105,7 +105,7 @@ test_that("Test getDepthAndTable", {
 
 test_that("Test deleteTableFromList", {
   testValues <-
-    readRDS(testthat::test_path("blackBearData_default.rds"))
+    readRDS(testthat::test_path("testdata", "blackBearData_default.rds"))
   
   expect_equal(names(testValues[["source"]][[1]][[1]]), c("d13C", "d15N"))
   expect_equal(names(testValues[["sourceUncert"]][[1]][[1]]), c("d13C", "d15N"))
@@ -120,7 +120,7 @@ test_that("Test deleteTableFromList", {
       "fiveSourcesData_default.rds"
     ) %>%
     sample(size = 1)
-  testValues <- readRDS(testthat::test_path(testFile))
+  testValues <- readRDS(testthat::test_path("testdata", testFile))
   
   testCols <- names(testValues[["source"]][[1]][[1]])
   colToDelete <- testCols[1]
@@ -155,7 +155,7 @@ test_that("Test deleteTableFromList", {
 
 test_that("Test updateTargetsInLists if non-baseline model", {
   testValues <-
-    readRDS(testthat::test_path("blackBearData_default.rds"))
+    readRDS(testthat::test_path("testdata", "blackBearData_default.rds"))
   
   expect_equal(names(testValues[["source"]][[1]][[1]]), c("d13C", "d15N"))
   expect_equal(names(testValues[["sourceUncert"]][[1]][[1]]), c("d13C", "d15N"))
@@ -182,7 +182,7 @@ test_that("Test updateTargetsInLists if non-baseline model", {
 
 test_that("Test updateTargetsInLists if baseline model", {
   testValues <-
-    readRDS(testthat::test_path("blackBearData_baselineModel.rds"))
+    readRDS(testthat::test_path("testdata", "blackBearData_baselineModel.rds"))
   
   expect_equal(names(testValues[["source"]][[1]][[1]]), c("d13C", "d15N"))
   expect_equal(names(testValues[["sourceUncert"]][[1]][[1]]), c("d13C", "d15N"))
@@ -214,7 +214,7 @@ test_that("Test updateTargetsInLists if baseline model", {
 
 test_that("Test updateObsvnsInLists if non-baseline model", {
   testValues <-
-    readRDS(testthat::test_path("blackBearData_default.rds"))
+    readRDS(testthat::test_path("testdata", "blackBearData_default.rds"))
   
   expect_null(names(testValues[["source"]][[1]]))
   expect_length(testValues[["source"]][[1]], 1)
@@ -230,7 +230,7 @@ test_that("Test updateObsvnsInLists if non-baseline model", {
 
 test_that("Test updateObsvnsInLists if baseline model", {
   testValues <-
-    readRDS(testthat::test_path("blackBearData_baselineModel.rds"))
+    readRDS(testthat::test_path("testdata", "blackBearData_baselineModel.rds"))
   
   expect_equal(names(testValues[["source"]][[1]])[1:3],
                c("Individual_1", "Individual_2", "Individual_3"))
@@ -279,7 +279,7 @@ test_that("Test updateListNames", {
       "fiveSourcesData_default.rds"
     ) %>%
     sample(size = 1)
-  testValues <- readRDS(testthat::test_path(testFile))
+  testValues <- readRDS(testthat::test_path("testdata", testFile))
   
   testCols <- names(testValues[["source"]][[1]][[1]])
   testCols[1] <- "newColName"

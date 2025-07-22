@@ -32,20 +32,16 @@ fruitsUI <- function(id, title = "FRUITS") {
         # ),
         # actionButton(ns("exampleModel"), "Load selected model"),
         tags$hr(),
-        checkboxInput(ns("onlyShowNimbleInput"),
-                      "Only show nimbleModel() input", 
-                      width = "100%"),
-        conditionalPanel(
+        helpText("Press 'Preview' to create or update 'Model code' and 'Model inputs' under the 'Results Report' tab."),
+        actionButton(ns("preview"), "Preview"),
+        if (!isRunningOnline()) checkboxInput(ns("applyCodeEdits"), "Run with edited 'Model code' or 'Model inputs'", value = FALSE) else NULL,
+        if (!isRunningOnline()) conditionalPanel(
+          condition = "input.applyCodeEdits == true",
           ns = ns,
-          condition = "input.onlyShowNimbleInput == true",
-          helpText("After 'Run': Check in 'Results Report' the sections 'Model code' and 'Model inputs'.")
-        ),
-        fluidRow(
-          actionButton(ns("run"), "Run", width = "100%") %>%
-            column(width = 5),
-          actionButton(ns("reset"), "Reset", width = "100%") %>%
-            column(width = 5, align = "right", offset = 2)
-        ),
+          helpTextApplyCodeEdits(),
+        ) else NULL,
+        actionButton(ns("run"), "Run"),
+        actionButton(ns("reset"), "Reset"),
         #checkboxInput(ns("adaptiveNames"), "Adaptive Names", value = FALSE),
         tags$hr(),
         dbContentSelectUI(ns("popUpTables"), label = "Data table"),
@@ -710,6 +706,12 @@ fruitsUI <- function(id, title = "FRUITS") {
                 selected = NULL,
                 multiple = TRUE
               ),
+              if (!isRunningOnline()) checkboxInput(ns("applyCodeEditsSim"), "Simulate with edited 'Model code' or 'Model inputs'", value = FALSE) else NULL,
+              if (!isRunningOnline()) conditionalPanel(
+                condition = "input.applyCodeEditsSim == true",
+                ns = ns,
+                helpTextApplyCodeEdits(),
+              ) else NULL,
               div(actionButton(ns("runModelChar"), "Simulate")),
               tags$br(),
               conditionalPanel(
@@ -943,45 +945,23 @@ fruitsUI <- function(id, title = "FRUITS") {
                 mainPanel(DT::dataTableOutput(ns("SummaryResults")), width = 8)
               )
             ),
-            tabPanel(
-              "Model code",
-              tags$h4("Model code"),
-              verbatimTextOutput(ns("modelCode"), download = TRUE)
-            ),
+            tabPanel("Model code", modelCodeUI(ns("modelCode"), title = "Model code")), 
             tabPanel(
               "Model inputs",
               tags$h4("Model inputs"),
               tabsetPanel(
                 id = ns("ModelInput"),
-                tabPanel(
-                  "Data",
-                  verbatimTextOutput(ns("modelInputData"), download = TRUE)
-                ),
-                tabPanel(
-                  "Names",
-                  verbatimTextOutput(ns(
-                    "modelInputValueNames"
-                  ), download = TRUE)
-                ),
-                tabPanel(
-                  "Model options",
-                  verbatimTextOutput(
-                    ns("modelInputModelOptions"),
-                    download = TRUE
-                  )
-                ),
-                tabPanel(
-                  "Priors",
-                  verbatimTextOutput(ns(
-                    "modelInputPriors"
-                  ), download = TRUE)
-                ),
-                tabPanel(
-                  "User estimates",
-                  verbatimTextOutput(ns(
-                    "modelUserEstimates"
-                  ), download = TRUE)
-                )
+                tabPanel("Data", modelCodeUI(ns("modelInputData"))),
+                tabPanel("Names", modelCodeUI(ns(
+                  "modelInputValueNames"
+                ))),
+                tabPanel("Model options", modelCodeUI(ns(
+                  "modelInputModelOptions"
+                ))),
+                tabPanel("Priors", modelCodeUI(ns("modelInputPriors"))),
+                tabPanel("User estimates", modelCodeUI(ns(
+                  "modelInputUserEstimates"
+                )))
               )
             )
           ),
@@ -992,7 +972,6 @@ fruitsUI <- function(id, title = "FRUITS") {
             tabPanel(
               "Convergence plots",
               value = "modelDiagnosticsTab",
-              tags$h4("Convergence plots"),
               conditionalPanel(
                 condition = "output.status == 'COMPLETED'",
                 ns = ns,
@@ -1150,4 +1129,8 @@ fruitsUI <- function(id, title = "FRUITS") {
       )
     )
   )
+}
+
+helpTextApplyCodeEdits <- function() {
+  helpText("This will overwrite any user input changes made after pressing 'Preview'. Only the code visible under 'Model code' and 'Model inputs' will be used.")
 }

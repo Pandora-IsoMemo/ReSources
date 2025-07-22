@@ -1,3 +1,70 @@
+# ReSources 25.06.4
+
+## Updates
+- increased DataTools to most recent version 25.06.5
+
+# ReSources 25.06.3  
+
+## Updates
+- fixed the nimble version to nimble 1.3.0 (#142, #150)
+
+# ReSources 25.06.2
+
+## Bug Fixes
+- use most recent DataTools version to fix a bug in the deployment of the app
+- fix an issue when adding a point to a boxplot
+
+# ReSources 25.06.1
+
+## New Features
+- One can now optionally add custom points:
+  - to plots in the _Model Diagnostics_ tab, or
+  - to line plots in the _Output Plots_ tab.
+
+## Bug Fixes
+- Fixed an issue when importing batch data using _DataTools_ version 25.06.0 (#147).
+
+# ReSources 25.06.0
+
+## Bug Fixes
+- fixed an issue with nimble versions newer than 0.13.0, where different settings need to be applied
+  to receive the previous behavior (#142)
+
+# ReSources 25.03.2
+
+## Updates
+- reduce package size by updating test data and including example files into the `.Rbuildignore`
+- skip large data tests in CI and add large test data to the `.Rbuildignore`
+
+# ReSources 25.03.1
+
+## Bug Fixes
+- fix the logic to update model inputs after editing model code or model inputs locally (#142)
+- update displayed help texts respectively to the new logic
+
+# ReSources 25.03.0
+
+## Bug Fixes
+- fix the update of user inputs after model import, ensuring that the input 
+  'Optimal objective prior' is updated (#142)
+
+# ReSources 25.01.0
+
+## Updates
+- optionally edit model inputs before running the model (#139)
+
+# ReSources 24.12.0
+
+## New Features
+- optionally edit the model code before running the model (#139)
+
+## Updates
+- update to shinyTools 24.12.0 to integrate the new header
+- update links in the ReadMe file
+
+## Bug Fixes
+- fix issue with missing _outText_ object after model run for some special case
+
 # ReSources 24.11.0
 
 ## Bug Fixes

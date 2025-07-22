@@ -27,20 +27,6 @@ tagList(
       tags$script(src = "IsoMemo/shinyMatrix.js")
     ) else NULL
   ),
-  div(
-    id = "header-right",
-    div(
-      id = "further-help",
-      tags$button(
-        onclick = "window.open('https://isomemo.com','_blank');",
-        class = "btn btn-default",
-        "Cite"
-      )
-    ),
-    div(
-      id = "help",
-      actionButton("getHelp", "Help")
-    )
-  ),
+  shinyTools::headerButtonsUI(id = "header", help_link = "https://pandora-isomemo.github.io/ReSources/"),
   shinyjs::useShinyjs()
 )

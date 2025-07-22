@@ -23,13 +23,4 @@ server <- function(input, output, session) {
     callModule(DSSM::modelResults2D, "model2D", isoData = isoData,
                savedMaps = savedMaps, fruitsData = fruitsData)
   }
-
-  observeEvent(input$getHelp, {
-    showModal(modalDialog(
-      title = "Help",
-      easyClose = TRUE,
-      getHelp(input$tab),
-      footer = modalButton("Ok")
-    ))
-  })
 }
