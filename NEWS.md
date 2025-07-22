@@ -1,3 +1,8 @@
+# ReSources 25.06.4
+
+## Updates
+- increased DataTools to most recent version 25.06.5
+
 # ReSources 25.06.3  
 
 ## Updates
