@@ -269,7 +269,7 @@ outputPlot <- function(input, output, session, model, values) {
       # we need to trigger the update after pressing "Apply", that's why we use the if condition
       if (input$applyOutputPlotRanges >= 0) {
         p <- p %>%
-          formatRangesOfGGplot(ranges = userRangesOutputPlot)
+          formatScalesOfGGplot(ranges = userRangesOutputPlot)
       }
       
       if (input$applyOutputPlotTitles >= 0) {

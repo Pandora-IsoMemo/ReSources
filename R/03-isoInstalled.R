@@ -2,8 +2,11 @@
 #'
 #' @export
 isoInstalled <- function() {
-  "DSSM" %in% installed.packages()[, 1] &&
-    compareVersion(as.character(packageVersion("DSSM")), isoVersion()) > -1
+  if (requireNamespace("DSSM", quietly = TRUE)) {
+    compareVersion(as.character(packageVersion("DSSM")), isoVersion()) >= 0
+  } else {
+    FALSE
+  }
 }
 
 isoVersion <- function() {
