@@ -1,3 +1,14 @@
+# ReSources 25.07.0
+
+## Updates
+- One can now optionally add custom points to _'BoxPlot'_, _'KernelDensity'_ or  _'Histogram'_ 
+  in the _Output Plots_ tab.
+  
+## Bug Fixes
+- Fixed an issue with custom points in the _Model Diagnostics_ tab, where the points were not 
+  displayed correctly
+
+
 # ReSources 25.06.4
 
 ## Updates
@@ -19,7 +30,7 @@
 ## New Features
 - One can now optionally add custom points:
   - to plots in the _Model Diagnostics_ tab, or
-  - to line plots in the _Output Plots_ tab.
+  - to _'Line'_ plots in the _Output Plots_ tab.
 
 ## Bug Fixes
 - Fixed an issue when importing batch data using _DataTools_ version 25.06.0 (#147).
