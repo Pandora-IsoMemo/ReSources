@@ -1,3 +1,5 @@
+getPlotTypes <- function() c("BoxPlot", "KernelDensity", "Histogram", "Line")
+
 outputPlotUI <- function(id) {
   ns <- NS(id)
   
@@ -7,41 +9,13 @@ outputPlotUI <- function(id) {
       tags$h4("Output plots"),
       plotOutput(outputId = ns("SourcePlot")),
       fluidRow(
-        column(
-          6,
-          conditionalPanel(
-            condition = "input.plotType == 'BoxPlot'",
-            ns = ns,
-            customPointsUI(
-              id = ns("outputPlotCustomPointsBox"),
-              plot_type = "ggplot"
-            )
-          ),
-          conditionalPanel(
-            condition = "input.plotType == 'KernelDensity'",
-            ns = ns,
-            customPointsUI(
-              id = ns("outputPlotCustomPointsKernel"),
-              plot_type = "ggplot"
-            )
-          ),
-          conditionalPanel(
-            condition = "input.plotType == 'Histogram'",
-            ns = ns,
-            customPointsUI(
-              id = ns("outputPlotCustomPointsHist"),
-              plot_type = "ggplot"
-            )
-          ),
-          conditionalPanel(
-            condition = "input.plotType == 'Line'",
-            ns = ns,
-            customPointsUI(
-              id = ns("outputPlotCustomPointsLine"),
-              plot_type = "ggplot"
-            )
-          )
-        ),
+        column(6,
+               lapply(
+                 getPlotTypes(),
+                 generate_custom_point_ui,
+                 ns = ns,
+                 plot_type_id = "plotType"
+               )), 
         column(6,
                align = "right",
                plotExportButton(ns("exportSourcePlot")),
@@ -192,37 +166,41 @@ outputPlot <- function(input, output, session, model, values) {
         input$`exportData-bins` == TRUE) {
       binSize <- input$`exportData-binSize`
     }
-    if(input$groupType %in% colnames(model()$fruitsObj$data$covariatesNum)){
-      numCov <- TRUE
-    } else {
-      numCov <- FALSE
-    }
-    list(
-      fruitsObj = model()$fruitsObj$data,
-      modelResults = values$modelResultSummary,
-      estType = input$estType,
-      groupType = input$groupType,
-      filterType = input$filterType,
-      # filterType2 = input$filterType2,
-      groupVars = input$groupVars,
-      individual = input$individuals,
-      plotType = input$plotType,
-      lineSmoothingMethod = input[["lineSmoothing-method"]],
-      lineSmoothingSpan = input[["lineSmoothing-loessSpan"]],
-      showLegend = input$showLegend,
-      histBins = input$histBins,
-      binSize = binSize,
-      colorPalette = input$colorPalette,
-      contributionLimit = input$contributionLimit,
-      boxQuantile = input$boxQuantile,
-      whiskerMultiplier = input$whiskerMultiplier,
-      numCov = numCov,
-      applyRanges = input$applyOutputPlotRanges, # only needed to trigger the plot update
-      applyTitles = input$applyOutputPlotTitles, # only needed to trigger the plot update
-      customPointsOutputPlotBox = customPointsOutputPlotBox(), # only needed to trigger the plot update
-      customPointsOutputPlotKernel = customPointsOutputPlotKernel(), # only needed to trigger the plot update
-      customPointsOutputPlotHist = customPointsOutputPlotHist(), # only needed to trigger the plot update
-      customPointsOutputPlotLine = customPointsOutputPlotLine() # only needed to trigger the plot update
+    
+    numCov <- input$groupType %in% colnames(model()$fruitsObj$data$covariatesNum)
+    
+    # Dynamically collect customPointsOutputPlotXYZ = customPointsModules[[XYZ]]()
+    customPointsList <- setNames(
+      lapply(getPlotTypes(), function(pt)
+        customPointsModules[[pt]]()),
+      paste0("customPointsOutputPlot", getPlotTypes())
+    )
+    
+    # Combine static params and dynamic ones
+    c(
+      list(
+        fruitsObj = model()$fruitsObj$data,
+        modelResults = values$modelResultSummary,
+        estType = input$estType,
+        groupType = input$groupType,
+        filterType = input$filterType,
+        groupVars = input$groupVars,
+        individual = input$individuals,
+        plotType = input$plotType,
+        lineSmoothingMethod = input[["lineSmoothing-method"]],
+        lineSmoothingSpan = input[["lineSmoothing-loessSpan"]],
+        showLegend = input$showLegend,
+        histBins = input$histBins,
+        binSize = binSize,
+        colorPalette = input$colorPalette,
+        contributionLimit = input$contributionLimit,
+        boxQuantile = input$boxQuantile,
+        whiskerMultiplier = input$whiskerMultiplier,
+        numCov = numCov,
+        applyRanges = input$applyOutputPlotRanges,
+        applyTitles = input$applyOutputPlotTitles
+      ),
+      customPointsList
     )
   }) %>% debounce(100)
   
@@ -261,12 +239,15 @@ outputPlot <- function(input, output, session, model, values) {
     }
   })
   
-  customPointsOutputPlotBox <- customPointsServer("outputPlotCustomPointsBox",
-                                                   plot_type = "ggplot",
-                                                   x_choices = x_choices)
-  customPointsOutputPlotKernel <- customPointsServer("outputPlotCustomPointsKernel", plot_type = "ggplot")
-  customPointsOutputPlotHist <- customPointsServer("outputPlotCustomPointsHist", plot_type = "ggplot")
-  customPointsOutputPlotLine <- customPointsServer("outputPlotCustomPointsLine", plot_type = "ggplot")
+  customPointsModules <- lapply(getPlotTypes(), function(type) {
+    id <- paste0("plotCustomPoints", type)
+    if (type == "BoxPlot") {
+      customPointsServer(id, plot_type = "ggplot", x_choices = x_choices)
+    } else {
+      customPointsServer(id, plot_type = "ggplot")
+    }
+  })
+  names(customPointsModules) <- getPlotTypes()
   
   userRangesOutputPlot <- plotRangesServer("outputPlotRanges",
                                      type = "ggplot",
@@ -288,36 +269,18 @@ outputPlot <- function(input, output, session, model, values) {
       
       # we need to trigger the update after pressing "Apply", that's why we use the if condition
       if (input$applyOutputPlotRanges >= 0) {
-        p <- p %>%
+        p <- p |>
           formatScalesOfGGplot(ranges = userRangesOutputPlot)
       }
       
       if (input$applyOutputPlotTitles >= 0) {
-        p <- p %>% 
+        p <- p |>
           formatTitlesOfGGplot(text = plotTitlesOutputPlot)
       }
       
-      if (input$plotType == "BoxPlot") {
+      if (input$plotType %in% names(customPointsModules)) {
         p <- p |>
-          addCustomPointsToGGplot(customPointsOutputPlotBox()) |>
-          shinyTryCatch(errorTitle = "Plotting failed")
-      }
-      
-      if (input$plotType == "KernelDensity") {
-        p <- p |>
-          addCustomPointsToGGplot(customPointsOutputPlotKernel()) |>
-          shinyTryCatch(errorTitle = "Plotting failed")
-      }
-      
-      if (input$plotType == "Histogram") {
-        p <- p |>
-          addCustomPointsToGGplot(customPointsOutputPlotHist()) |>
-          shinyTryCatch(errorTitle = "Plotting failed")
-      }
-      
-      if (input$plotType == "Line") {
-        p <- p |>
-          addCustomPointsToGGplot(customPointsOutputPlotLine()) |>
+          addCustomPointsToGGplot(customPointsModules[[input$plotType]]()) |>
           shinyTryCatch(errorTitle = "Plotting failed")
       }
       
