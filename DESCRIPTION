@@ -38,7 +38,7 @@ Imports:
   shinyjs,
   shinyMatrix (>= 0.6.3),
   shinythemes,
-  shinyTools (>= 25.06.0),
+  shinyTools (>= 25.07.0),
   shinyWidgets,
   templates,
   tibble,

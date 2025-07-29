@@ -7,8 +7,25 @@ modelDiagnosticsPlotUI <- function(id) {
       tags$h4("Convergence plots"),
       plotOutput(outputId = ns("DiagnosticsPlot")),
       fluidRow(
-        column(6, customPointsUI(id = ns("diagPlotCustomPoints"), plot_type = "ggplot")),
-        column(
+        column(6, 
+               conditionalPanel(
+                 condition = "input.plotTypeDiag == 'Trace'",
+                 ns = ns,
+                 customPointsUI(
+                   id = ns("diagPlotCustomPointsTrace"),
+                   plot_type = "ggplot"
+                 )
+               ),
+               conditionalPanel(
+                 condition = "input.plotTypeDiag == 'AutoCorr'",
+                 ns = ns,
+                 customPointsUI(
+                   id = ns("diagPlotCustomPointsAutoCorr"),
+                   plot_type = "ggplot"
+                 )
+               )
+        ),
+      column(
           6,
           align = "right",
           plotExportButton(ns("exportDiagnosticsPlot")),
@@ -94,7 +111,8 @@ modelDiagnosticsPlotUI <- function(id) {
 
 
 modelDiagnosticsPlot <- function(input, output, session, model, values) {
-  customePointsDiag <- customPointsServer("diagPlotCustomPoints", plot_type = "ggplot")
+  customPointsDiagTrace <- customPointsServer("diagPlotCustomPointsTrace", plot_type = "ggplot")
+  customPointsDiagAutoCorr <- customPointsServer("diagPlotCustomPointsAutoCorr", plot_type = "ggplot")
   
   plotParams <- reactive({
     list(
@@ -113,7 +131,8 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
       colorPalette = input$colorPaletteDiag,
       applyRanges = input$applyRangesDiag, # needed only for plot update
       applyTitles = input$applyTitlesDiag, # needed only for plot update
-      customePointsDiag = customePointsDiag() # needed only for plot update
+      customPointsDiagTrace = customPointsDiagTrace(), # needed only for plot update
+      customPointsDiagAutoCorr = customPointsDiagAutoCorr() # needed only for plot update
     )
   }) %>% debounce(100)
 
@@ -152,10 +171,18 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
           formatTitlesOfGGplot(text = plotTitlesDiag)
       }
       
-      p <- p |>
-        addCustomPointsToGGplot(customePointsDiag()) |>
-        shinyTryCatch(errorTitle = "Plotting failed")
-        
+      if (input$plotTypeDiag == "Trace") {
+        p <- p |>
+          addCustomPointsToGGplot(customPointsDiagTrace()) |>
+          shinyTryCatch(errorTitle = "Plotting failed")
+      }
+      
+      if (input$plotTypeDiag == "AutoCorr") {
+        p <- p |>
+          addCustomPointsToGGplot(customPointsDiagAutoCorr()) |>
+          shinyTryCatch(errorTitle = "Plotting failed")
+      }
+      
       p
     }
   })

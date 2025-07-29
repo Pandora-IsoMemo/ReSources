@@ -18,6 +18,22 @@ outputPlotUI <- function(id) {
             )
           ),
           conditionalPanel(
+            condition = "input.plotType == 'KernelDensity'",
+            ns = ns,
+            customPointsUI(
+              id = ns("outputPlotCustomPointsKernel"),
+              plot_type = "ggplot"
+            )
+          ),
+          conditionalPanel(
+            condition = "input.plotType == 'Histogram'",
+            ns = ns,
+            customPointsUI(
+              id = ns("outputPlotCustomPointsHist"),
+              plot_type = "ggplot"
+            )
+          ),
+          conditionalPanel(
             condition = "input.plotType == 'Line'",
             ns = ns,
             customPointsUI(
@@ -203,8 +219,10 @@ outputPlot <- function(input, output, session, model, values) {
       numCov = numCov,
       applyRanges = input$applyOutputPlotRanges, # only needed to trigger the plot update
       applyTitles = input$applyOutputPlotTitles, # only needed to trigger the plot update
-      customePointsOutputPlotBox = customePointsOutputPlotBox(), # only needed to trigger the plot update
-      customePointsOutputPlotLine = customePointsOutputPlotLine() # only needed to trigger the plot update
+      customPointsOutputPlotBox = customPointsOutputPlotBox(), # only needed to trigger the plot update
+      customPointsOutputPlotKernel = customPointsOutputPlotKernel(), # only needed to trigger the plot update
+      customPointsOutputPlotHist = customPointsOutputPlotHist(), # only needed to trigger the plot update
+      customPointsOutputPlotLine = customPointsOutputPlotLine() # only needed to trigger the plot update
     )
   }) %>% debounce(100)
   
@@ -243,10 +261,12 @@ outputPlot <- function(input, output, session, model, values) {
     }
   })
   
-  customePointsOutputPlotBox <- customPointsServer("outputPlotCustomPointsBox",
+  customPointsOutputPlotBox <- customPointsServer("outputPlotCustomPointsBox",
                                                    plot_type = "ggplot",
                                                    x_choices = x_choices)
-  customePointsOutputPlotLine <- customPointsServer("outputPlotCustomPointsLine", plot_type = "ggplot")
+  customPointsOutputPlotKernel <- customPointsServer("outputPlotCustomPointsKernel", plot_type = "ggplot")
+  customPointsOutputPlotHist <- customPointsServer("outputPlotCustomPointsHist", plot_type = "ggplot")
+  customPointsOutputPlotLine <- customPointsServer("outputPlotCustomPointsLine", plot_type = "ggplot")
   
   userRangesOutputPlot <- plotRangesServer("outputPlotRanges",
                                      type = "ggplot",
@@ -279,13 +299,25 @@ outputPlot <- function(input, output, session, model, values) {
       
       if (input$plotType == "BoxPlot") {
         p <- p |>
-          addCustomPointsToGGplot(customePointsOutputPlotBox()) |>
+          addCustomPointsToGGplot(customPointsOutputPlotBox()) |>
+          shinyTryCatch(errorTitle = "Plotting failed")
+      }
+      
+      if (input$plotType == "KernelDensity") {
+        p <- p |>
+          addCustomPointsToGGplot(customPointsOutputPlotKernel()) |>
+          shinyTryCatch(errorTitle = "Plotting failed")
+      }
+      
+      if (input$plotType == "Histogram") {
+        p <- p |>
+          addCustomPointsToGGplot(customPointsOutputPlotHist()) |>
           shinyTryCatch(errorTitle = "Plotting failed")
       }
       
       if (input$plotType == "Line") {
         p <- p |>
-          addCustomPointsToGGplot(customePointsOutputPlotLine()) |>
+          addCustomPointsToGGplot(customPointsOutputPlotLine()) |>
           shinyTryCatch(errorTitle = "Plotting failed")
       }
       
