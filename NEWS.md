@@ -8,7 +8,6 @@
 - Fixed an issue with custom points in the _Model Diagnostics_ tab, where the points were not 
   displayed correctly
 
-
 # ReSources 25.06.4
 
 ## Updates
