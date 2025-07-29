@@ -7,9 +7,8 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
                         returnType = "plot",
                         showLegend = FALSE, colorPalette = "default",
                         contributionLimit = "None",
-                        pointDat = data.frame(), histBins = 50,
+                        histBins = 50,
                         binSize = NULL,
-                        #fontFamily = NULL, 
                         whiskerMultiplier = 0.95, boxQuantile = 0.68,
                         numCov = FALSE, ...) {
   if (length(groupVars) == 0 && numCov == FALSE) {
@@ -35,9 +34,6 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
   modelResults <- modelResults[, c("estimate", "group")]
   if (contributionLimit == "0-100%") {
     modelResults <- modelResults %>% mutate(estimate = .data$estimate * 100)
-    if (nrow(pointDat) > 0) {
-      pointDat <- pointDat %>% mutate(y = .data$y * 100)
-    }
   }
   
   # default header
@@ -117,20 +113,6 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
       p <- p + ylim(c(0, 1))
     }
 
-    if (nrow(pointDat) > 0) {
-      if (contributionLimit == "0-100%") {
-        pointDat$y <- pointDat$y / 100
-      }
-      p <- p + geom_point(
-        data = pointDat, mapping = aes(x = pointDat$group, y = pointDat$y),
-        color = pointDat$pointColor,
-        size = pointDat$pointSize, alpha = pointDat$pointAlpha,
-        show.legend = FALSE
-      )
-    }
-    # if (!is.null(fontFamily)) {
-    #   p <- p + theme(text = element_text(family = fontFamily))
-    # }
     if (colorPalette != "default") {
       colorPalette <- brewer.pal(n = 9, name = colorPalette)
       colorPaletteRamp <- colorRampPalette(colorPalette)

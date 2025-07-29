@@ -1,3 +1,5 @@
+getPlotTypesDiag <- function() c("Trace", "AutoCorr")
+
 modelDiagnosticsPlotUI <- function(id) {
   ns <- NS(id)
 
@@ -7,7 +9,15 @@ modelDiagnosticsPlotUI <- function(id) {
       tags$h4("Convergence plots"),
       plotOutput(outputId = ns("DiagnosticsPlot")),
       fluidRow(
-        column(6, customPointsUI(id = ns("diagPlotCustomPoints"), plot_type = "ggplot")),
+        column(
+          6,
+          lapply(
+            getPlotTypesDiag(),
+            generate_custom_point_ui,
+            ns = ns,
+            plot_type_id = "plotTypeDiag"
+          )
+        ), 
         column(
           6,
           align = "right",
@@ -94,29 +104,43 @@ modelDiagnosticsPlotUI <- function(id) {
 
 
 modelDiagnosticsPlot <- function(input, output, session, model, values) {
-  customePointsDiag <- customPointsServer("diagPlotCustomPoints", plot_type = "ggplot")
+  customPointsModules <- lapply(getPlotTypesDiag(), function(type) {
+    id <- paste0("plotCustomPoints", type)
+    customPointsServer(id, plot_type = "ggplot")
+  })
+  names(customPointsModules) <- getPlotTypesDiag()
   
   plotParams <- reactive({
-    list(
-      fruitsObj = model()$fruitsObj$data,
-      modelResults = values$modelResultSummary,
-      estType = input$estTypeDiag,
-      groupType = input$groupTypeDiag,
-      filterType = input$filterTypeDiag,
-      groupVars = input$groupVarsDiag,
-      # filterType2 = input$filterType2Diag,
-      individual = input$individualsDiag,
-      plotType = input$plotTypeDiag,
-      showLegend = input$showLegendDiag,
-      histBins = input$histBinsDiag,
-      contributionLimit = input$contributionLimitDiag,
-      colorPalette = input$colorPaletteDiag,
-      applyRanges = input$applyRangesDiag, # needed only for plot update
-      applyTitles = input$applyTitlesDiag, # needed only for plot update
-      customePointsDiag = customePointsDiag() # needed only for plot update
+    # Dynamically collect customPointsOutputPlotXYZ = customPointsModules[[XYZ]]()
+    customPointsList <- setNames(
+      lapply(getPlotTypesDiag(), function(pt)
+        customPointsModules[[pt]]()),
+      paste0("customPointsOutputPlot", getPlotTypesDiag())
+    )
+    
+    c(
+      list(
+        fruitsObj = model()$fruitsObj$data,
+        modelResults = values$modelResultSummary,
+        estType = input$estTypeDiag,
+        groupType = input$groupTypeDiag,
+        filterType = input$filterTypeDiag,
+        groupVars = input$groupVarsDiag,
+        # filterType2 = input$filterType2Diag,
+        individual = input$individualsDiag,
+        plotType = input$plotTypeDiag,
+        showLegend = input$showLegendDiag,
+        histBins = input$histBinsDiag,
+        contributionLimit = input$contributionLimitDiag,
+        colorPalette = input$colorPaletteDiag,
+        applyRanges = input$applyRangesDiag,
+        # needed only for plot update
+        applyTitles = input$applyTitlesDiag # needed only for plot update
+      ),
+      customPointsList
     )
   }) %>% debounce(100)
-
+  
   userRangesDiag <- plotRangesServer("plotRangesDiag",
                                      type = "ggplot",
                                      initRanges = list(xAxis = config()[["plotRange"]],
@@ -133,29 +157,30 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
         return(NULL)
       }
       
-      p <- do.call(
-        plotTargets,
-        plotParams()
-      ) %>%
-        shinyTryCatch(errorTitle = "Error during plotting",
-                      warningTitle = "Warning during plotting",
-                      alertStyle = "shinyalert")
+      p <- do.call(plotTargets, plotParams()) %>%
+        shinyTryCatch(
+          errorTitle = "Error during plotting",
+          warningTitle = "Warning during plotting",
+          alertStyle = "shinyalert"
+        )
       
       # we need to trigger the update after pressing "Apply", that's why we use the if condition
       if (input$applyRangesDiag > 0) {
-        p <- p %>%
-          formatRangesOfGGplot(ranges = userRangesDiag)
+        p <- p |>
+          formatScalesOfGGplot(ranges = userRangesDiag)
       }
       
       if (input$applyTitlesDiag > 0) {
-        p <- p %>% 
+        p <- p |>
           formatTitlesOfGGplot(text = plotTitlesDiag)
       }
       
-      p <- p |>
-        addCustomPointsToGGplot(customePointsDiag()) |>
-        shinyTryCatch(errorTitle = "Plotting failed")
-        
+      if (input$plotTypeDiag %in% names(customPointsModules)) {
+        p <- p |>
+          addCustomPointsToGGplot(customPointsModules[[input$plotTypeDiag]]()) |>
+          shinyTryCatch(errorTitle = "Plotting failed")
+      }
+      
       p
     }
   })
@@ -328,4 +353,14 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
       choices = groupChoices(), selected = groupChoices()
     )
   })
+}
+
+generate_custom_point_ui <- function(plot_type_id, plot_type, ns) {
+  conditionalPanel(
+    condition = sprintf("input.%s == '%s'", plot_type_id, plot_type),
+    ns = ns,
+    customPointsUI(id = ns(paste0(
+      "plotCustomPoints", plot_type
+    )), plot_type = "ggplot")
+  )
 }
