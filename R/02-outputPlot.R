@@ -105,7 +105,7 @@ outputPlotUI <- function(id) {
       ),
       sliderInput(
         inputId = ns("boxQuantile"),
-        label = "Box upper quantile",
+        label = "Box credible interval",
         value = 0.68,
         min = 0.5,
         max = 0.99,
@@ -113,10 +113,10 @@ outputPlotUI <- function(id) {
       ),
       sliderInput(
         inputId = ns("whiskerMultiplier"),
-        label = "Whiskers coverage interval",
+        label = "Whisker credible interval",
         value = 0.95,
         min = 0.5,
-        max = 1,
+        max = 0.99,
         step = 0.001
       ),
       tags$hr(),
