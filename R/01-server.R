@@ -113,7 +113,6 @@ fruitsTab <- function(input,
     ckanFileTypes = config()[["ckanModelTypes"]],
     ignoreWarnings = TRUE,
     defaultSource = config()[["defaultSourceModel"]],
-    fileExtension = config()[["fileExtension"]],
     options = importOptions(rPackageName = config()[["rPackageName"]])
   )
   
