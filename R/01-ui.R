@@ -902,15 +902,15 @@ fruitsUI <- function(id, title = "FRUITS") {
               fluidRow(
                 sidebarPanel(
                   tags$h5("Select additional summary statistics"),
-                  checkboxInput(ns("SummaryMin"), "Minimum"),
-                  checkboxInput(ns("SummaryMax"), "Maximum"),
-                  checkboxInput(ns("SummaryMedian"), "Median"),
-                  checkboxInput(ns("SummaryQuantileCheck"), "Quantiles"),
+                  checkboxInput(ns("SummaryMin"), "Minimum"), # statistics[1]
+                  checkboxInput(ns("SummaryMax"), "Maximum"), # statistics[2]
+                  checkboxInput(ns("SummaryMedian"), "Median"), # statistics[3]
+                  checkboxInput(ns("SummaryQuantileCheck"), "Quantiles"), # statistics[4]
                   conditionalPanel(
                     condition = "input.SummaryQuantileCheck == true",
                     ns = ns,
                     sliderInput(
-                      inputId = ns("SummaryQuantile"),
+                      inputId = ns("SummaryQuantile"), # statistics[5]
                       label = "Select quantile",
                       min = 0,
                       max = 1,
@@ -919,7 +919,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                       step = 0.001
                     ),
                     sliderInput(
-                      inputId = ns("SummaryQuantile2"),
+                      inputId = ns("SummaryQuantile2"), # statistics[6]
                       label = "Select quantile",
                       min = 0,
                       max = 1,
@@ -928,16 +928,30 @@ fruitsUI <- function(id, title = "FRUITS") {
                       step = 0.001
                     )
                   ),
-                  checkboxInput(ns("BayesianPValuesCheck"), "P-values"),
+                  checkboxInput(ns("BayesianPValuesCheck"), "P-values"), # statistics[8]
                   conditionalPanel(
                     condition = "input.BayesianPValuesCheck == true",
                     ns = ns,
                     numericInput(
-                      ns("pVal"),
+                      ns("pVal"), # statistics[8]
                       "Test against value of:",
                       value = 0,
                       step = 0.1
                     )
+                  ),
+                  checkboxInput(ns("SummaryHDICheck"), "HDI credible interval", value = TRUE), # statistics[9]
+                  conditionalPanel(
+                    condition = "input.SummaryHDICheck == true",
+                    ns = ns,
+                    sliderInput(
+                      inputId = ns("SummaryHDI"), # statistics[10]
+                      label = "credible interval",
+                      min = 0,
+                      max = 1,
+                      value = 0.95,
+                      width = "100%",
+                      step = 0.001
+                    )                    
                   ),
                   exportDataUI(ns("exportSummaryData"), "Export Data"),
                   width = 3

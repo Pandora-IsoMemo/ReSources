@@ -1647,7 +1647,9 @@ fruitsTab <- function(input,
         input$SummaryQuantile,
         input$SummaryQuantile2,
         input$BayesianPValuesCheck,
-        input$pVal
+        input$pVal,
+        input$SummaryHDICheck,
+        input$SummaryHDI
       )
     )
   })
@@ -1790,7 +1792,9 @@ fruitsTab <- function(input,
           input$SummaryQuantile,
           input$SummaryQuantile2,
           input$BayesianPValuesCheck,
-          input$pVal
+          input$pVal,
+          input$SummaryHDICheck,
+          input$SummaryHDI
         ),
         DT = FALSE
       )[input[["SummaryResults_rows_all"]], ]

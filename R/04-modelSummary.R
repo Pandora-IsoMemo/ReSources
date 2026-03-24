@@ -17,9 +17,14 @@ getResultStatistics <- function(parameters, userEstimates, fruitsObj,
   # pay attention to alignment with ui-input-objects
   statisticsNames <- transformUIStatNames(statistics)$statisticsNames
   statisticsFunctions <- transformUIStatNames(statistics)$statisticsReturn
-  statisticsNames <- c("mean", "sd", "lower 95%", "upper 95%", statisticsNames)
+  statisticsNames <- c("mean", "sd", #"lower 95%", "upper 95%",
+                       statisticsNames)
   statisticsFunctions <- c(
-    transformStatNames(c("mean", "sd", "lower 95%", "upper 95%")),
+    #transformStatNames(
+    c(
+      "mean", "sd" #, "lower 95%", "upper 95%"
+    ),
+    #),
     statisticsFunctions
   )
   if (bins) {
@@ -218,15 +223,21 @@ transformUIStatNames <- function(statistics) {
       )
       statisticsNames <- c(statisticsNames, "P-value")
     }
+    if (statistics[9] == TRUE) {
+      statisticsReturn <- c(statisticsReturn, paste0("function(y) HDInterval::hdi(y, credMass = ", statistics[10], ")[1]"))
+      statisticsNames <- c(statisticsNames, paste0("lower_C.I._", statistics[10]))
+      statisticsReturn <- c(statisticsReturn, paste0("function(y) HDInterval::hdi(y, credMass = ", statistics[10], ")[2]"))
+      statisticsNames <- c(statisticsNames, paste0("upper_C.I._", statistics[10]))
+    }
   }
   return(list(statisticsReturn = statisticsReturn, statisticsNames = statisticsNames))
 }
 
-transformStatNames <- function(statistics) {
-  statistics <- sub("lower 95%", "function(y) quantile(y, 0.025, na.rm = TRUE)", statistics)
-  statistics <- sub("upper 95%", "function(y) quantile(y, 0.975, na.rm = TRUE)", statistics)
-  statistics
-}
+# transformStatNames <- function(statistics) {
+#   statistics <- sub("lower 95%", "function(y) quantile(y, 0.025, na.rm = TRUE)", statistics)
+#   statistics <- sub("upper 95%", "function(y) quantile(y, 0.975, na.rm = TRUE)", statistics)
+#   statistics
+# }
 
 translateParameters <- function(parameters, fruitsObj, addNameTypes = FALSE) {
   # sources
