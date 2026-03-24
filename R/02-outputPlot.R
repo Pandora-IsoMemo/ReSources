@@ -119,6 +119,8 @@ outputPlotUI <- function(id) {
         max = 0.99,
         step = 0.001
       ),
+      checkboxInput(ns("show_mean"), "Show mean"),
+      checkboxInput(ns("show_median"), "Show median"),
       tags$hr(),
       plotRangesUI(id = ns("outputPlotRanges"), title = "Axis Ranges"),
       actionButton(ns("applyOutputPlotRanges"), "Apply"),
@@ -196,6 +198,8 @@ outputPlot <- function(input, output, session, model, values) {
         contributionLimit = input$contributionLimit,
         boxQuantile = input$boxQuantile,
         whiskerMultiplier = input$whiskerMultiplier,
+        show_mean = input$show_mean,
+        show_median = input$show_median,
         numCov = numCov,
         applyRanges = input$applyOutputPlotRanges,
         applyTitles = input$applyOutputPlotTitles

@@ -10,6 +10,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
                         histBins = 50,
                         binSize = NULL,
                         whiskerMultiplier = 0.95, boxQuantile = 0.68,
+                        show_mean = FALSE, show_median = FALSE,
                         numCov = FALSE, ...) {
   if (length(groupVars) == 0 && numCov == FALSE) {
     return(NULL)
@@ -131,9 +132,21 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
         ymin = .data$whisker_lower,
         ymax = .data$whisker_upper
       ),
-      stat = "identity"
-    ) + geom_errorbar(aes(ymin = .data$meanEst, ymax = .data$meanEst), linetype = "dashed", data = dataSummary) +
-      geom_errorbar(aes(ymin = .data$median, ymax = .data$median), linetype = "dotted", data = dataSummary)
+      stat = "identity",
+      median.linetype = "blank"
+    )
+
+    if (show_mean) {
+      p <- p + geom_errorbar(
+        aes(ymin = .data$meanEst, ymax = .data$meanEst), linetype = "dashed", data = dataSummary
+      )
+    }
+
+    if (show_median) {
+      p <- p + geom_errorbar(
+        aes(ymin = .data$median, ymax = .data$median), linetype = "dotted", data = dataSummary
+      )
+    }
 
     if (contributionLimit == "0-100%") {
       p <- p + ylim(c(0, 100))
