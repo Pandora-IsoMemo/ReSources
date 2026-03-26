@@ -138,7 +138,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
 
     if (show_mean) {
       p <- p + geom_errorbar(
-        aes(ymin = .data$meanEst, ymax = .data$meanEst), linetype = "dashed", data = dataSummary
+        aes(ymin = .data$meanEst, ymax = .data$meanEst), linetype = "solid", data = dataSummary
       )
     }
 
