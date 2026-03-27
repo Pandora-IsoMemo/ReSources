@@ -65,7 +65,19 @@ test_that("bins=TRUE adds bin columns", {
 })
 
 test_that("Custom statistics argument is respected", {
-  stats <- c(TRUE, TRUE, TRUE, FALSE, NA, NA, FALSE) # min, max, median
+  stats <- c(
+    TRUE, #input$SummaryMin,
+    TRUE, #input$SummaryMax,
+    TRUE, #input$SummaryMedian,
+    FALSE, #input$SummaryQuantileCheck,
+    NA, #input$SummaryQuantile / 100,
+    NA, #input$SummaryQuantile2 / 100,
+    FALSE, #input$BayesianPValuesCheck,
+    NA, #input$pVal,
+    FALSE, #input$SummaryHDICheck,
+    NA #input$SummaryHDI / 100
+  )
+          
   res <- getResultStatistics(mock_parameters, mock_userEstimates, mock_fruitsObj, statistics = stats, DT = FALSE, agg = TRUE)
   expect_true(any(grepl("Minimum|Maximum|Median", names(res))))
 })

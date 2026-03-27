@@ -61,7 +61,7 @@ test_that("checkDim works as expected", {
   x <- array(1:(3 * 4 * 5), dim = c(3, 4, 5))
   expect_error(ReSources:::checkDim(x, c(3, 4, 5)), NA)
   expect_error(
-    ReSources:::checkDim(x, c(3, 4), argName = "x"),
+    suppressWarnings(ReSources:::checkDim(x, c(3, 4), argName = "x")),
     "x has wrong dimensions: '3, 4, 5' instead of '3, 4'"
   )
   expect_error(
