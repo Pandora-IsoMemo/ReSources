@@ -1,0 +1,394 @@
+# Changelog
+
+## ReSources 25.07.0
+
+### Updates
+
+- One can now optionally add custom points to *‘BoxPlot’*,
+  *‘KernelDensity’* or *‘Histogram’* in the *Output Plots* tab.
+
+### Bug Fixes
+
+- Fixed an issue with custom points in the *Model Diagnostics* tab,
+  where the points were not displayed correctly
+
+## ReSources 25.06.4
+
+### Updates
+
+- increased DataTools to most recent version 25.06.5
+
+## ReSources 25.06.3
+
+### Updates
+
+- fixed the nimble version to nimble 1.3.0 (#142, \#150)
+
+## ReSources 25.06.2
+
+### Bug Fixes
+
+- use most recent DataTools version to fix a bug in the deployment of
+  the app
+- fix an issue when adding a point to a boxplot
+
+## ReSources 25.06.1
+
+### New Features
+
+- One can now optionally add custom points:
+  - to plots in the *Model Diagnostics* tab, or
+  - to *‘Line’* plots in the *Output Plots* tab.
+
+### Bug Fixes
+
+- Fixed an issue when importing batch data using *DataTools* version
+  25.06.0 (#147).
+
+## ReSources 25.06.0
+
+### Bug Fixes
+
+- fixed an issue with nimble versions newer than 0.13.0, where different
+  settings need to be applied to receive the previous behavior (#142)
+
+## ReSources 25.03.2
+
+### Updates
+
+- reduce package size by updating test data and including example files
+  into the `.Rbuildignore`
+- skip large data tests in CI and add large test data to the
+  `.Rbuildignore`
+
+## ReSources 25.03.1
+
+### Bug Fixes
+
+- fix the logic to update model inputs after editing model code or model
+  inputs locally (#142)
+- update displayed help texts respectively to the new logic
+
+## ReSources 25.03.0
+
+### Bug Fixes
+
+- fix the update of user inputs after model import, ensuring that the
+  input ‘Optimal objective prior’ is updated (#142)
+
+## ReSources 25.01.0
+
+### Updates
+
+- optionally edit model inputs before running the model (#139)
+
+## ReSources 24.12.0
+
+### New Features
+
+- optionally edit the model code before running the model (#139)
+
+### Updates
+
+- update to shinyTools 24.12.0 to integrate the new header
+- update links in the ReadMe file
+
+### Bug Fixes
+
+- fix issue with missing *outText* object after model run for some
+  special case
+
+## ReSources 24.11.0
+
+### Bug Fixes
+
+- use *shinyTools* version 24.11.2 to fix issues with plotExport module
+  (#136)
+
+## ReSources 24.10.1
+
+### New Features
+
+- adjust Rprofile
+- add pkgdown doc
+- add github action workflow for r cmd check
+- remove rgpt3 dependency
+- cleanup dockerfile & DESCRIPTION - renaming of mpiisoapp -\> DSSM
+
+## ReSources 24.09.0
+
+### Bug Fixes
+
+- fix assue with the assignment of source names (#132)
+- remove warnings for deprecated functions from dplyr
+- fix old package name: MpiIsoApp -\> DSSM
+
+## ReSources 24.08.2
+
+### New Features
+
+- Adds one-dimensional source mixture plot in addition to available 2-
+  and 3dimensional ones
+
+## ReSources 24.08.1
+
+### Bug Fixes
+
+- fixes issue with missing labels in *Prior Info* and in *User
+  Estimates* (#125)
+
+## ReSources 24.08.0
+
+### Updates
+
+- apply new faster version of model import from DataTools package
+
+### Bug Fixes
+
+- *Result graphs*: fix error when a covariate is selected in “Display
+  by” (#126)
+- catch errors when plotting data and display as a popup message,
+  prevents the app from crashing
+
+## ReSources 24.07.0
+
+### New Features
+
+- *Result graphs*: optionally select the smoothing method (default is
+  “lm”) and the amount of smoothing when displaying line plots, now
+  called “Smooth Line” (#54)
+
+## ReSources 24.05.4
+
+### New Features
+
+- *Result graphs*: default y range is now set to 0-100% for several
+  estimate types (#120)
+
+### Bug Fixes
+
+- *Result graphs*: add missing default (empty) header to fix the
+  crashing of the app when selecting an estimate type different than
+  “Source contributions” (#121)
+
+## ReSources 24.05.3
+
+### New Features
+
+- *Data input tables*: new select input for the different tables in data
+  input to signal (#54)
+  - if during the copying of data the first row and/or column are
+    included
+  - if during the pasting of data the first row and/or column are
+    included
+
+## ReSources 24.05.2
+
+### New Features
+
+- *Result graphs*:
+  - new UI to format titles and axis labels which additionally enables
+    to rotate the axis labels (#54)
+
+### Updates
+
+- *Plot export*:
+  - apply export module from package ShinyTools for improved error
+    handling
+- *error handling*:
+  - improved error messages for the user with
+    [`shinyTools::shinyTryCatch()`](https://pandora-isomemo.github.io/shiny-tools/reference/shinyTryCatch.html)
+
+## ReSources 24.05.1
+
+### New Features
+
+- *Model options:*
+  - new UI to specify individually hyper parameter values for different
+    food sources (#54)
+  - if the number of food sources is changed after these are set then
+    reset their values to 1 (#54)
+
+### Updates
+
+- *Download and Import of models*:
+  - when saving a model its default name is “model.resources” (#54)
+  - if a model was previously loaded the default name is that of the
+    loaded model (#54)
+  - a reset returns the default name to “model.resources” (#54)
+
+## ReSources 24.05.1
+
+### Bug Fixes
+
+- fix issue with the check for empty tables after importing a model.
+  Now, source tables are checked correctly.
+
+## ReSources 24.05.0
+
+### New Features
+
+- *Model diagnostic plots (Trace, AutoCor)*: optionally select the x and
+  y axes ranges to be displayed (#54)
+
+### Bug Fixes
+
+- *Oxcal Export*: catch error when trying to load files for curves
+  without internet connection
+
+## ReSources 23.12.1
+
+### Bug Fixes
+
+- fixes an issue with a missing case when splitting user estimate
+  samples into groups (#109)
+
+## ReSources 23.12.0
+
+### New Features
+
+- *Import of models from Pandora*:
+  - display of “About” information that is associated to a selected
+    Pandora Repository
+
+### Bug Fixes
+
+- *Import of models from Pandora*:
+  - an error message occurred when trying to load a model from pandora.
+  - fix: adding the missing download of the zip file from the url before
+    unpacking the zip
+
+## ReSources 23.07.2
+
+### Bug Fixes
+
+- catch definition of source and concentration names when respective
+  data is missing (#99)
+
+## ReSources 23.07.1
+
+### Bug Fixes
+
+- error message when prior names are not found or do mismatch (#100)
+
+## ReSources 23.07.0
+
+### New Features
+
+- checkbox for optionally only displaying the input for nimbleModel()
+  instead of running the model when pressing *Run* (#96)
+
+## ReSources 23.06.0
+
+### New Features
+
+- *Import Model* button: additional option to import a model from
+  pandora or url
+
+## ReSources 23.05.1
+
+### New Features
+
+- button to reset a single table (#3)
+
+## ReSources 23.03.4
+
+### Bug Fixes
+
+- Fix for baseline models when only one proxy present (#83)
+
+## ReSources 23.03.3
+
+### Updates
+
+- remote models are loaded from the github folder
+  `inst/app/predefinedModels` of the respective repository
+- if there is no internet connection remote models are taken from the
+  models that were saved with the last deployed app version
+
+## ReSources 23.03.2
+
+### Bug Fixes
+
+- use most recent version of the shinyMatrix package (#73)
+- fix update of tables after using enter to submit values (#82)
+
+## ReSources 23.03.1
+
+### Bug fixes
+
+- forward more specific error messages to the user if conditions to run
+  a model are not met (#81, \#83)
+
+## ReSources 23.02.4
+
+### Bug fixes
+
+- switch to kaleido package instead of orca for plotly export (#76)
+
+## ReSources 23.02.3
+
+### Bug fixes
+
+- fix update of covariate variables (#74)
+
+## ReSources 23.02.2
+
+### New Features
+
+- the *Import Data* module is now imported from the package DataTools
+  (#70, PR \#72)
+- additionally to file import, now import from URL or from Pandora
+  Platform is possible
+- specific checks for matrix imports are integrated into the new *Import
+  Data* module
+- all redundant code was removed
+- using “file” as default source in Import Data
+
+## ReSources 23.02.1
+
+### Bug fixes
+
+- fix bug in export of xlsx files
+- fix height of sidebar with auto scroll
+
+## ReSources 22.12.1
+
+### Bug fixes
+
+- fix loop when deleting a column or a row (#58)
+
+## ReSources 22.11.3
+
+### Bug fixes
+
+- fix loop when entering new columns (#64)
+
+## ReSources 22.11.2
+
+### Bug fixes
+
+- endless loop when uploading data with no names of list elements, that
+  is no baseline model (#62)
+
+## ReSources 22.11.1
+
+### Bug fixes
+
+- fix update of list names for sources and concentration tables after
+  names where changed in target tables, values are not reset anymore
+  (#34)
+
+## ReSources 22.09.1
+
+### Enhancements
+
+- check if uploaded data contains empty tables
+- use shinyalerts in data uploads with different types of alarms:
+  “error”, “warning”, “success”
+
+## ReSources 22.08.2
+
+### Bug Fixes
+
+- fix conflicts with column names (#44)

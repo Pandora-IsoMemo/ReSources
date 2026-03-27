@@ -1,0 +1,209 @@
+# ReSources
+
+### Access to online version:
+
+- MAIN version: <https://isomemoapp.com/app/resources>
+- BETA version: <https://isomemoapp.com/app/resources-beta>
+
+### Documentation
+
+- <https://pandora-isomemo.github.io/ReSources/>
+
+### Installation instructions
+
+- <https://pandora-isomemo.github.io/docs/apps.html#resources---food-reconstruction-using-isotopic-transferred-signals>
+
+### Release notes:
+
+- see `NEWS.md`
+
+### Folder for online models
+
+- [`inst/app/predefinedModels`](https://github.com/Pandora-IsoMemo/resources/tree/main/inst/app/predefinedModels)
+
+# Package index
+
+## All functions
+
+- [`checkClass()`](https://pandora-isomemo.github.io/ReSources/reference/checkClass.md)
+  : Check if class is in a set of accepted classes
+
+- [`checkData()`](https://pandora-isomemo.github.io/ReSources/reference/checkData.md)
+  : Check data
+
+- [`checkDataDimensions()`](https://pandora-isomemo.github.io/ReSources/reference/checkDataDimensions.md)
+  : Check if data dimensions are correct
+
+- [`checkDataNameConsistency()`](https://pandora-isomemo.github.io/ReSources/reference/checkDataNameConsistency.md)
+  : Check if data names are correct
+
+- [`checkDim()`](https://pandora-isomemo.github.io/ReSources/reference/checkDim.md)
+  : Check if dimensions are correct
+
+- [`checkIndividualNames()`](https://pandora-isomemo.github.io/ReSources/reference/checkIndividualNames.md)
+  : Check individual names
+
+- [`checkLength()`](https://pandora-isomemo.github.io/ReSources/reference/checkLength.md)
+  : Check if length is correct
+
+- [`checkModelOptions()`](https://pandora-isomemo.github.io/ReSources/reference/checkModelOptions.md)
+  : Check model options
+
+- [`checkNames()`](https://pandora-isomemo.github.io/ReSources/reference/checkNames.md)
+  : Check if names are correct
+
+- [`checkPriors()`](https://pandora-isomemo.github.io/ReSources/reference/checkPriors.md)
+  : Check priors
+
+- [`checkUserEstimates()`](https://pandora-isomemo.github.io/ReSources/reference/checkUserEstimates.md)
+  : Check user estimates
+
+- [`checkValueNames()`](https://pandora-isomemo.github.io/ReSources/reference/checkValueNames.md)
+  : Check value names
+
+- [`compileRunModel()`](https://pandora-isomemo.github.io/ReSources/reference/compileRunModel.md)
+  : Modeling ReSources
+
+- [`componentsServer()`](https://pandora-isomemo.github.io/ReSources/reference/componentsServer.md)
+  : Components Server
+
+- [`componentsUI()`](https://pandora-isomemo.github.io/ReSources/reference/componentsUI.md)
+  : Components UI
+
+- [`concentrationsServer()`](https://pandora-isomemo.github.io/ReSources/reference/concentrationsServer.md)
+  : Concentrations Server
+
+- [`concentrationsUI()`](https://pandora-isomemo.github.io/ReSources/reference/concentrationsUI.md)
+  : Concentrations UI
+
+- [`config()`](https://pandora-isomemo.github.io/ReSources/reference/config.md)
+  : Config
+
+- [`createDummyMatrix()`](https://pandora-isomemo.github.io/ReSources/reference/createDummyMatrix.md)
+  : Create dummy matrix
+
+- [`createModel()`](https://pandora-isomemo.github.io/ReSources/reference/createModel.md)
+  [`alterModel()`](https://pandora-isomemo.github.io/ReSources/reference/createModel.md)
+  : Create or Alter a Model Object
+
+- [`createModelCode()`](https://pandora-isomemo.github.io/ReSources/reference/createModelCode.md)
+  : Create model code
+
+- [`createNameEvents()`](https://pandora-isomemo.github.io/ReSources/reference/createNameEvents.md)
+  : Create events from changed matrix names
+
+- [`createOxCalText()`](https://pandora-isomemo.github.io/ReSources/reference/createOxCalText.md)
+  : Create Oxcal Text
+
+- [`deleteTableFromList()`](https://pandora-isomemo.github.io/ReSources/reference/deleteTableFromList.md)
+  : Delete Table From List
+
+- [`exportCSV()`](https://pandora-isomemo.github.io/ReSources/reference/exportCSV.md)
+  : Export to csv
+
+- [`exportFilename()`](https://pandora-isomemo.github.io/ReSources/reference/exportFilename.md)
+  : Filename of Export
+
+- [`exportJSON()`](https://pandora-isomemo.github.io/ReSources/reference/exportJSON.md)
+  : Export to json
+
+- [`exportXLSX()`](https://pandora-isomemo.github.io/ReSources/reference/exportXLSX.md)
+  : Export to xlsx
+
+- [`extractContributionLimit()`](https://pandora-isomemo.github.io/ReSources/reference/extractContributionLimit.md)
+  : Extract contribution limit
+
+- [`extractPotentialCat()`](https://pandora-isomemo.github.io/ReSources/reference/extractPotentialCat.md)
+  : Extract Potential Cat
+
+- [`extractPotentialNumerics()`](https://pandora-isomemo.github.io/ReSources/reference/extractPotentialNumerics.md)
+  : Extract Potential Numerics
+
+- [`fillValuesFromUpload()`](https://pandora-isomemo.github.io/ReSources/reference/fillValuesFromUpload.md)
+  : Fill Values From Upload
+
+- [`fixMatrixCols()`](https://pandora-isomemo.github.io/ReSources/reference/fixMatrixCols.md)
+  : Fix Matrix Cols
+
+- [`fruits()`](https://pandora-isomemo.github.io/ReSources/reference/fruits.md)
+  :
+
+  Constructor for S3 class `fruits`
+
+- [`fruitsTab()`](https://pandora-isomemo.github.io/ReSources/reference/fruitsTab.md)
+  : Server Function for the FRUITS Module / Tab
+
+- [`fruitsUI()`](https://pandora-isomemo.github.io/ReSources/reference/fruitsUI.md)
+  : UI function for the FRUITS Tab / Module
+
+- [`getDepthAndTable()`](https://pandora-isomemo.github.io/ReSources/reference/getDepthAndTable.md)
+  : Get Depth And Table
+
+- [`getFractionNames()`](https://pandora-isomemo.github.io/ReSources/reference/getFractionNames.md)
+  : Get Fraction Names
+
+- [`getLoop()`](https://pandora-isomemo.github.io/ReSources/reference/getLoop.md)
+  : Get Loop
+
+- [`getResultStatistics()`](https://pandora-isomemo.github.io/ReSources/reference/getResultStatistics.md)
+  : Analyse MCMC results
+
+- [`getSourceNames()`](https://pandora-isomemo.github.io/ReSources/reference/getSourceNames.md)
+  : Get Source Names
+
+- [`isDeepestEntry()`](https://pandora-isomemo.github.io/ReSources/reference/isDeepestEntry.md)
+  : Is Deepest Entry
+
+- [`isPreDeepestEntry()`](https://pandora-isomemo.github.io/ReSources/reference/isPreDeepestEntry.md)
+  : Is Pre Deepest Entry
+
+- [`isoInstalled()`](https://pandora-isomemo.github.io/ReSources/reference/isoInstalled.md)
+  : Check Availability for Mpi Iso App package
+
+- [`processNameEvents()`](https://pandora-isomemo.github.io/ReSources/reference/processNameEvents.md)
+  : Update matrix based on events list from createNameEvents
+
+- [`readString()`](https://pandora-isomemo.github.io/ReSources/reference/readString.md)
+  : Read String
+
+- [`readStringWrapper()`](https://pandora-isomemo.github.io/ReSources/reference/readStringWrapper.md)
+  : Read String Wrapper
+
+- [`readSystemFile()`](https://pandora-isomemo.github.io/ReSources/reference/readSystemFile.md)
+  : Read system file form ReSources package
+
+- [`removeLine()`](https://pandora-isomemo.github.io/ReSources/reference/removeLine.md)
+  : Remove Line
+
+- [`shinyInputToClass()`](https://pandora-isomemo.github.io/ReSources/reference/shinyInputToClass.md)
+  :
+
+  Build object of class `fruits` from shiny input
+
+- [`sourcesServer()`](https://pandora-isomemo.github.io/ReSources/reference/sourcesServer.md)
+  : Sources Server
+
+- [`sourcesUI()`](https://pandora-isomemo.github.io/ReSources/reference/sourcesUI.md)
+  : Sources UI
+
+- [`startApplication()`](https://pandora-isomemo.github.io/ReSources/reference/startApplication.md)
+  : Start Application
+
+- [`targetValuesServer()`](https://pandora-isomemo.github.io/ReSources/reference/targetValuesServer.md)
+  : Target Values Server
+
+- [`targetValuesUI()`](https://pandora-isomemo.github.io/ReSources/reference/targetValuesUI.md)
+  : Target Values UI
+
+- [`updateListNames()`](https://pandora-isomemo.github.io/ReSources/reference/updateListNames.md)
+  : Update List Names
+
+- [`updateObsvnsInLists()`](https://pandora-isomemo.github.io/ReSources/reference/updateObsvnsInLists.md)
+  : Remove Obsvn From Lists
+
+- [`updateObsvnsOfEntry()`](https://pandora-isomemo.github.io/ReSources/reference/updateObsvnsOfEntry.md)
+  : Remove Obsvn From Entry
+
+- [`updateTargetsInLists()`](https://pandora-isomemo.github.io/ReSources/reference/updateTargetsInLists.md)
+  : Update Targets In Lists
+
