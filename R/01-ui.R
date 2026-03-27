@@ -671,12 +671,12 @@ fruitsUI <- function(id, title = "FRUITS") {
                               value = FALSE
                 )
               ),
-              sliderInput(
+              percentileSliderInput(
                 ns("confidenceLevel"),
                 label = "Credible level",
-                min = 0.5,
-                max = 0.9999,
-                value = 0.9
+                min = 50,
+                max = 99.99,
+                value = 90
               ),
               radioButtons(
                 ns("horizontalPlot"),
@@ -909,23 +909,17 @@ fruitsUI <- function(id, title = "FRUITS") {
                   conditionalPanel(
                     condition = "input.SummaryQuantileCheck == true",
                     ns = ns,
-                    sliderInput(
+                    percentileSliderInput(
                       inputId = ns("SummaryQuantile"), # statistics[5]
                       label = "Select quantile",
-                      min = 0,
-                      max = 1,
-                      value = 0.95,
-                      width = "100%",
-                      step = 0.001
+                      value = 95,
+                      width = "100%"
                     ),
-                    sliderInput(
+                    percentileSliderInput(
                       inputId = ns("SummaryQuantile2"), # statistics[6]
                       label = "Select quantile",
-                      min = 0,
-                      max = 1,
-                      value = 0.99,
-                      width = "100%",
-                      step = 0.001
+                      value = 99,
+                      width = "100%"
                     )
                   ),
                   checkboxInput(ns("BayesianPValuesCheck"), "P-values"), # statistics[8]
@@ -943,15 +937,12 @@ fruitsUI <- function(id, title = "FRUITS") {
                   conditionalPanel(
                     condition = "input.SummaryHDICheck == true",
                     ns = ns,
-                    sliderInput(
+                    percentileSliderInput(
                       inputId = ns("SummaryHDI"), # statistics[10]
                       label = "credible interval",
-                      min = 0,
-                      max = 1,
-                      value = 0.95,
-                      width = "100%",
-                      step = 0.001
-                    )                    
+                      value = 95,
+                      width = "100%"
+                    )
                   ),
                   exportDataUI(ns("exportSummaryData"), "Export Data"),
                   width = 3

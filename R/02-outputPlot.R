@@ -103,24 +103,18 @@ outputPlotUI <- function(id) {
         choices = c("None", "0-1", "0-100%"),
         selected = "0-1"
       ),
-      sliderInput(
+      percentileSliderInput(
         inputId = ns("boxQuantile"),
         label = "Box credible interval",
-        value = 0.68,
-        min = 0.5,
-        max = 0.99,
-        step = 0.01
+        value = 68
       ),
-      sliderInput(
+      percentileSliderInput(
         inputId = ns("whiskerMultiplier"),
         label = "Whisker credible interval",
-        value = 0.95,
-        min = 0.5,
-        max = 0.99,
-        step = 0.001
+        value = 95
       ),
-      checkboxInput(ns("show_mean"), "Show mean"),
-      checkboxInput(ns("show_median"), "Show median"),
+      checkboxInput(ns("show_mean"), "Mean visible"),
+      checkboxInput(ns("show_median"), "Median visible"),
       tags$hr(),
       plotRangesUI(id = ns("outputPlotRanges"), title = "Axis Ranges"),
       actionButton(ns("applyOutputPlotRanges"), "Apply"),
@@ -196,8 +190,8 @@ outputPlot <- function(input, output, session, model, values) {
         binSize = binSize,
         colorPalette = input$colorPalette,
         contributionLimit = input$contributionLimit,
-        boxQuantile = input$boxQuantile,
-        whiskerMultiplier = input$whiskerMultiplier,
+        boxQuantile = input$boxQuantile / 100,
+        whiskerMultiplier = input$whiskerMultiplier / 100,
         show_mean = input$show_mean,
         show_median = input$show_median,
         numCov = numCov,
