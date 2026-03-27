@@ -1,3 +1,5 @@
+getPlotTypes <- function() c("BoxPlot", "KernelDensity", "Histogram", "Line")
+
 outputPlotUI <- function(id) {
   ns <- NS(id)
   
@@ -8,21 +10,12 @@ outputPlotUI <- function(id) {
       plotOutput(outputId = ns("SourcePlot")),
       fluidRow(
         column(6,
-               conditionalPanel(
-                 condition = "input.plotType == 'Line'",
+               lapply(
+                 getPlotTypes(),
+                 generate_custom_point_ui,
                  ns = ns,
-                 customPointsUI(id = ns("outputPlotCustomPoints"), plot_type = "ggplot")
-               ),
-               conditionalPanel(
-                 condition = "input.plotType == 'BoxPlot'",
-                 ns = ns,
-                 actionButton(ns("add_btn"), "Add data point"),
-                 actionButton(ns("rm_btn"), "Remove data point"),
-                 # colourInput(ns("col_btn"), "Select colour of data point"),
-                 # sliderInput(ns("size_btn"), "Size data point", min = 0.1, max = 10, value = 1),
-                 uiOutput(ns("pointInput"))
-               )
-        ),
+                 plot_type_id = "plotType"
+               )), 
         column(6,
                align = "right",
                plotExportButton(ns("exportSourcePlot")),
@@ -110,14 +103,6 @@ outputPlotUI <- function(id) {
         choices = c("None", "0-1", "0-100%"),
         selected = "0-1"
       ),
-      # removing fontFamily because it has side effects with plotTitles module
-      # selectInput(
-      #   inputId = ns("fontFamily"),
-      #   label = "Font",
-      #   selected = NULL,
-      #   choices = availableFonts()
-      # ),
-      #helpText("This will only have an effect on the pdf output"),
       sliderInput(
         inputId = ns("boxQuantile"),
         label = "Box upper quantile",
@@ -174,31 +159,6 @@ lineSmoothingUI <- function(id) {
 
 outputPlot <- function(input, output, session, model, values) {
   options(deparse.max.lines = 1)
-  pointDat <- reactiveVal({
-    data.frame(
-      index = numeric(0),
-      y = numeric(0),
-      group = character(0),
-      pointSize = numeric(0),
-      pointAlpha = numeric(0),
-      pointColor = character(0)
-    )
-  })
-  
-  observeEvent(model(), ignoreNULL = FALSE, {
-    pointDat(
-      data.frame(
-        index = numeric(0),
-        y = numeric(0),
-        group = character(0),
-        pointSize = numeric(0),
-        pointAlpha = numeric(0),
-        pointColor = character(0)
-      )
-    )
-  })
-  
-  customePointsOutputPlot <- customPointsServer("outputPlotCustomPoints", plot_type = "ggplot")
   
   plotParams <- reactive({
     binSize <- NULL
@@ -206,38 +166,88 @@ outputPlot <- function(input, output, session, model, values) {
         input$`exportData-bins` == TRUE) {
       binSize <- input$`exportData-binSize`
     }
-    if(input$groupType %in% colnames(model()$fruitsObj$data$covariatesNum)){
-      numCov <- TRUE
-    } else {
-      numCov <- FALSE
-    }
-    list(
-      fruitsObj = model()$fruitsObj$data,
-      modelResults = values$modelResultSummary,
-      estType = input$estType,
-      groupType = input$groupType,
-      filterType = input$filterType,
-      # filterType2 = input$filterType2,
-      groupVars = input$groupVars,
-      individual = input$individuals,
-      plotType = input$plotType,
-      lineSmoothingMethod = input[["lineSmoothing-method"]],
-      lineSmoothingSpan = input[["lineSmoothing-loessSpan"]],
-      showLegend = input$showLegend,
-      histBins = input$histBins,
-      binSize = binSize,
-      colorPalette = input$colorPalette,
-      contributionLimit = input$contributionLimit,
-      pointDat = na.omit(pointDat()),
-      #fontFamily = input$fontFamily,
-      boxQuantile = input$boxQuantile,
-      whiskerMultiplier = input$whiskerMultiplier,
-      numCov = numCov,
-      applyRanges = input$applyOutputPlotRanges, # only needed to trigger update of plot
-      applyTitles = input$applyOutputPlotTitles, # only needed to trigger update of plot
-      customePointsOutputPlot = customePointsOutputPlot() # only needed to trigger update of plot
+    
+    numCov <- input$groupType %in% colnames(model()$fruitsObj$data$covariatesNum)
+    
+    # Dynamically collect customPointsOutputPlotXYZ = customPointsModules[[XYZ]]()
+    customPointsList <- setNames(
+      lapply(getPlotTypes(), function(pt)
+        customPointsModules[[pt]]()),
+      paste0("customPointsOutputPlot", getPlotTypes())
+    )
+    
+    # Combine static params and dynamic ones
+    c(
+      list(
+        fruitsObj = model()$fruitsObj$data,
+        modelResults = values$modelResultSummary,
+        estType = input$estType,
+        groupType = input$groupType,
+        filterType = input$filterType,
+        groupVars = input$groupVars,
+        individual = input$individuals,
+        plotType = input$plotType,
+        lineSmoothingMethod = input[["lineSmoothing-method"]],
+        lineSmoothingSpan = input[["lineSmoothing-loessSpan"]],
+        showLegend = input$showLegend,
+        histBins = input$histBins,
+        binSize = binSize,
+        colorPalette = input$colorPalette,
+        contributionLimit = input$contributionLimit,
+        boxQuantile = input$boxQuantile,
+        whiskerMultiplier = input$whiskerMultiplier,
+        numCov = numCov,
+        applyRanges = input$applyOutputPlotRanges,
+        applyTitles = input$applyOutputPlotTitles
+      ),
+      customPointsList
     )
   }) %>% debounce(100)
+  
+  basePlot <- reactive({
+    if (is.null(model()) || is.null(model()$modelResults)) {
+      return(NULL)
+    }
+    
+    validate(validModelOutput(model()))
+    
+    params <- c(plotParams())
+    p <- do.call(
+      plotTargets,
+      params
+    ) %>%
+      shinyTryCatch(errorTitle = "Error during plotting",
+                    warningTitle = "Warning during plotting",
+                    alertStyle = "shinyalert")
+    return(p)
+  })
+  
+  x_choices <- reactive({
+    if (input$plotType != "BoxPlot")
+      return(NULL)
+    
+    if (is.null(model()) ||
+        is.null(model()$modelResults) || is.null(basePlot())) {
+      return(c("No groups found ... " = ""))
+    } else {
+      p <- basePlot()
+      
+      choices <- p$data$group |> unique() |> as.character()
+      attr(choices, "x") <- "group"
+      
+      return(choices)
+    }
+  })
+  
+  customPointsModules <- lapply(getPlotTypes(), function(type) {
+    id <- paste0("plotCustomPoints", type)
+    if (type == "BoxPlot") {
+      customPointsServer(id, plot_type = "ggplot", x_choices = x_choices)
+    } else {
+      customPointsServer(id, plot_type = "ggplot")
+    }
+  })
+  names(customPointsModules) <- getPlotTypes()
   
   userRangesOutputPlot <- plotRangesServer("outputPlotRanges",
                                      type = "ggplot",
@@ -255,33 +265,22 @@ outputPlot <- function(input, output, session, model, values) {
   
   plotFunTarget <- reactive({
     function() {
-      if (is.null(model()) || is.null(model()$modelResults)) {
-        return(NULL)
-      }
-      
-      params <- c(plotParams())
-      p <- do.call(
-        plotTargets,
-        params
-      ) %>%
-        shinyTryCatch(errorTitle = "Error during plotting",
-                      warningTitle = "Warning during plotting",
-                      alertStyle = "shinyalert")
+      p <- basePlot()
       
       # we need to trigger the update after pressing "Apply", that's why we use the if condition
       if (input$applyOutputPlotRanges >= 0) {
-        p <- p %>%
-          formatRangesOfGGplot(ranges = userRangesOutputPlot)
+        p <- p |>
+          formatScalesOfGGplot(ranges = userRangesOutputPlot)
       }
       
       if (input$applyOutputPlotTitles >= 0) {
-        p <- p %>% 
+        p <- p |>
           formatTitlesOfGGplot(text = plotTitlesOutputPlot)
       }
       
-      if (input$plotType == "Line") {
+      if (input$plotType %in% names(customPointsModules)) {
         p <- p |>
-          addCustomPointsToGGplot(customePointsOutputPlot()) |>
+          addCustomPointsToGGplot(customPointsModules[[input$plotType]]()) |>
           shinyTryCatch(errorTitle = "Plotting failed")
       }
       
@@ -452,96 +451,6 @@ outputPlot <- function(input, output, session, model, values) {
       selected = groupChoices()
     )
   })
-  
-  addRow <- function(df) {
-    rbind(
-      df,
-      data.frame(
-        index = nrow(df) + 1,
-        y = NA,
-        group = NA,
-        pointColor = "black",
-        pointSize = 1,
-        pointAlpha = 0.5,
-        stringsAsFactors = FALSE
-      )
-    )
-  }
-  
-  rmRow <- function(df) {
-    if (nrow(df) > 0) {
-      df[-nrow(df), , drop = FALSE]
-    } else {
-      df
-    }
-  }
-  
-  observeEvent(input$add_btn, {
-    new_point_data <- addRow(pointDat()) %>%
-      shinyTryCatch(errorTitle = "Error adding data point",
-                    warningTitle = "Warning adding data point",
-                    alertStyle = "shinyalert")
-    pointDat(new_point_data)
-  })
-  
-  observeEvent(input$rm_btn, {
-    new_point_data <- rmRow(pointDat()) %>%
-      shinyTryCatch(errorTitle = "Error removing data point",
-                    warningTitle = "Warning adding data point",
-                    alertStyle = "shinyalert")
-    pointDat(new_point_data)
-  })
-  
-  observe({
-    df <- pointDat()
-    indices <- df$index
-    
-    lapply(indices, function(index) {
-      yval <- input[[paste("y", index, sep = "_")]]
-      groupval <- input[[paste("group", index, sep = "_")]]
-      pointColor <- input[[paste("pointColor", index, sep = "_")]]
-      pointSize <- input[[paste("pointSize", index, sep = "_")]]
-      pointAlpha <- input[[paste("pointAlpha", index, sep = "_")]]
-      df[index, "pointColor"] <<-
-        if (is.null(pointColor)) {
-          "#000000"
-        } else {
-          pointColor
-        }
-      df[index, "pointSize"] <<-
-        if (is.null(pointSize)) {
-          1
-        } else {
-          pointSize
-        }
-      df[index, "pointAlpha"] <<-
-        if (is.null(pointAlpha)) {
-          1
-        } else {
-          pointAlpha
-        }
-      df[index, "y"] <<- if (is.null(yval)) {
-        NA
-      } else {
-        yval
-      }
-      df[index, "group"] <<- if (is.null(groupval)) {
-        NA
-      } else {
-        groupval
-      }
-    })
-    
-    pointDat(df)
-  })
-  
-  inputGroup <- reactive({
-    createPointInputGroup(pointDat(), groupChoices = groupChoices(), ns = session$ns)
-  })
-  
-  output$pointInput <- renderUI(inputGroup())
-  output$n <- reactive(nrow(pointDat()))
-  outputOptions(output, "n", suspendWhenHidden = FALSE)
 }
 
 #' Extract contribution limit
@@ -577,71 +486,3 @@ extractContributionLimit <- function(estType, userEstimateGroups) {
   
   return(res)
 }
-
-createPointInputGroup <- function(df, groupChoices, ns) {
-  lapply(seq_len(nrow(df)), function(i) {
-    createPointInput(
-      index = df$index[i],
-      y = df$y[i],
-      group = df$group[i],
-      groupChoices = groupChoices,
-      pointColor = df$pointColor[i],
-      pointSize = df$pointSize[i],
-      pointAlpha = df$pointAlpha[i],
-      ns = ns
-    )
-  })
-}
-
-createPointInput <- function(index,
-                             y,
-                             group,
-                             groupChoices,
-                             pointColor,
-                             pointSize,
-                             pointAlpha,
-                             ns) {
-  tags$div(
-    numericInput(
-      ns(paste("y", index, sep = "_")),
-      paste("y", index, sep = "_"),
-      value = y,
-      min = 0,
-      max = 1,
-      step = 0.01
-    ),
-    selectInput(
-      ns(paste("group", index, sep = "_")),
-      paste("group", index, sep = "_"),
-      selected = group,
-      choices = groupChoices
-    ),
-    colourInput(ns(paste(
-      "pointColor", index,
-      sep = "_"
-    )),
-    label = "Choose point color", value = pointColor
-    ),
-    sliderInput(
-      ns(paste("pointSize", index, sep = "_")),
-      label = "Point size",
-      value = pointSize,
-      min = 0.1,
-      max = 5,
-      step = 0.1
-    ),
-    sliderInput(
-      ns(paste("pointAlpha", index, sep = "_")),
-      label = "Point alpha",
-      value = pointAlpha,
-      min = 0.1,
-      max = 1,
-      step = 0.1
-    )
-  )
-}
-
-# currently disabled feature
-# availableFonts <- function() {
-#   intersect(names(postscriptFonts()), names(pdfFonts()))
-# }

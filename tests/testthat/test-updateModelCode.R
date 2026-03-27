@@ -16,7 +16,7 @@ test_that("updateModelCode", {
 })
 
 test_that("system command inside 'nimbleCode()' is not evaluated", {
-  expect_equal(eval(parse(text = paste("nimbleCode(", "system('ls -a')", ")"))), quote(system('ls -a')))
+  expect_equal(eval(parse(text = paste("nimbleCode({", "system('ls -a')", "})"))), quote({system('ls -a')}))
 })
 
 test_that("sanitizeInput accepts valid inputs", {

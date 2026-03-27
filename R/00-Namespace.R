@@ -38,7 +38,7 @@
 #' @importFrom shinyjs reset useShinyjs alert show hide
 #' @importFrom shinyMatrix matrixInput updateMatrixInput
 #' @importFrom shinyTools addCustomPointsToGGplot customPointsUI customPointsServer
-#'  formatRangesOfGGplot formatTitlesOfGGplot headerButtonsUI plotExportButton plotExportServer
+#'  formatScalesOfGGplot formatTitlesOfGGplot headerButtonsUI plotExportButton plotExportServer
 #'  plotRangesUI plotRangesServer plotTitlesServer plotTitlesUI shinyTryCatch
 #'  updateUserInputs vectorInputServer vectorInputUI
 #' @importFrom shinyWidgets pickerInput updatePickerInput
