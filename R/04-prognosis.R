@@ -437,6 +437,19 @@ sourceTargetPlot <- function(simSources = NULL,
     as.numeric()]
   plotData <- data.frame(x = numeric(), y = numeric(), error = numeric(), colorsPlot = character())
 
+  # Convert 1D posterior draws into asymmetric HDI error bars (upper/lower distance from the mean)
+  getHDIErrors1D <- function(simList, credMass = confidence) {
+    lapply(seq_along(simList), function(i) {
+      draws <- simList[[i]][, 1]
+      hdi_bounds <- HDInterval::hdi(draws, credMass = credMass)
+      mean_val <- mean(draws)
+      list(
+        upper = hdi_bounds[2] - mean_val,
+        lower = mean_val - hdi_bounds[1]
+      )
+    })
+  }
+
   # Estimate joint HDR support from posterior samples via ks::kde.
   getHDRPoints <- function(draws, credMass = confidence) {
     draws <- as.matrix(draws)
@@ -541,15 +554,7 @@ sourceTargetPlot <- function(simSources = NULL,
   if (plot3D == -1) {
     if (!is.null(simSources)) {
       # Calculate HDI bounds from posterior draws for each source
-      hdi_results <- lapply(1:length(simSources), function(i) {
-        draws <- simSources[[i]][, 1]  # 1D draws for this source
-        hdi_bounds <- HDInterval::hdi(draws, credMass = confidence)
-        mean_val <- mean(draws)
-        list(
-          upper = hdi_bounds[2] - mean_val,
-          lower = mean_val - hdi_bounds[1]
-        )
-      })
+      hdi_results <- getHDIErrors1D(simSources, credMass = confidence)
 
       plotData <- data.frame(
         y = round(as.vector(means), 3), x = rownames(means),
@@ -560,15 +565,7 @@ sourceTargetPlot <- function(simSources = NULL,
 
       if((showGrid | showPoints) & (!is.null(sources))){
         # Calculate HDI bounds for all grid mixtures
-        hdi_results_all <- lapply(1:length(simSourcesAll), function(i) {
-          draws <- simSourcesAll[[i]][, 1]
-          hdi_bounds <- HDInterval::hdi(draws, credMass = confidence)
-          mean_val <- mean(draws)
-          list(
-            upper = hdi_bounds[2] - mean_val,
-            lower = mean_val - hdi_bounds[1]
-          )
-        })
+        hdi_results_all <- getHDIErrors1D(simSourcesAll, credMass = confidence)
 
         simData <- data.frame(
           y = round(meansAll[, 1], 3),
@@ -605,15 +602,7 @@ sourceTargetPlot <- function(simSources = NULL,
       cols <- colorRampPalette(brewer.pal(max(3, min(8, nrow(means))), "Set3"))(nrow(meansUser))
 
       # Calculate HDI bounds from userDefinedSim draws
-      hdi_results_user <- lapply(1:length(userDefinedSim), function(i) {
-        draws <- userDefinedSim[[i]][, 1]  # 1D draws
-        hdi_bounds <- HDInterval::hdi(draws, credMass = confidence)
-        mean_val <- mean(draws)
-        list(
-          upper = hdi_bounds[2] - mean_val,
-          lower = mean_val - hdi_bounds[1]
-        )
-      })
+      hdi_results_user <- getHDIErrors1D(userDefinedSim, credMass = confidence)
 
       userData <- data.frame(
         y = round(as.vector(meansUser), 3),
