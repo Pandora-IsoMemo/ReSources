@@ -100,11 +100,17 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
         q32 = quantile(.data$estimate, (1 - boxQuantile) / 2),
         q95 = quantile(.data$estimate, 1 - ((1 - whiskerMultiplier) / 2)),
         q05 = quantile(.data$estimate, (1 - whiskerMultiplier) / 2),
-        box_lower = HDInterval::hdi(.data$estimate, credMass = boxQuantile)[1],
-        box_upper = HDInterval::hdi(.data$estimate, credMass = boxQuantile)[2],
-        whisker_lower = HDInterval::hdi(.data$estimate, credMass = whiskerMultiplier)[1],
-        whisker_upper = HDInterval::hdi(.data$estimate, credMass = whiskerMultiplier)[2],
+        hdi_box = list(HDInterval::hdi(.data$estimate, credMass = boxQuantile)),
+        hdi_whisker = list(HDInterval::hdi(.data$estimate, credMass = whiskerMultiplier)),
+        box_lower = hdi_box[[1]][1],
+        box_upper = hdi_box[[1]][2],
+        whisker_lower = hdi_whisker[[1]][1],
+        whisker_upper = hdi_whisker[[1]][2],
         .groups = "drop"
+      ) %>%
+      mutate(
+        hdi_box = NULL,
+        hdi_whisker = NULL
       ) %>%
       ungroup()
     if (colorPalette == "white") {
