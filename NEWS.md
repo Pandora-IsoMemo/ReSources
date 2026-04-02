@@ -1,3 +1,10 @@
+# ReSources 26.04.0
+
+## Updates
+- Replaced normal/ellipse-based confidence intervals with HDI (1D) and KDE-based HDR (2D/3D) in `sourceTargetPlot()`. (#154)
+- Added HDI-based credible interval options to summary statistics and updated UI sliders to use percent inputs (converted via `/100` in the server).
+- Expanded test coverage for prognosis plotting and result statistics; added developer notes and tooling configuration.
+
 # ReSources 25.07.0
 
 ## Updates
