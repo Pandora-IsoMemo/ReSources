@@ -922,7 +922,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                       width = "100%"
                     )
                   ),
-                  checkboxInput(ns("BayesianPValuesCheck"), "P-values"), # statistics[8]
+                  checkboxInput(ns("BayesianPValuesCheck"), "P-values"), # statistics[7]
                   conditionalPanel(
                     condition = "input.BayesianPValuesCheck == true",
                     ns = ns,
