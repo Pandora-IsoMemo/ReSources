@@ -439,17 +439,42 @@ sourceTargetPlot <- function(simSources = NULL,
   ########### 1D ####
   if (plot3D == -1) {
     if (!is.null(simSources)) {
+      # Calculate HDI bounds from posterior draws for each source
+      hdi_results <- lapply(1:length(simSources), function(i) {
+        draws <- simSources[[i]][, 1]  # 1D draws for this source
+        hdi_bounds <- HDInterval::hdi(draws, credMass = confidence)
+        mean_val <- mean(draws)
+        list(
+          upper = hdi_bounds[2] - mean_val,
+          lower = mean_val - hdi_bounds[1]
+        )
+      })
+
       plotData <- data.frame(
         y = round(as.vector(means), 3), x = rownames(means),
-        error = round(qnorm(1 - (1 - confidence) / 2) * sqrt(unlist(covs)), 3),
+        error_upper = round(sapply(hdi_results, function(x) x$upper), 3),
+        error_lower = round(sapply(hdi_results, function(x) x$lower), 3),
         colorsPlot = colorsPlot
       )
+
       if((showGrid | showPoints) & (!is.null(sources))){
+        # Calculate HDI bounds for all grid mixtures
+        hdi_results_all <- lapply(1:length(simSourcesAll), function(i) {
+          draws <- simSourcesAll[[i]][, 1]
+          hdi_bounds <- HDInterval::hdi(draws, credMass = confidence)
+          mean_val <- mean(draws)
+          list(
+            upper = hdi_bounds[2] - mean_val,
+            lower = mean_val - hdi_bounds[1]
+          )
+        })
+
         simData <- data.frame(
           y = round(meansAll[, 1], 3),
           x = sapply(1:nrow(simGrid),
                      function(i) paste(paste0(colnames(simGrid), ":", round(simGrid[i, ],3)), collapse = ", ")),
-          error = round(qnorm(1 - (1 - confidence) / 2) * sqrt(unlist(covsAll)), 3),
+          error_upper = round(sapply(hdi_results_all, function(x) x$upper), 3),
+          error_lower = round(sapply(hdi_results_all, function(x) x$lower), 3),
           colorsPlot = "blue"
         )
         plotData <- rbind(simData, plotData)
@@ -463,21 +488,37 @@ sourceTargetPlot <- function(simSources = NULL,
           factor() %>%
           as.numeric()]
       }
+      # For targetValues: convert symmetric error to asymmetric (same on both sides since no draws available)
+      symmetric_err <- round(qnorm(1 - (1 - confidence) / 2) * targetErrors[, targets], 3)
+
       individualData <- data.frame(
         y = targetValues[, targets],
         x = rownames(targetValues),
-        error = round(qnorm(1 - (1 - confidence) / 2) *
-          targetErrors[, targets], 3),
+        error_upper = symmetric_err,
+        error_lower = symmetric_err,
         colorsPlot = cols
       )
       plotData <- rbind(individualData, plotData)
     }
     if (!is.null(userDefinedSim)) {
       cols <- colorRampPalette(brewer.pal(max(3, min(8, nrow(means))), "Set3"))(nrow(meansUser))
+
+      # Calculate HDI bounds from userDefinedSim draws
+      hdi_results_user <- lapply(1:length(userDefinedSim), function(i) {
+        draws <- userDefinedSim[[i]][, 1]  # 1D draws
+        hdi_bounds <- HDInterval::hdi(draws, credMass = confidence)
+        mean_val <- mean(draws)
+        list(
+          upper = hdi_bounds[2] - mean_val,
+          lower = mean_val - hdi_bounds[1]
+        )
+      })
+
       userData <- data.frame(
         y = round(as.vector(meansUser), 3),
         x = rownames(meansUser),
-        error = round(qnorm(1 - (1 - confidence) / 2) * sqrt(unlist(covsUser)), 3),
+        error_upper = round(sapply(hdi_results_user, function(x) x$upper), 3),
+        error_lower = round(sapply(hdi_results_user, function(x) x$lower), 3),
         colorsPlot = cols
       )
       plotData <- rbind(userData, plotData)
@@ -485,14 +526,23 @@ sourceTargetPlot <- function(simSources = NULL,
 
 
     if (!is.null(covariates)) {
+      # For covariates: convert symmetric error to asymmetric (same on both sides)
+      cov_symmetric_err <- lapply(
+        1:length(individualCovList),
+        function(x) {
+          sqrt(sum((targetErrors[individualCovList[[x]], targets])^2) /
+            length(individualCovList[[x]])^2)
+        }
+      )
+
       covData <- do.call("rbind", lapply(
         1:length(individualCovList),
         function(x) {
           data.frame(
             y = mean(targetValues[individualCovList[[x]], targets]),
             x = covariates[x],
-            error = sqrt(sum((targetErrors[individualCovList[[x]], targets])^2) /
-              length(individualCovList[[x]])^2),
+            error_upper = cov_symmetric_err[[x]],
+            error_lower = cov_symmetric_err[[x]],
             colorsPlot = rep("darkgrey", 1)
           )
         }
@@ -500,11 +550,15 @@ sourceTargetPlot <- function(simSources = NULL,
       plotData <- rbind(covData, plotData)
     }
     if (!is.null(concentrationValues)) {
+      # For concentration: convert symmetric error to asymmetric (same on both sides since no draws available)
+      conc_symmetric_err <- round(qnorm(1 - (1 - confidence) / 2) *
+        concentrationErrors[, fractions], 3)
+
       concData <- data.frame(
         y = concentrationValues[, fractions],
         x = rownames(concentrationValues),
-        error = round(qnorm(1 - (1 - confidence) / 2) *
-          concentrationErrors[, fractions], 3),
+        error_upper = conc_symmetric_err,
+        error_lower = conc_symmetric_err,
         colorsPlot = colorsPlot
       )
       plotData <- rbind(concData, plotData)
@@ -518,14 +572,14 @@ sourceTargetPlot <- function(simSources = NULL,
           data = plotData, x = ~y,
           type = "scatter", mode = "markers", showlegend = showLegend, color = I(plotData$colorsPlot),
           name = ~x,
-          error_x = ~ list(array = error)
+          error_x = list(array = plotData$error_upper, arrayminus = plotData$error_lower)
         )
       } else {
         plot <- plot_ly(
           data = plotData, x = ~x, y = ~y,
           type = "scatter", mode = "markers", showlegend = FALSE, color = I(plotData$colorsPlot),
           name = ~x,
-          error_y = ~ list(array = error)
+          error_y = list(array = plotData$error_upper, arrayminus = plotData$error_lower)
         )
       }
     } else {
