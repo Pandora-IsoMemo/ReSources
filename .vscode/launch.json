@@ -8,6 +8,6 @@
             "env": {
                 "R_PROFILE_USER": "${workspaceFolder}/.Rprofile"
             }
-        },
+        }
     ]
 }
