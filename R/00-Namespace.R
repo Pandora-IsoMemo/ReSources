@@ -15,6 +15,7 @@
 #' @importFrom grDevices chull colorRampPalette
 #' @importFrom htmltools save_html withTags
 #' @importFrom jsonlite fromJSON toJSON
+#' @importFrom ks kde contourLevels
 #' @importFrom nimble calculateWAIC nimbleOptions nimbleModel configureMCMC buildMCMC compileNimble 
 #' runMCMC nimbleFunction registerDistributions rmulti
 #' @importFrom openxlsx read.xlsx write.xlsx

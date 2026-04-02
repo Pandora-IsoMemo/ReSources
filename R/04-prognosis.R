@@ -436,6 +436,107 @@ sourceTargetPlot <- function(simSources = NULL,
     factor() %>%
     as.numeric()]
   plotData <- data.frame(x = numeric(), y = numeric(), error = numeric(), colorsPlot = character())
+
+  # Estimate joint HDR support from posterior samples via ks::kde.
+  getHDRPoints <- function(draws, credMass = confidence) {
+    draws <- as.matrix(draws)
+    n <- nrow(draws)
+    d <- ncol(draws)
+    if (n <= max(5, d + 2)) {
+      return(draws)
+    }
+
+    # KDE on sample points; retain points above the density threshold for credMass.
+    fhat <- tryCatch(
+      ks::kde(x = draws),
+      error = function(e) NULL
+    )
+
+    if (is.null(fhat)) {
+      return(draws)
+    }
+
+    dens_at_draws <- tryCatch(
+      as.numeric(ks::kde(x = draws, H = fhat$H, eval.points = draws)$estimate),
+      error = function(e) rep(NA_real_, n)
+    )
+
+    if (all(is.na(dens_at_draws))) {
+      return(draws)
+    }
+
+    keepThr <- as.numeric(quantile(dens_at_draws, probs = 1 - credMass, na.rm = TRUE, names = FALSE))
+    keep <- dens_at_draws >= keepThr
+    hdr <- draws[keep, , drop = FALSE]
+
+    minPts <- max(d + 1, 4)
+    if (nrow(hdr) < minPts) {
+      ord <- order(dens_at_draws, decreasing = TRUE, na.last = NA)
+      hdr <- draws[ord[1:min(minPts, n)], , drop = FALSE]
+    }
+    hdr
+  }
+
+  getHDRPolygon2D <- function(draws2D, credMass = confidence) {
+    draws2D <- as.matrix(draws2D)
+    if (nrow(draws2D) < 6) {
+      return(draws2D)
+    }
+
+    fhat2d <- tryCatch(
+      ks::kde(x = draws2D),
+      error = function(e) NULL
+    )
+
+    if (is.null(fhat2d)) {
+      hdrPts <- getHDRPoints(draws2D, credMass = credMass)
+      if (nrow(hdrPts) < 3) {
+        return(hdrPts)
+      }
+      h <- chull(hdrPts[, 1], hdrPts[, 2])
+      return(hdrPts[c(h, h[1]), , drop = FALSE])
+    }
+
+    lvl <- tryCatch(
+      as.numeric(ks::contourLevels(fhat = fhat2d, cont = 100 * credMass))[1],
+      error = function(e) NA_real_
+    )
+
+    if (is.na(lvl)) {
+      dens_at_draws <- tryCatch(
+        as.numeric(ks::kde(x = draws2D, H = fhat2d$H, eval.points = draws2D)$estimate),
+        error = function(e) rep(NA_real_, nrow(draws2D))
+      )
+      if (all(is.na(dens_at_draws))) {
+        return(draws2D)
+      }
+      lvl <- as.numeric(quantile(dens_at_draws, probs = 1 - credMass, na.rm = TRUE, names = FALSE))
+    }
+
+    cl <- tryCatch(
+      contourLines(
+        x = fhat2d$eval.points[[1]],
+        y = fhat2d$eval.points[[2]],
+        z = fhat2d$estimate,
+        levels = lvl
+      ),
+      error = function(e) list()
+    )
+
+    if (length(cl) == 0) {
+      hdrPts <- getHDRPoints(draws2D, credMass = credMass)
+      if (nrow(hdrPts) < 3) {
+        return(hdrPts)
+      }
+      h <- chull(hdrPts[, 1], hdrPts[, 2])
+      return(hdrPts[c(h, h[1]), , drop = FALSE])
+    }
+
+    # Use longest contour as principal HDR boundary.
+    idx <- which.max(vapply(cl, function(ci) length(ci$x), numeric(1)))
+    cbind(cl[[idx]]$x, cl[[idx]]$y)
+  }
+
   ########### 1D ####
   if (plot3D == -1) {
     if (!is.null(simSources)) {
@@ -656,16 +757,11 @@ sourceTargetPlot <- function(simSources = NULL,
     if (showConfidence) {
       if (!is.null(simSources)) {
         ellipses <- lapply(1:nrow(plotData), function(i) {
-          car::ellipse(unlist(plotData[i, c("x", "y")]),
-            shape = covs[[which(names(covs) == plotData$name[i])]],
-            sqrt(qchisq(1 - (1 - confidence), 2)), draw = FALSE
-          )
+          srcName <- as.character(plotData$name[i])
+          getHDRPolygon2D(simSources[[srcName]][, c(1, 2), drop = FALSE], credMass = confidence)
         })
         ellipsesAll <- lapply(1:nrow(plotDataSegments), function(i) {
-          car::ellipse(unlist(plotDataSegments[i, c("x", "y")]),
-            shape = covsAll[[i]],
-            sqrt(qchisq(1 - (1 - confidence), 2)), draw = FALSE
-          )
+          getHDRPolygon2D(simSourcesAll[[i]][, c(1, 2), drop = FALSE], credMass = confidence)
         })
       } else {
         ellipses <- lapply(1:nrow(means), function(i) {
@@ -722,11 +818,8 @@ sourceTargetPlot <- function(simSources = NULL,
       plotDataAll <- rbind(plotDataAll, userData)
       if (showConfidence) {
         ellipsesUser <- lapply(1:nrow(userData), function(i) {
-          car::ellipse(unlist(userData[i, c("x", "y")]),
-            shape = covsUser[[i]],
-            sqrt(qchisq(1 - (1 - confidence), 2)),
-            draw = FALSE
-          )
+          userName <- as.character(userData$name[i])
+          getHDRPolygon2D(userDefinedSim[[userName]][, c(1, 2), drop = FALSE], credMass = confidence)
         })
       }
       sourceAnnotationsUser <- list(
@@ -1087,18 +1180,11 @@ sourceTargetPlot <- function(simSources = NULL,
     if (showConfidence) {
       if (!is.null(simSources)) {
         ellipses <- lapply(1:nrow(plotData), function(i) {
-          rgl::ellipse3d(
-            centre = unlist(plotData[i, c("x", "y", "z")]),
-            x = covs[[i]],
-            level = confidence
-          )
+          srcName <- as.character(plotData$name[i])
+          getHDRPoints(simSources[[srcName]][, c(1, 2, 3), drop = FALSE], credMass = confidence)
         })
         ellipsesAll <- lapply(1:nrow(plotDataSegments), function(i) {
-          rgl::ellipse3d(
-            centre = unlist(plotDataSegments[i, c("x", "y", "z")]),
-            x = covsAll[[i]],
-            level = confidence
-          )
+          getHDRPoints(simSourcesAll[[i]][, c(1, 2, 3), drop = FALSE], credMass = confidence)
         })
       } else {
         ellipses <- lapply(1:nrow(plotData), function(i) {
@@ -1172,11 +1258,8 @@ sourceTargetPlot <- function(simSources = NULL,
 
       if (showConfidence) {
         ellipsesUser <- lapply(1:nrow(userData), function(i) {
-          rgl::ellipse3d(
-            centre = unlist(userData[i, c("x", "y", "z")]),
-            x = covsUser[[which(names(covsUser) == userData$name[i])]],
-            level = confidence
-          )
+          userName <- as.character(userData$name[i])
+          getHDRPoints(userDefinedSim[[userName]][, c(1, 2, 3), drop = FALSE], credMass = confidence)
         })
       }
     }
@@ -1399,24 +1482,44 @@ sourceTargetPlot <- function(simSources = NULL,
 
     if (showConfidence) {
       for (i in 1:nrow(means)) {
-        plot <- add_trace(plot,
-          x = ellipses[[i]]$vb[1, ], y = ellipses[[i]]$vb[2, ], z = ellipses[[i]]$vb[3, ],
-          type = "mesh3d", name = plotData$name[i],
-          showlegend = FALSE,
-          color = I(plotData$colorsPlot[i]), opacity = 0.15,
-          alphahull = 0, inherit = FALSE
-        )
+        if (is.matrix(ellipses[[i]]) || is.data.frame(ellipses[[i]])) {
+          plot <- add_trace(plot,
+            x = ellipses[[i]][, 1], y = ellipses[[i]][, 2], z = ellipses[[i]][, 3],
+            type = "mesh3d", name = plotData$name[i],
+            showlegend = FALSE,
+            color = I(plotData$colorsPlot[i]), opacity = 0.15,
+            alphahull = 0, inherit = FALSE
+          )
+        } else {
+          plot <- add_trace(plot,
+            x = ellipses[[i]]$vb[1, ], y = ellipses[[i]]$vb[2, ], z = ellipses[[i]]$vb[3, ],
+            type = "mesh3d", name = plotData$name[i],
+            showlegend = FALSE,
+            color = I(plotData$colorsPlot[i]), opacity = 0.15,
+            alphahull = 0, inherit = FALSE
+          )
+        }
       }
 
       if (!is.null(userDefinedSim)) {
         for (i in 1:nrow(meansUser)) {
-          plot <- add_trace(plot,
-            x = ellipsesUser[[i]]$vb[1, ], y = ellipsesUser[[i]]$vb[2, ], z = ellipsesUser[[i]]$vb[3, ],
-            type = "mesh3d", name = userData$name[i],
-            showlegend = FALSE,
-            color = I(userData$colorsPlot[i]), opacity = 0.15,
-            alphahull = 0, inherit = FALSE
-          )
+          if (is.matrix(ellipsesUser[[i]]) || is.data.frame(ellipsesUser[[i]])) {
+            plot <- add_trace(plot,
+              x = ellipsesUser[[i]][, 1], y = ellipsesUser[[i]][, 2], z = ellipsesUser[[i]][, 3],
+              type = "mesh3d", name = userData$name[i],
+              showlegend = FALSE,
+              color = I(userData$colorsPlot[i]), opacity = 0.15,
+              alphahull = 0, inherit = FALSE
+            )
+          } else {
+            plot <- add_trace(plot,
+              x = ellipsesUser[[i]]$vb[1, ], y = ellipsesUser[[i]]$vb[2, ], z = ellipsesUser[[i]]$vb[3, ],
+              type = "mesh3d", name = userData$name[i],
+              showlegend = FALSE,
+              color = I(userData$colorsPlot[i]), opacity = 0.15,
+              alphahull = 0, inherit = FALSE
+            )
+          }
         }
       }
 
