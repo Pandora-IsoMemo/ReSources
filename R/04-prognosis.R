@@ -586,7 +586,8 @@ sourceTargetPlot <- function(simSources = NULL,
           factor() %>%
           as.numeric()]
       }
-      # For targetValues: compute symmetric error bars using normal approximation (since no posterior draws available)
+      # For targetValues: compute symmetric error bars using normal approximation
+      # (since no posterior draws available)
       symmetric_err <- round(qnorm(1 - (1 - confidence) / 2) * targetErrors[, targets], 3)
 
       individualData <- data.frame(
@@ -616,7 +617,8 @@ sourceTargetPlot <- function(simSources = NULL,
 
 
     if (!is.null(covariates)) {
-      # For covariates: convert symmetric error to asymmetric (same on both sides)
+      # For covariates: use symmetric pooled measurement-error bars, because
+      # these are aggregated point estimates (no posterior draws available for HDI)
       cov_symmetric_err <- lapply(
         1:length(individualCovList),
         function(x) {
@@ -640,7 +642,8 @@ sourceTargetPlot <- function(simSources = NULL,
       plotData <- rbind(covData, plotData)
     }
     if (!is.null(concentrationValues)) {
-      # For concentration: compute symmetric error bars using normal approximation (since no posterior draws available)
+      # For concentration: compute symmetric error bars using normal approximation
+      # (since no posterior draws available)
       conc_symmetric_err <- round(qnorm(1 - (1 - confidence) / 2) * concentrationErrors[, fractions], 3)
 
       concData <- data.frame(
