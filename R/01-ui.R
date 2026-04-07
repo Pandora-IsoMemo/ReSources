@@ -913,12 +913,14 @@ fruitsUI <- function(id, title = "FRUITS") {
                       inputId = ns("SummaryQuantile"), # statistics[5]
                       label = "Select quantile",
                       value = 95,
+                      step = 1,
                       width = "100%"
                     ),
                     percentileSliderInput(
                       inputId = ns("SummaryQuantile2"), # statistics[6]
                       label = "Select quantile",
                       value = 99,
+                      step = 1,
                       width = "100%"
                     )
                   ),
@@ -941,6 +943,7 @@ fruitsUI <- function(id, title = "FRUITS") {
                       inputId = ns("SummaryHDI"), # statistics[10]
                       label = "credible interval",
                       value = 95,
+                      step = 1,
                       width = "100%"
                     )
                   ),

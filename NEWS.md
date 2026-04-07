@@ -1,3 +1,8 @@
+# ReSources 26.04.1
+
+## Bug Fixes
+- Fixed an issue where the median line in boxplots could not be toggled (#154)
+
 # ReSources 26.04.0
 
 ## Updates
