@@ -134,12 +134,12 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
         # hdi for boxplot:
         lower = .data$box_lower,
         upper = .data$box_upper,
-        middle = (.data$box_lower + .data$box_upper) / 2,  # geometric center
+        middle = .data$median,  # hidden via fatten = 0
         ymin = .data$whisker_lower,
         ymax = .data$whisker_upper
       ),
       stat = "identity",
-      median.linetype = "blank"
+      fatten = 0
     )
 
     if (show_mean) {
