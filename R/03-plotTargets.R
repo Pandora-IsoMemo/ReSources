@@ -10,6 +10,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
                         histBins = 50,
                         binSize = NULL,
                         whiskerMultiplier = 0.95, boxQuantile = 0.68,
+                        show_mean = FALSE, show_median = FALSE,
                         numCov = FALSE, ...) {
   if (length(groupVars) == 0 && numCov == FALSE) {
     return(NULL)
@@ -64,25 +65,52 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
 
   if (plotType == "BoxPlot") {
     # return BoxPlot ----
-    
+
     # default labels
-      xlabel <- groupType
-      if (contributionLimit == "0-100%") {
-        ylabel <- "contribution (%)"
-      } else {
-        ylabel <- "contribution"
-      }
-    
+    xlabel <- groupType
+    if (contributionLimit == "0-100%") {
+      ylabel <- "contribution (%)"
+    } else {
+      ylabel <- "contribution"
+    }
+
+    logDebug("Calculating summary statistics for boxplot")
+    logDebug(
+      "Overall quantile for box: [%s, %s]",
+      quantile(modelResults$estimate, probs = (1 - boxQuantile) / 2),
+      quantile(modelResults$estimate, probs = 1 - ((1 - boxQuantile) / 2))
+    )
+    logDebug(
+      "Overall quantile for whiskers: [%s, %s]",
+      quantile(modelResults$estimate, probs = (1 - whiskerMultiplier) / 2),
+      quantile(modelResults$estimate, probs = 1 - ((1 - whiskerMultiplier) / 2))
+    )
+    hdi_box <- HDInterval::hdi(modelResults$estimate, credMass = boxQuantile)
+    logDebug("Overall HDI for box: [%s, %s]", hdi_box[1], hdi_box[2])
+    hdi_whisker <- HDInterval::hdi(modelResults$estimate, credMass = whiskerMultiplier)
+    logDebug("Overall HDI for whiskers: [%s, %s]", hdi_whisker[1], hdi_whisker[2])
+
     dataSummary <- modelResults %>%
       group_by(.data$group) %>%
       summarise(
         # sd = sd(.data$estimate),
         median = median(.data$estimate),
         meanEst = mean(.data$estimate),
-        q68 = quantile(.data$estimate, boxQuantile),
+        q68 = quantile(.data$estimate, (1 - (1 - boxQuantile) / 2)),
+        q32 = quantile(.data$estimate, (1 - boxQuantile) / 2),
         q95 = quantile(.data$estimate, 1 - ((1 - whiskerMultiplier) / 2)),
-        q32 = quantile(.data$estimate, 1 - boxQuantile),
         q05 = quantile(.data$estimate, (1 - whiskerMultiplier) / 2),
+        hdi_box = list(HDInterval::hdi(.data$estimate, credMass = boxQuantile)),
+        hdi_whisker = list(HDInterval::hdi(.data$estimate, credMass = whiskerMultiplier)),
+        box_lower = hdi_box[[1]][1],
+        box_upper = hdi_box[[1]][2],
+        whisker_lower = hdi_whisker[[1]][1],
+        whisker_upper = hdi_whisker[[1]][2],
+        .groups = "drop"
+      ) %>%
+      mutate(
+        hdi_box = NULL,
+        hdi_whisker = NULL
       ) %>%
       ungroup()
     if (colorPalette == "white") {
@@ -95,17 +123,37 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
         xlab(xlabel)
     }
 
-
     p <- p + geom_boxplot(
       mapping = aes(
-        lower = .data$q32,
-        upper = .data$q68,
-        middle = .data$median,
-        ymin = .data$q05,
-        ymax = .data$q95
+        # quantiles for boxplot:
+        # lower = .data$q32,
+        # upper = .data$q68,
+        # middle = .data$median,
+        # ymin = .data$q05,
+        # ymax = .data$q95
+        # hdi for boxplot:
+        lower = .data$box_lower,
+        upper = .data$box_upper,
+        middle = (.data$box_lower + .data$box_upper) / 2,  # geometric center
+        ymin = .data$whisker_lower,
+        ymax = .data$whisker_upper
       ),
-      stat = "identity"
-    ) + geom_errorbar(aes(ymin = .data$meanEst, ymax = .data$meanEst), linetype = "dashed", data = dataSummary)
+      stat = "identity",
+      median.linetype = "blank"
+    )
+
+    if (show_mean) {
+      p <- p + geom_errorbar(
+        aes(ymin = .data$meanEst, ymax = .data$meanEst), linetype = "solid", data = dataSummary
+      )
+    }
+
+    if (show_median) {
+      p <- p + geom_errorbar(
+        aes(ymin = .data$median, ymax = .data$median), linetype = "dotted", data = dataSummary
+      )
+    }
+
     if (contributionLimit == "0-100%") {
       p <- p + ylim(c(0, 100))
     }
