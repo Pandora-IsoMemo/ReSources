@@ -134,7 +134,7 @@ plotTargets <- function(fruitsObj, modelResults, individual, estType = "Source c
         # hdi for boxplot:
         lower = .data$box_lower,
         upper = .data$box_upper,
-        middle = .data$box_lower,  # hidden via fatten = 0
+        middle = .data$median,  # hidden via fatten = 0
         ymin = .data$whisker_lower,
         ymax = .data$whisker_upper
       ),
