@@ -586,7 +586,7 @@ sourceTargetPlot <- function(simSources = NULL,
           factor() %>%
           as.numeric()]
       }
-      # For targetValues: convert symmetric error to asymmetric (same on both sides since no draws available)
+      # For targetValues: compute symmetric error bars using normal approximation (since no posterior draws available)
       symmetric_err <- round(qnorm(1 - (1 - confidence) / 2) * targetErrors[, targets], 3)
 
       individualData <- data.frame(
@@ -640,9 +640,8 @@ sourceTargetPlot <- function(simSources = NULL,
       plotData <- rbind(covData, plotData)
     }
     if (!is.null(concentrationValues)) {
-      # For concentration: convert symmetric error to asymmetric (same on both sides since no draws available)
-      conc_symmetric_err <- round(qnorm(1 - (1 - confidence) / 2) *
-        concentrationErrors[, fractions], 3)
+      # For concentration: compute symmetric error bars using normal approximation (since no posterior draws available)
+      conc_symmetric_err <- round(qnorm(1 - (1 - confidence) / 2) * concentrationErrors[, fractions], 3)
 
       concData <- data.frame(
         y = concentrationValues[, fractions],
