@@ -261,18 +261,18 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
     updateSelectInput(session, "estTypeDiag", choices = estTypChoices)
 
     updateSelectInput(session, "groupTypeDiag", choices = groupTypChoicesDiag)
+  })
 
-    observeEvent(input$estTypeDiag, {
-      if (input$estTypeDiag %in% c(
-        "Source contributions",
-        "Component contributions",
-        "Source contributions by proxy"
-      )) {
-        updateSelectInput(session, "contributionLimitDiag", selected = "0-1")
-      } else {
-        updateSelectInput(session, "contributionLimitDiag", selected = "None")
-      }
-    })
+  observeEvent(input$estTypeDiag, {
+    if (input$estTypeDiag %in% c(
+      "Source contributions",
+      "Component contributions",
+      "Source contributions by proxy"
+    )) {
+      updateSelectInput(session, "contributionLimitDiag", selected = "0-1")
+    } else {
+      updateSelectInput(session, "contributionLimitDiag", selected = "None")
+    }
   })
 
   observe({
@@ -340,12 +340,12 @@ modelDiagnosticsPlot <- function(input, output, session, model, values) {
       )
     }
   })
+
   groupChoices <- reactive({
     as.character(unique(
       values$modelResultSummary[values$modelResultSummary[, "Group"] == input$estTypeDiag, input$groupTypeDiag]
     ))
   })
-
 
   observe({
     updatePickerInput(

@@ -4,6 +4,9 @@ RUN adduser --system --disabled-password --home /home/inwt inwt
 ENV HOME=/home/inwt 
 USER inwt
 
+RUN Rscript -e "remotes::install_github('r-lib/httr2@v1.2.3')" \
+    && Rscript -e "remotes::install_github('tidyverse/ellmer@v0.4.1')"
+
 ADD . .
 
 # the first attempt to install miniconda will fail

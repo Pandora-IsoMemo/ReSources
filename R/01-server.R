@@ -376,8 +376,7 @@ fruitsTab <- function(input,
   
   concentrationsServer("concentration",
                        values = values,
-                       events = events
-                       )
+                       events = events)
   
   ## -- from IsoMemo
   observeEvent(isoMemoData()$event, {
@@ -1437,8 +1436,7 @@ fruitsTab <- function(input,
       selected = NULL,
       choices = unique(
         getAllCovariateInteractions(values$targetValuesCovariates,
-                                    vars = values$categoricalVars
-        )
+                                    vars = values$categoricalVars)
       )
     )
   })

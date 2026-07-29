@@ -1,3 +1,8 @@
+# ReSources 26.07.0
+
+## Bug Fixes
+- Fixed container build by adding httr2 and ellmer installation in Docker.
+
 # ReSources 26.04.1
 
 ## Bug Fixes

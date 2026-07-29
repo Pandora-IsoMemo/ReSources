@@ -395,8 +395,7 @@ outputPlot <- function(input, output, session, model, values) {
       )
       updatePickerInput(session,
                         "groupVars",
-                        label = "Select target"
-      )
+                        label = "Select target")
     }
     if (input$filterType == "Estimate") {
       parameterNames <-
@@ -409,8 +408,7 @@ outputPlot <- function(input, output, session, model, values) {
       )
       updatePickerInput(session,
                         "groupVars",
-                        label = "Select estimates"
-      )
+                        label = "Select estimates")
     }
     if (!(input$filterType %in% c("Target", "Estimate", ""))) {
       covNames <-
@@ -424,8 +422,7 @@ outputPlot <- function(input, output, session, model, values) {
       )
       updatePickerInput(session,
                         "groupVars",
-                        label = "Select estimates"
-      )
+                        label = "Select estimates")
     }
     
     if (input$filterType == input$groupType) {
