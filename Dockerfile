@@ -11,6 +11,7 @@ RUN apt-get update \
         libfreetype6-dev \
         libglpk40 \
         libglu1-mesa-dev \
+        libmagick++-dev \
         libpng-dev \
         libx11-dev \
         libxss1 \
