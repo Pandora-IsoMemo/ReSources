@@ -28,7 +28,7 @@ RUN Rscript -e "remotes::install_github('tidyverse/ellmer@v0.4.1', upgrade = 'ne
 # Install nimble first because ReSources uses nimble in LinkingTo.
 #
 # The dated Posit Package Manager repository acts as a snapshot and pins a version.
-RUN Rscript -e "install.packages('nimble', repos = 'https://packagemanager.posit.co/cran/__linux__/jammy/2025-03-01')"
+RUN Rscript -e "install.packages('nimble', repos = 'https://packagemanager.posit.co/cran/__linux__/noble/2025-03-01')"
 
 # Build and install the package
 WORKDIR /opt/ReSources
