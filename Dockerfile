@@ -9,6 +9,7 @@ RUN apt-get update \
         lbzip2 \
         libcairo2-dev \
         libfreetype6-dev \
+        libglpk40 \
         libglu1-mesa-dev \
         libpng-dev \
         libx11-dev \
