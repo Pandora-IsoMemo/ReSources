@@ -1,4 +1,4 @@
-test_that("getCurveTitlesXlsx_1", {
+test_that("getCurveTitlesXlsx - terrestrial.xlsx", {
   file1 <- safe_read_xlsx(
     "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/b7732618-7764-460a-b1fa-c614f4cdbe95/download/terrestrial.xlsx"
   )
