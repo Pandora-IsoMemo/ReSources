@@ -9,7 +9,7 @@ test_that("getCurveTitlesXlsx - terrestrial.xlsx", {
   )
 })
 
-test_that("getCurveTitlesXlsx_2", {
+test_that("getCurveTitlesXlsx - aquatic1.xlsx", {
   file2 <- safe_read_xlsx("https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/2037632f-f984-4834-8e25-4af5498df163/download/aquatic1.xlsx")
 
   expect_equal(
@@ -18,7 +18,7 @@ test_that("getCurveTitlesXlsx_2", {
   )
 })
 
-test_that("getCurveTitlesXlsx_3", {
+test_that("getCurveTitlesXlsx - aquatic2.xlsx", {
   file3 <- safe_read_xlsx(
     "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/120d810e-ff7d-49b7-80b8-e9791e2980b3/download/aquatic2.xlsx"
   )
@@ -29,7 +29,7 @@ test_that("getCurveTitlesXlsx_3", {
   )
 })
 
-test_that("getCodeTerrestrial", {
+test_that("getCodeTerrestrial - terrestrial.xlsx", {
   file <- safe_read_xlsx(
     "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/b7732618-7764-460a-b1fa-c614f4cdbe95/download/terrestrial.xlsx"
   )
