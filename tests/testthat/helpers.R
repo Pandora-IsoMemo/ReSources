@@ -31,3 +31,12 @@ compileTestModels <- function(testData, testModelTypes, priors = NULL, userEstim
   
   testResultsVec
 }
+
+safe_read_xlsx <- function(xlsxFile) {
+  tryCatch(
+    read.xlsx(xlsxFile),
+    error = function(e) {
+      testthat::skip(paste("Skipping xlsx test because the source could not be read:", conditionMessage(e)))
+    }
+  )
+}

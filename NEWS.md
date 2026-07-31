@@ -1,3 +1,10 @@
+# ReSources 26.07.1
+
+## Updates
+- Switched Docker base image to `inwt/r-shiny:4.4.3` and added apt system dependencies needed by ReSources' R package stack (e.g., rgl/graphics-related libs).
+- Added a `safe_read_xlsx()` helper to skip tests when remote xlsx sources can't be read, and updated OxCal tests to use it.
+- Adjusted Jenkins Docker invocation to run the container as `root` during `check`.
+
 # ReSources 26.07.0
 
 ## Bug Fixes
