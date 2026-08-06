@@ -1609,8 +1609,9 @@ fruitsTab <- function(input,
   )
   
   callModule(OxCalOutput, "oxcal",
-             model = model, 
-             exportCoordinates = values$exportCoordinates)
+             model = model,
+             exportCoordinates = values$exportCoordinates,
+             isActive = reactive(input$mainTabs == "Oxcal export"))
   
   expChains <- reactive({
     validate(validModelOutput(model()))

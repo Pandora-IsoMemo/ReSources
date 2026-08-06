@@ -127,7 +127,7 @@ OxCalOutputUI <- function(id) {
   )
 }
 
-OxCalOutput <- function(input, output, session, model, exportCoordinates) {
+OxCalOutput <- function(input, output, session, model, exportCoordinates, isActive) {
   isInternet <- reactiveVal(has_internet())
   
   terrestrialCurvesXlsx <- reactive({
@@ -135,7 +135,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates) {
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/b7732618-7764-460a-b1fa-c614f4cdbe95/download/terrestrial.xlsx"
-    read.xlsx(file)
+    Pandora::loadData(file)
   })
   
   aquaticCurves1Xlsx <- reactive({
@@ -143,7 +143,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates) {
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/2037632f-f984-4834-8e25-4af5498df163/download/aquatic1.xlsx"
-    read.xlsx(file)
+    Pandora::loadData(file)
   })
   
   aquaticCurves2Xlsx <- reactive({
@@ -151,18 +151,19 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates) {
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/120d810e-ff7d-49b7-80b8-e9791e2980b3/download/aquatic2.xlsx"
-    read.xlsx(file)
+    Pandora::loadData(file)
   })
   
   oxCalBasicCode <- reactive({
-    if (!isInternet()) return(data.frame())
+    if (!isInternet()) return(character())
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/f4b0a2b4-8f65-463d-aff4-2a31490abc78/download/oxcal_basic_code.txt"
-    readLines(file, warn = FALSE)
+    Pandora::loadData(file)
   })
 
   observe({
+    req(isTRUE(isActive()))
     logDebug("Oxcal: Update curves")
     updateSelectInput(session,
                       "terrestrialCurve",
@@ -173,7 +174,8 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates) {
                       "aquaticCurve2",
                       choices = c(list("none" = NA),
                                   getCurveTitlesXlsx(aquaticCurves2Xlsx())))
-  })
+  }) %>%
+    bindEvent(isActive(), isInternet(), ignoreInit = TRUE)
 
   observe({
     logDebug("Oxcal: Reconnect clicked")
@@ -234,7 +236,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates) {
     helpFile <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/aa53dfbf-a521-4aaa-81a6-a01ac89f1667/download/oxcal_help.txt"
     showModal(modalDialog(title = "OxCal Help",
-                          readLines(helpFile)))
+                          Pandora::loadData(helpFile)))
   })
 
   terrestrialParams <- reactiveVal(NULL)
