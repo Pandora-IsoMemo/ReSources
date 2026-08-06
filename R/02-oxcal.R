@@ -155,7 +155,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates, isActi
   })
   
   oxCalBasicCode <- reactive({
-    if (!isInternet()) return(data.frame())
+    if (!isInternet()) return(character())
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/f4b0a2b4-8f65-463d-aff4-2a31490abc78/download/oxcal_basic_code.txt"
@@ -175,7 +175,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates, isActi
                       choices = c(list("none" = NA),
                                   getCurveTitlesXlsx(aquaticCurves2Xlsx())))
   }) %>%
-  bindEvent(isActive(), input$reconnectButton, ignoreInit = TRUE)
+    bindEvent(isActive(), isInternet(), ignoreInit = TRUE)
 
   observe({
     logDebug("Oxcal: Reconnect clicked")
