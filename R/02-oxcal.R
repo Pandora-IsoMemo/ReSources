@@ -159,7 +159,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates, isActi
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/f4b0a2b4-8f65-463d-aff4-2a31490abc78/download/oxcal_basic_code.txt"
-    Pandora::loadData(file)
+    Pandora::loadText(file)
   })
 
   observe({
