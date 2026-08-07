@@ -1,5 +1,10 @@
 # ReSources 26.08.0
 
+## Bug Fixes
+- Fixed container build issues with user rights
+
+# ReSources 26.08.0
+
 ## Updates
 - Added `Pandora::loadData()` as the unified loader for remote OxCal resources (xlsx + txt)
 - Added an `isActive` hook so the OxCal module can avoid doing network/refresh work while its tab is inactive.

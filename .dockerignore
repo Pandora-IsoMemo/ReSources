@@ -1,6 +1,48 @@
+# Version Control
+.git
+.gitignore
+.gitattributes
+.github/
+
+# IDE / Editor
+.vscode/
+.RStudio/
+.Rhistory
+.Rproj.user/
+*.Rproj
+
+# OS specific
+.DS_Store
+Thumbs.db
+.env*
+.env.local
+
+# R specific
+.RData
+.Rdata
+.Rprofile
+
+# Documentation
+man/
+README.md
+LICENSE.md
+NEWS.md
+_pkgdown.yml
+
+# Build & Cache
+_build/
+_cache/
+
+# CI/CD
+Jenkinsfile
+.jenkins/
+
+# Development / Testing
+tests/
+RScripts/
+purlFiles/
+
+# Platform-specific libraries (only needed for production)
 libLinux/*
 libWin/*
 libMac/*
-.git
-.Rprofile
-.Rproj*
