@@ -49,7 +49,8 @@ RUN Rscript -e "install.packages('nimble', repos = 'https://packagemanager.posit
 WORKDIR /opt/ReSources
 COPY . .
 RUN installPackage DSSM \
-    && installPackage
+    && installPackage \
+    && chown -R inwt /usr/local/lib/R/site-library/ReSources
 
 # 6. Switch to non-root for everything runtime-related
 USER inwt
