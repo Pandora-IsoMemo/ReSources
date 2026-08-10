@@ -46,7 +46,8 @@ RUN Rscript -e "install.packages('nimble', repos = 'https://packagemanager.posit
 # 5. Build and install the package (root, but $HOME=/home/inwt)
 # Build and install the package
 # installPackage without arguments installs from the current directory, so WORKDIR is required.
-WORKDIR /opt/ReSources
+# chown is required because installPackage installs into the system library, which is owned by root.
+WORKDIR /home/inwt
 COPY . .
 RUN installPackage DSSM \
     && installPackage \
@@ -70,5 +71,4 @@ RUN Rscript -e "reticulate::install_miniconda(force = TRUE); \
                 reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly'); \
                 reticulate::use_miniconda('r-reticulate');"
 
-WORKDIR /home/inwt
 CMD ["Rscript", "-e", "library(shiny); ReSources::startApplication(3838, '0.0.0.0')"]
