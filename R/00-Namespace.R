@@ -12,7 +12,7 @@
 #' @importFrom ggplot2 aes ggplot ylab xlab geom_boxplot geom_density geom_histogram geom_line
 #' theme element_text scale_fill_brewer labs ylim scale_fill_manual scale_color_manual
 #' geom_point scale_color_brewer xlim geom_errorbar geom_smooth
-#' @importFrom grDevices chull colorRampPalette
+#' @importFrom grDevices chull colorRampPalette contourLines
 #' @importFrom htmltools save_html withTags
 #' @importFrom jsonlite fromJSON toJSON
 #' @importFrom ks kde contourLevels
