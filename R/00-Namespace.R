@@ -21,7 +21,7 @@
 #' @importFrom openxlsx read.xlsx write.xlsx
 #' @importFrom plotly plot_ly layout add_trace renderPlotly plotlyOutput save_image
 #' @importFrom RColorBrewer brewer.pal
-#' @importFrom Pandora loadData
+#' @importFrom Pandora loadData loadText
 #' @importFrom shiny actionButton bindEvent callModule checkboxInput column conditionalPanel 
 #'  debounce div downloadButton downloadHandler eventReactive exportTestValues fileInput fluidRow
 #'  helpText hideTab HTML includeHTML invalidateLater isolate is.reactive 
