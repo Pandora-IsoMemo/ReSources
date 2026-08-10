@@ -33,6 +33,13 @@ When testing with a local docker container, please make sure to rebuild the dock
 docker build -t resources-app:latest .
 ```
 
+or for a full rebuild without cache:
+
+```bash
+docker build --no-cache -t resources-app:latest .
+```
+
+
 After that, start the container as usual via:
 
 ```bash
