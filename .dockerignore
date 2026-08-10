@@ -23,7 +23,6 @@ Thumbs.db
 .Rprofile
 
 # Documentation
-man/
 README.md
 LICENSE.md
 NEWS.md
