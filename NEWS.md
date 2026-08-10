@@ -1,7 +1,13 @@
-# ReSources 26.08.1
+# ReSources 26.08.2
 
 ## Bug Fixes
 - Fixed bug when clicking on "Generate Oxcal code" causing the app to stop
+
+# ReSources 26.08.1
+
+## Bug Fixes
+- Fixed Docker build failures caused by user and file-permission settings.
+- Improved Docker runtime support for non-root execution by aligning ownership/write permissions.
 
 # ReSources 26.08.0
 
