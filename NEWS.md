@@ -1,7 +1,8 @@
-# ReSources 26.08.0
+# ReSources 26.08.1
 
 ## Bug Fixes
-- Fixed container build issues with user rights
+- Fixed Docker build failures caused by user and file-permission settings.
+- Improved Docker runtime support for non-root execution by aligning ownership/write permissions.
 
 # ReSources 26.08.0
 
