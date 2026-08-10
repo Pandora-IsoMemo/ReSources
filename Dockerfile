@@ -30,6 +30,7 @@ RUN echo "options(repos = c(getOption('repos'), PANDORA = 'https://Pandora-IsoMe
 #    writes any home-dir artifacts to /home/inwt, not /root.
 # Create the runtime user before installing Miniconda into its home.
 RUN adduser --system --disabled-password --home /home/inwt inwt
+
 ENV HOME=/home/inwt
 ENV RETICULATE_MINICONDA_PATH=/home/inwt/.local/share/r-miniconda
 
@@ -43,11 +44,11 @@ RUN Rscript -e "remotes::install_github('r-lib/httr2@v1.2.3', upgrade = 'never')
 # The dated Posit Package Manager repository acts as a snapshot and pins a version.
 RUN Rscript -e "install.packages('nimble', repos = 'https://packagemanager.posit.co/cran/__linux__/noble/2025-03-01')"
 
-# 5. Build and install the package (root, but $HOME=/home/inwt)
+# 5. Build and install the package
 # Build and install the package
 # installPackage without arguments installs from the current directory, so WORKDIR is required.
 # chown is required because installPackage installs into the system library, which is owned by root.
-WORKDIR /home/inwt
+WORKDIR /opt/ReSources
 COPY . .
 RUN installPackage DSSM \
     && installPackage \
@@ -70,5 +71,8 @@ RUN Rscript -e "reticulate::install_miniconda(force = TRUE); \
                 reticulate::conda_install('r-reticulate', c('python-kaleido', 'packaging')); \
                 reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly'); \
                 reticulate::use_miniconda('r-reticulate');"
+
+# IMPORTANT: stay in the package directory.
+WORKDIR /opt/ReSources
 
 CMD ["Rscript", "-e", "library(shiny); ReSources::startApplication(3838, '0.0.0.0')"]
