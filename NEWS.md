@@ -1,5 +1,10 @@
 # ReSources 26.08.2
 
+## Updates
+- Removed rcmd-check for linux oldrel-2, tried to enable win and mac checks
+
+# ReSources 26.08.2
+
 ## Bug Fixes
 - Fixed bug when clicking on "Generate Oxcal code" causing the app to stop
 

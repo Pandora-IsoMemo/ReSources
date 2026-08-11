@@ -22,12 +22,12 @@ jobs:
 
           # We can't test on mac-os, because Docker in Mac images aren't 
           # available due to licensing issues
-          # - {os: macos-latest,   r: 'release'}
-          # - {os: windows-latest, r: 'release'}
+          - {os: macos-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
-          - {os: ubuntu-latest,   r: 'oldrel-2'}
+          # - {os: ubuntu-latest,   r: 'oldrel-2'} # too old for some recent packages
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -45,7 +45,22 @@ jobs:
           use-public-rspm: true
           extra-repositories: |
             Pandora = https://Pandora-IsoMemo.github.io/drat/
-            PPM =https://packagemanager.posit.co/cran/__linux__/jammy/2025-03-01
+
+      # Add the dated PPM snapshot only on Linux.
+      - name: Configure Linux PPM snapshot
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          echo 'options(repos = c(
+            PPM = "https://packagemanager.posit.co/cran/__linux__/noble/2025-03-01",
+            getOption("repos")
+          ))' >> ~/.Rprofile
+
+      - name: Show R version
+        run: |
+          echo "Matrix R selector: ${{ matrix.config.r }}"
+          Rscript -e 'cat("Resolved R version:", R.version.string, "\n")'
+          Rscript -e 'cat("Repositories:\n"); print(getOption("repos"))'
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
