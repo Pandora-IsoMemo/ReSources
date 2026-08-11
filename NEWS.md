@@ -1,4 +1,9 @@
-# ReSources 26.08.2
+# ReSources 26.08.4
+
+## Bug Fixes
+- Fixed cross-platform OxCal issues caused by inconsistent newline handling in remote xlsx resources.
+
+# ReSources 26.08.3
 
 ## Updates
 - Removed rcmd-check for linux oldrel-2, tried to enable win and mac checks

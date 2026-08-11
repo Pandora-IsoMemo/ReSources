@@ -34,7 +34,7 @@ compileTestModels <- function(testData, testModelTypes, priors = NULL, userEstim
 
 safe_read_xlsx <- function(path) {
   tryCatch(
-    Pandora::loadData(path),
+    normalize_newlines(Pandora::loadData(path)),
     error = function(e) {
       testthat::skip(paste("Skipping xlsx test because the source could not be read:", conditionMessage(e)))
     }

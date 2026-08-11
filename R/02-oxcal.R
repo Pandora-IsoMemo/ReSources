@@ -135,7 +135,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates, isActi
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/b7732618-7764-460a-b1fa-c614f4cdbe95/download/terrestrial.xlsx"
-    Pandora::loadData(file)
+    normalize_newlines(Pandora::loadData(file))
   })
   
   aquaticCurves1Xlsx <- reactive({
@@ -143,7 +143,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates, isActi
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/2037632f-f984-4834-8e25-4af5498df163/download/aquatic1.xlsx"
-    Pandora::loadData(file)
+    normalize_newlines(Pandora::loadData(file))
   })
   
   aquaticCurves2Xlsx <- reactive({
@@ -151,7 +151,7 @@ OxCalOutput <- function(input, output, session, model, exportCoordinates, isActi
     
     file <-
       "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/120d810e-ff7d-49b7-80b8-e9791e2980b3/download/aquatic2.xlsx"
-    Pandora::loadData(file)
+    normalize_newlines(Pandora::loadData(file))
   })
   
   oxCalBasicCode <- reactive({
