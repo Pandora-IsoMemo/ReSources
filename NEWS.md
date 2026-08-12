@@ -1,3 +1,54 @@
+# ReSources 26.08.4
+
+## Bug Fixes
+- Fixed cross-platform OxCal issues caused by inconsistent newline handling in remote xlsx resources.
+
+# ReSources 26.08.3
+
+## Updates
+- Removed rcmd-check for linux oldrel-2, tried to enable win and mac checks
+
+# ReSources 26.08.2
+
+## Bug Fixes
+- Fixed bug when clicking on "Generate Oxcal code" causing the app to stop
+
+# ReSources 26.08.1
+
+## Bug Fixes
+- Fixed Docker build failures caused by user and file-permission settings.
+- Improved Docker runtime support for non-root execution by aligning ownership/write permissions.
+
+# ReSources 26.08.0
+
+## Updates
+- Added `Pandora::loadData()` as the unified loader for remote OxCal resources (xlsx + txt)
+- Added an `isActive` hook so the OxCal module can avoid doing network/refresh work while its tab is inactive.
+
+# ReSources 26.07.1
+
+## Updates
+- Switched Docker base image to `inwt/r-shiny:4.4.3` and added apt system dependencies needed by ReSources' R package stack (e.g., rgl/graphics-related libs).
+- Added a `safe_read_xlsx()` helper to skip tests when remote xlsx sources can't be read, and updated OxCal tests to use it.
+- Adjusted Jenkins Docker invocation to run the container as `root` during `check`.
+
+# ReSources 26.07.0
+
+## Bug Fixes
+- Fixed container build by adding httr2 and ellmer installation in Docker.
+
+# ReSources 26.04.1
+
+## Bug Fixes
+- Fixed an issue where the median line in boxplots could not be toggled (#154)
+
+# ReSources 26.04.0
+
+## Updates
+- Replaced normal/ellipse-based confidence intervals with HDI (1D) and KDE-based HDR (2D/3D) in `sourceTargetPlot()`. (#154)
+- Added HDI-based credible interval options to summary statistics and updated UI sliders to use percent inputs (converted via `/100` in the server).
+- Expanded test coverage for prognosis plotting and result statistics; added developer notes and tooling configuration.
+
 # ReSources 25.07.0
 
 ## Updates

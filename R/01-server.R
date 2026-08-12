@@ -113,7 +113,6 @@ fruitsTab <- function(input,
     ckanFileTypes = config()[["ckanModelTypes"]],
     ignoreWarnings = TRUE,
     defaultSource = config()[["defaultSourceModel"]],
-    fileExtension = config()[["fileExtension"]],
     options = importOptions(rPackageName = config()[["rPackageName"]])
   )
   
@@ -377,8 +376,7 @@ fruitsTab <- function(input,
   
   concentrationsServer("concentration",
                        values = values,
-                       events = events
-                       )
+                       events = events)
   
   ## -- from IsoMemo
   observeEvent(isoMemoData()$event, {
@@ -1438,8 +1436,7 @@ fruitsTab <- function(input,
       selected = NULL,
       choices = unique(
         getAllCovariateInteractions(values$targetValuesCovariates,
-                                    vars = values$categoricalVars
-        )
+                                    vars = values$categoricalVars)
       )
     )
   })
@@ -1473,7 +1470,7 @@ fruitsTab <- function(input,
         showConfidence = input$showConfidence,
         showLegend = input$showLegend,
         legendInside = input$legendInside,
-        confidence = input$confidenceLevel,
+        confidence = input$confidenceLevel / 100,
         showIndividuals = TRUE,
         horizontalPlot = input$horizontalPlot,
         covariates = input$characteristicsCovariatesTarget,
@@ -1503,7 +1500,7 @@ fruitsTab <- function(input,
         showConfidence = input$showConfidence,
         showLegend = input$showLegend,
         legendInside = input$legendInside,
-        confidence = input$confidenceLevel,
+        confidence = input$confidenceLevel / 100,
         showIndividuals = FALSE,
         covariates = NULL,
         concentrationValues = values$concentration[[1]][, input$concentrationsSelect, drop = FALSE],
@@ -1529,7 +1526,7 @@ fruitsTab <- function(input,
         showConfidence = input$showConfidence,
         showLegend = input$showLegend,
         legendInside = input$legendInside,
-        confidence = input$confidenceLevel,
+        confidence = input$confidenceLevel / 100,
         showIndividuals = input$showIndividuals,
         showTargetNames = input$showTargetNames,
         covariates = input$characteristicsCovariates,
@@ -1554,7 +1551,7 @@ fruitsTab <- function(input,
         showConfidence = input$showConfidence,
         showLegend = input$showLegend,
         legendInside = input$legendInside,
-        confidence = input$confidenceLevel,
+        confidence = input$confidenceLevel / 100,
         showIndividuals = input$showIndividualsMix,
         showTargetNames = input$showTargetNamesMix,
         sources = input$sourceSelectMix2,
@@ -1612,8 +1609,9 @@ fruitsTab <- function(input,
   )
   
   callModule(OxCalOutput, "oxcal",
-             model = model, 
-             exportCoordinates = values$exportCoordinates)
+             model = model,
+             exportCoordinates = values$exportCoordinates,
+             isActive = reactive(input$mainTabs == "Oxcal export"))
   
   expChains <- reactive({
     validate(validModelOutput(model()))
@@ -1645,10 +1643,12 @@ fruitsTab <- function(input,
         input$SummaryMax,
         input$SummaryMedian,
         input$SummaryQuantileCheck,
-        input$SummaryQuantile,
-        input$SummaryQuantile2,
+        input$SummaryQuantile / 100,
+        input$SummaryQuantile2 / 100,
         input$BayesianPValuesCheck,
-        input$pVal
+        input$pVal,
+        input$SummaryHDICheck,
+        input$SummaryHDI / 100
       )
     )
   })
@@ -1788,10 +1788,12 @@ fruitsTab <- function(input,
           input$SummaryMax,
           input$SummaryMedian,
           input$SummaryQuantileCheck,
-          input$SummaryQuantile,
-          input$SummaryQuantile2,
+          input$SummaryQuantile / 100,
+          input$SummaryQuantile2 / 100,
           input$BayesianPValuesCheck,
-          input$pVal
+          input$pVal,
+          input$SummaryHDICheck,
+          input$SummaryHDI / 100
         ),
         DT = FALSE
       )[input[["SummaryResults_rows_all"]], ]

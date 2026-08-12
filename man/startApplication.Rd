@@ -4,12 +4,18 @@
 \alias{startApplication}
 \title{Start Application}
 \usage{
-startApplication(port = 4242, host = "127.0.0.1")
+startApplication(
+  port = 4242,
+  host = "127.0.0.1",
+  launch.browser = getOption("shiny.launch.browser", interactive())
+)
 }
 \arguments{
 \item{port}{port of web application}
 
 \item{host}{accept connections from this address}
+
+\item{launch.browser}{whether to launch the application in a web browser}
 }
 \description{
 Start Application

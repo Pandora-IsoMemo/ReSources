@@ -12,14 +12,16 @@
 #' @importFrom ggplot2 aes ggplot ylab xlab geom_boxplot geom_density geom_histogram geom_line
 #' theme element_text scale_fill_brewer labs ylim scale_fill_manual scale_color_manual
 #' geom_point scale_color_brewer xlim geom_errorbar geom_smooth
-#' @importFrom grDevices chull colorRampPalette
+#' @importFrom grDevices chull colorRampPalette contourLines
 #' @importFrom htmltools save_html withTags
 #' @importFrom jsonlite fromJSON toJSON
+#' @importFrom ks kde contourLevels
 #' @importFrom nimble calculateWAIC nimbleOptions nimbleModel configureMCMC buildMCMC compileNimble 
 #' runMCMC nimbleFunction registerDistributions rmulti
 #' @importFrom openxlsx read.xlsx write.xlsx
 #' @importFrom plotly plot_ly layout add_trace renderPlotly plotlyOutput save_image
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom Pandora loadData loadText
 #' @importFrom shiny actionButton bindEvent callModule checkboxInput column conditionalPanel 
 #'  debounce div downloadButton downloadHandler eventReactive exportTestValues fileInput fluidRow
 #'  helpText hideTab HTML includeHTML invalidateLater isolate is.reactive 

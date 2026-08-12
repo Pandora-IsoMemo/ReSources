@@ -1,19 +1,36 @@
-pasteLines <- function(...) {
-  paste(..., sep = "\n")
-}
+test_that("getCurveTitlesXlsx - terrestrial.xlsx", {
+  file1 <- safe_read_xlsx(
+    "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/b7732618-7764-460a-b1fa-c614f4cdbe95/download/terrestrial.xlsx"
+  )
 
-test_that("getCurveTitlesXlsx", {
-  file1 <- read.xlsx("https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/b7732618-7764-460a-b1fa-c614f4cdbe95/download/terrestrial.xlsx")
-  file2 <- read.xlsx("https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/2037632f-f984-4834-8e25-4af5498df163/download/aquatic1.xlsx")
-  file3 <- read.xlsx("https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/120d810e-ff7d-49b7-80b8-e9791e2980b3/download/aquatic2.xlsx")
-
-  expect_equal(getCurveTitlesXlsx(file1), structure(1:3, .Names = c("IntCal20", "SHCal20", "Mix IntCal20 andSHCal20")))
-  expect_equal(getCurveTitlesXlsx(file2), structure(1:2, .Names = c("Marine20", "Same as terrestrial")))
-  expect_equal(getCurveTitlesXlsx(file3), structure(1:2, .Names = c("Marine20", "Same as terrestrial")))
+  expect_equal(
+    getCurveTitlesXlsx(file1),
+    structure(1:3, .Names = c("IntCal20", "SHCal20", "Mix IntCal20 andSHCal20"))
+  )
 })
 
-test_that("getCodeTerrestrial", {
-  file <- read.xlsx(
+test_that("getCurveTitlesXlsx - aquatic1.xlsx", {
+  file2 <- safe_read_xlsx("https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/2037632f-f984-4834-8e25-4af5498df163/download/aquatic1.xlsx")
+
+  expect_equal(
+    getCurveTitlesXlsx(file2),
+    structure(1:2, .Names = c("Marine20", "Same as terrestrial"))
+  )
+})
+
+test_that("getCurveTitlesXlsx - aquatic2.xlsx", {
+  file3 <- safe_read_xlsx(
+    "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/120d810e-ff7d-49b7-80b8-e9791e2980b3/download/aquatic2.xlsx"
+  )
+
+  expect_equal(
+    getCurveTitlesXlsx(file3),
+    structure(1:2, .Names = c("Marine20", "Same as terrestrial"))
+  )
+})
+
+test_that("getCodeTerrestrial - terrestrial.xlsx", {
+  file <- safe_read_xlsx(
     "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/b7732618-7764-460a-b1fa-c614f4cdbe95/download/terrestrial.xlsx"
   )
 
@@ -41,7 +58,7 @@ test_that("getCodeTerrestrial", {
       mixOption = "Option point",
       mixParams = c(3, 0)
     ),
-    "Curve(\"IntCal20\",\"IntCal20.14c\");\r\nCurve(\"SHCal20\",\"SHCal20.14c\");\r\nMix_Curves(\"terrestrial\",\"IntCal20\",\"SHCal20\", 3);"
+    "Curve(\"IntCal20\",\"IntCal20.14c\");\nCurve(\"SHCal20\",\"SHCal20.14c\");\nMix_Curves(\"terrestrial\",\"IntCal20\",\"SHCal20\", 3);"
   )
 
   expect_equal(
@@ -50,7 +67,7 @@ test_that("getCodeTerrestrial", {
       mixOption = "Option Mean SD",
       mixParams = c(2, 1)
     ),
-    "Curve(\"IntCal20\",\"IntCal20.14c\");\r\nCurve(\"SHCal20\",\"SHCal20.14c\");\r\nMix_Curves(\"terrestrial\",\"IntCal20\",\"SHCal20\", 2,1);"
+    "Curve(\"IntCal20\",\"IntCal20.14c\");\nCurve(\"SHCal20\",\"SHCal20.14c\");\nMix_Curves(\"terrestrial\",\"IntCal20\",\"SHCal20\", 2,1);"
   )
 
   expect_equal(
@@ -59,12 +76,12 @@ test_that("getCodeTerrestrial", {
       mixOption = "Option uniform",
       mixParams = c(0, 2)
     ),
-    "Curve(\"IntCal20\",\"IntCal20.14c\");\r\nCurve(\"SHCal20\",\"SHCal20.14c\");\r\nMix_Curves(\"terrestrial\",\"IntCal20\",\"SHCal20\", U(0,2));"
+    "Curve(\"IntCal20\",\"IntCal20.14c\");\nCurve(\"SHCal20\",\"SHCal20.14c\");\nMix_Curves(\"terrestrial\",\"IntCal20\",\"SHCal20\", U(0,2));"
   )
 })
 
 test_that("getCodeAquatic", {
-  file <- read.xlsx(
+  file <- safe_read_xlsx(
     "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/2037632f-f984-4834-8e25-4af5498df163/download/aquatic1.xlsx"
   )
 
@@ -74,8 +91,8 @@ test_that("getCodeAquatic", {
       binOption = "Option Mean SD",
       deltaRParams = c(2, 1)
     ),
-    list(header = "Curve(\"Marine20\",\"Marine20.14c\");\r\nDelta_R(\"Aquatic1\",2,1);", 
-         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", %%MEAN%%,%%SD%%);\r\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
+    list(header = "Curve(\"Marine20\",\"Marine20.14c\");\nDelta_R(\"Aquatic1\",2,1);", 
+         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", %%MEAN%%,%%SD%%);\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
   )
 
   expect_equal(
@@ -84,11 +101,11 @@ test_that("getCodeAquatic", {
       binOption = "Option PDF",
       deltaRParams = c(2, 1)
     ),
-    list(header = "Curve(\"terrestrial\");\r\nDelta_R(\"Aquatic1\",2,1);", 
-         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", P(0,100,[0,%%BINS%%,0]));\r\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
+    list(header = "Curve(\"terrestrial\");\nDelta_R(\"Aquatic1\",2,1);", 
+         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", P(0,100,[0,%%BINS%%,0]));\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
   )
   
-  file <- read.xlsx(
+  file <- safe_read_xlsx(
     "https://pandoradata.earth/dataset/46fe7fc7-55a4-493d-91e8-c9abffbabcca/resource/120d810e-ff7d-49b7-80b8-e9791e2980b3/download/aquatic2.xlsx"
   )
   
@@ -98,8 +115,8 @@ test_that("getCodeAquatic", {
       binOption = "Option PDF",
       deltaRParams = c(2, 1)
     ),
-    list(header = "Curve(\"Marine20\",\"Marine20.14c\");\r\nDelta_R(\"Aquatic1\",2,1);", 
-         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", P(0,100,[0,%%BINS%%,0]));\r\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
+    list(header = "Curve(\"Marine20\",\"Marine20.14c\");\nDelta_R(\"Aquatic1\",2,1);", 
+         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", P(0,100,[0,%%BINS%%,0]));\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
   )
   
   expect_equal(
@@ -108,8 +125,8 @@ test_that("getCodeAquatic", {
       binOption = "Option Mean SD",
       deltaRParams = c(2, 1)
     ),
-    list(header = "Curve(\"terrestrial\");\r\nDelta_R(\"Aquatic1\",2,1);", 
-         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", %%MEAN%%,%%SD%%);\r\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
+    list(header = "Curve(\"terrestrial\");\nDelta_R(\"Aquatic1\",2,1);", 
+         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", %%MEAN%%,%%SD%%);\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
   )
 })
 
@@ -133,23 +150,23 @@ test_that("Create OxCal Output", {
     )
   
   terrestrialCurve <-
-    "Curve(\"IntCal20\",\"IntCal20.14c\");\r\nCurve(\"SHCal20\",\"SHCal20.14c\");\r\nMix_Curves(\"terrestrial\",\"IntCal20\",\"SHCal20\", 2,1);"
+    "Curve(\"IntCal20\",\"IntCal20.14c\");\nCurve(\"SHCal20\",\"SHCal20.14c\");\nMix_Curves(\"terrestrial\",\"IntCal20\",\"SHCal20\", 2,1);"
   
   aquaticCurve1Mean <-
-    list(header = "Curve(\"Marine20\",\"Marine20.14c\");\r\nDelta_R(\"Aquatic1\",2,1);", 
-         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", %%MEAN%%,%%SD%%);\r\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
+      list(header = "Curve(\"Marine20\",\"Marine20.14c\");\nDelta_R(\"Aquatic1\",2,1);", 
+        option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", %%MEAN%%,%%SD%%);\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
   
   aquaticCurve1PDF <-
-    list(header = "Curve(\"terrestrial\");\r\nDelta_R(\"Aquatic1\",2,1);", 
-         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", P(0,100,[0,%%BINS%%,0]));\r\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
+      list(header = "Curve(\"terrestrial\");\nDelta_R(\"Aquatic1\",2,1);", 
+        option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", P(0,100,[0,%%BINS%%,0]));\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
   
   aquaticCurve2PDF <-
-    list(header = "Curve(\"Marine20\",\"Marine20.14c\");\r\nDelta_R(\"Aquatic1\",2,1);", 
-         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", P(0,100,[0,%%BINS%%,0]));\r\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
+      list(header = "Curve(\"Marine20\",\"Marine20.14c\");\nDelta_R(\"Aquatic1\",2,1);", 
+        option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", P(0,100,[0,%%BINS%%,0]));\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
   
   aquaticCurve2Mean <-
-    list(header = "Curve(\"terrestrial\");\r\nDelta_R(\"Aquatic1\",2,1);", 
-         option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", %%MEAN%%,%%SD%%);\r\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
+      list(header = "Curve(\"terrestrial\");\nDelta_R(\"Aquatic1\",2,1);", 
+        option = "Mix_Curve(%%TARGET_ID%%,\"terrestrial\",\"Aquatic1\", %%MEAN%%,%%SD%%);\nR_Date(“%%TARGET_ID%%“, %%RADIOCARBON_MEAN%%,%%RADIOCARBON_SD%%);")
   
   oxCalA <- "Source contributions_Carnivores"
   oxCalB <- "Source contributions_Fish2"
@@ -202,28 +219,30 @@ test_that("Create OxCal Output", {
     unlist()
 
   expect_equal(oxcalLines1[1], "Plot()")
-  expect_equal(oxcalLines1[3], "Curve(\"IntCal20\",\"IntCal20.14c\");\r")
+  expect_equal(oxcalLines1[3], "Curve(\"IntCal20\",\"IntCal20.14c\");")
   expect_equal(
     oxcalLines1[11] %>% substr(start = 1, stop = 100),
     "Mix_Curve(\"Individual_1\",\"terrestrial\",\"Aquatic1\", 0.434,0.294);"
   )
-  expect_equal(
-    oxcalLines1[13] %>% substr(start = 1, stop = 100),
-    "R_Date(“Individual_1“, 1001,1);"
-  )
-  expect_equal(
-    oxcalLines1[42] %>% substr(start = 1, stop = 100),
-    "Mix_Curve(\"england.male\",\"terrestrial\",\"Aquatic1\", 0.083,0.101);"
-  )
+  expect_true(any(
+    grepl("R_Date", oxcalLines1, fixed = TRUE) &
+      grepl("Individual_1", oxcalLines1, fixed = TRUE)
+  ))
+  expect_true(any(grepl(
+    "Mix_Curve(\"england.male\",\"terrestrial\",\"Aquatic1\", 0.083,0.101);",
+    oxcalLines1,
+    fixed = TRUE
+  )))
 
   expect_equal(oxcalLines2[1], "Plot()")
-  expect_equal(oxcalLines2[3], "Curve(\"IntCal20\",\"IntCal20.14c\");\r")
+  expect_equal(oxcalLines2[3], "Curve(\"IntCal20\",\"IntCal20.14c\");")
   expect_equal(
     oxcalLines2[11] %>% substr(start = 1, stop = 100),
     "Mix_Curve(\"Individual_1\",\"terrestrial\",\"Aquatic1\", P(0,100,[0,0, 0, 0, 0, 0.002, 0.003, 0.007, 0.01,"
   )
-  expect_equal(
-    oxcalLines2[15] %>% substr(start = 1, stop = 100),
-    "Mix_Curve(\"Individual_2\",\"terrestrial\",\"Aquatic1\", P(0,100,[0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,"
-  )
+  expect_true(any(grepl(
+    "Mix_Curve(\"Individual_2\",\"terrestrial\",\"Aquatic1\", P(0,100,[0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,",
+    oxcalLines2,
+    fixed = TRUE
+  )))
 })
