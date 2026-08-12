@@ -52,7 +52,8 @@ WORKDIR /opt/ReSources
 COPY . .
 RUN installPackage DSSM \
     && installPackage \
-    && chown -R inwt /usr/local/lib/R/site-library/ReSources
+    && chown -R inwt /usr/local/lib/R/site-library/ReSources \
+    && chown -R inwt /opt/ReSources
 
 # 6. Switch to non-root for everything runtime-related
 USER inwt
